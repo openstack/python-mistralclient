@@ -19,4 +19,5 @@
 import setuptools
 
 setuptools.setup(
-    name="python-mistralclient")
+    setup_requires=['pbr'],
+    pbr=True)
