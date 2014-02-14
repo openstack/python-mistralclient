@@ -24,14 +24,10 @@ class Execution(base.Resource):
 class ExecutionManager(base.ResourceManager):
     resource_class = Execution
 
-    def create(self, workbook_name, target_task):
-        self._ensure_not_empty(workbook_name=workbook_name,
-                               target_task=target_task)
+    def create(self, workbook_name, task):
+        self._ensure_not_empty(workbook_name=workbook_name, task=task)
 
-        data = {
-            'workbook_name': workbook_name,
-            'target_task': target_task
-        }
+        data = {'workbook_name': workbook_name, 'task': task}
 
         return self._create('/workbooks/%s/executions' % workbook_name, data)
 
