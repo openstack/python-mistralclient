@@ -14,7 +14,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import json
+
 from mistralclient.api import base
+from mistralclient import exceptions as ex
 
 
 class Execution(base.Resource):
@@ -24,10 +27,31 @@ class Execution(base.Resource):
 class ExecutionManager(base.ResourceManager):
     resource_class = Execution
 
-    def create(self, workbook_name, task):
+    def _validate_context_str(self, context):
+        msg = 'Context must be a dictionary or json compatible string.'
+
+        if not isinstance(context, str):
+            raise ex.IllegalArgumentException(msg)
+
+        try:
+            json.loads(context)
+        except Exception as e:
+            raise ex.IllegalArgumentException(msg + e)
+
+    def create(self, workbook_name, task, context=None):
         self._ensure_not_empty(workbook_name=workbook_name, task=task)
 
-        data = {'workbook_name': workbook_name, 'task': task}
+        if isinstance(context, dict):
+            context_str = str(context)
+        else:
+            self._validate_context_str(context)
+            context_str = context
+
+        data = {
+            'workbook_name': workbook_name,
+            'task': task,
+            'context': context_str
+        }
 
         return self._create('/workbooks/%s/executions' % workbook_name, data)
 

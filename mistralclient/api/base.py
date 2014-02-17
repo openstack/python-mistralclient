@@ -138,7 +138,7 @@ class ResourceManager(object):
 
 def get_json(response):
     """This method provided backward compatibility with old versions
-    of requests library
+    of requests library.
 
     """
     json_field_or_function = getattr(response, 'json', None)

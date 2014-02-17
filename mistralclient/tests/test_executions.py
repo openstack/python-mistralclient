@@ -14,6 +14,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import unittest2
+
 from mistralclient.tests import base
 
 # TODO: Later we need additional tests verifying all the errors etc.
@@ -37,12 +39,12 @@ EXECS = [
 
 
 class TestExecutions(base.BaseClientTest):
-
     def test_create(self):
         self.mock_http_post(json=EXECS[0])
 
         ex = self.executions.create(EXECS[0]['workbook_name'],
-                                    EXECS[0]['target_task'])
+                                    EXECS[0]['target_task'],
+                                    EXECS[0]['context'])
 
         self.assertIsNotNone(ex)
         self.assertEqual(EXECS[0]['id'], ex.id)
@@ -50,6 +52,18 @@ class TestExecutions(base.BaseClientTest):
         self.assertEqual(EXECS[0]['target_task'], ex.target_task)
         self.assertEqual(EXECS[0]['state'], ex.state)
         self.assertEqual(EXECS[0]['context'], ex.context)
+
+    @unittest2.expectedFailure
+    def test_create_failure1(self):
+        self.executions.create(EXECS[0]['workbook_name'],
+                               EXECS[0]['target_task'],
+                               "sdfsdf")
+
+    @unittest2.expectedFailure
+    def test_create_failure2(self):
+        self.executions.create(EXECS[0]['workbook_name'],
+                               EXECS[0]['target_task'],
+                               list('343', 'sdfsd'))
 
     def test_update(self):
         self.mock_http_put(json=EXECS[0])
