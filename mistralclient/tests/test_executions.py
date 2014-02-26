@@ -53,6 +53,15 @@ class TestExecutions(base.BaseClientTest):
         self.assertEqual(EXECS[0]['state'], ex.state)
         self.assertEqual(EXECS[0]['context'], ex.context)
 
+    def test_create_with_empty_context(self):
+        execs = EXECS[0].copy()
+        execs.pop('context')
+        self.mock_http_post(json=execs)
+        ex = self.executions.create(execs['workbook_name'],
+                                    execs['target_task'])
+        with self.assertRaises(AttributeError):
+            ex.context
+
     @unittest2.expectedFailure
     def test_create_failure1(self):
         self.executions.create(EXECS[0]['workbook_name'],

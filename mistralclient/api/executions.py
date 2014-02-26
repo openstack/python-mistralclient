@@ -27,31 +27,26 @@ class Execution(base.Resource):
 class ExecutionManager(base.ResourceManager):
     resource_class = Execution
 
-    def _validate_context_str(self, context):
+    def _get_context_as_str(self, context):
         msg = 'Context must be a dictionary or json compatible string.'
-
-        if not isinstance(context, str):
-            raise ex.IllegalArgumentException(msg)
+        context_as_str = str(context)
 
         try:
-            json.loads(context)
+            json.loads(context_as_str)
         except Exception as e:
             raise ex.IllegalArgumentException(msg + e)
+        return context_as_str
 
     def create(self, workbook_name, task, context=None):
         self._ensure_not_empty(workbook_name=workbook_name, task=task)
 
-        if isinstance(context, dict):
-            context_str = str(context)
-        else:
-            self._validate_context_str(context)
-            context_str = context
-
         data = {
             'workbook_name': workbook_name,
-            'task': task,
-            'context': context_str
+            'task': task
         }
+
+        if context is not None:
+            data['context'] = self._get_context_as_str(context)
 
         return self._create('/workbooks/%s/executions' % workbook_name, data)
 
