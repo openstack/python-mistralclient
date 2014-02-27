@@ -59,3 +59,14 @@ class BaseClientTest(unittest2.TestCase):
     def mock_http_delete(self, status_code=204):
         self._client.http_client.delete = \
             mock.MagicMock(return_value=FakeResponse(status_code))
+
+
+class BaseCommandTest(unittest2.TestCase):
+    def setUp(self):
+        self.app = mock.Mock()
+        self.app.client = mock.Mock()
+
+    def call(self, command, app_args=[], prog_name=''):
+        cmd = command(self.app, app_args)
+        parsed_args = cmd.get_parser(prog_name).parse_args(app_args)
+        return cmd.take_action(parsed_args)

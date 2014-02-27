@@ -56,8 +56,8 @@ class Client(object):
                      input_auth_token=None):
         if mistral_url and not isinstance(mistral_url, six.string_types):
             raise RuntimeError('Mistral url should be string')
-        if (isinstance(project_name, six.string_types) or
-                isinstance(project_id, six.string_types)):
+        if ((isinstance(project_name, six.string_types) and project_name) or
+                (isinstance(project_id, six.string_types) and project_id)):
             if project_name and project_id:
                 raise RuntimeError('Only project name or '
                                    'project id should be set')
@@ -77,12 +77,10 @@ class Client(object):
             token = keystone.auth_token
             user_id = keystone.user_id
             if project_name and not project_id:
-                if keystone.tenants.find(name=project_name):
-                    project_id = str(keystone.tenants.find(
-                        name=project_name).id)
+                project_id = keystone.project_id
         else:
             raise RuntimeError('Project name or project id should'
-                               ' not be empty and should be string')
+                               ' not be empty and should be non-empty string')
 
         if not mistral_url:
             catalog = keystone.service_catalog.get_endpoints(service_type)

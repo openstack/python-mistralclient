@@ -15,7 +15,8 @@
 #    limitations under the License.
 
 import json
-import logging
+
+from mistralclient.openstack.common import log as logging
 
 LOG = logging.getLogger(__name__)
 

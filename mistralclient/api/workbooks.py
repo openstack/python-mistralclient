@@ -44,7 +44,7 @@ class WorkbookManager(base.ResourceManager):
             'tags': tags,
         }
 
-        return self._update('/workbooks', data)
+        return self._update('/workbooks/%s' % name, data)
 
     def list(self):
         return self._list('/workbooks', 'workbooks')
