@@ -33,11 +33,8 @@ class FakeResponse(object):
 
 
 class BaseClientTest(unittest2.TestCase):
-    @mock.patch('keystoneclient.v3.client.Client')
-    def setUp(self, keystone):
-        keystone.return_value = mock.Mock()
+    def setUp(self):
         self._client = client.Client(project_name="test",
-                                     auth_url="v3.0",
                                      mistral_url="test")
         self.workbooks = self._client.workbooks
         self.executions = self._client.executions

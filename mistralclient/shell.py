@@ -176,7 +176,7 @@ class MistralShell(App):
             '--os-auth-url',
             action='store',
             dest='auth_url',
-            default=env('OS_AUTH_URL', default='http://localhost:5000/v3'),
+            default=env('OS_AUTH_URL'),
             help='Authentication URL (Env: OS_AUTH_URL)'
         )
         return parser
@@ -190,7 +190,7 @@ class MistralShell(App):
                              project_id=self.options.tenant_id,
                              endpoint_type='publicURL',
                              service_type='workflow',
-                             input_auth_token=self.options.token)
+                             auth_token=self.options.token)
 
 
 def main(argv=sys.argv[1:]):

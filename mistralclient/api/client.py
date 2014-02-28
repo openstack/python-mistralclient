@@ -29,19 +29,23 @@ class Client(object):
     def __init__(self, mistral_url=None, username=None, api_key=None,
                  project_name=None, auth_url=None, project_id=None,
                  endpoint_type='publicURL', service_type='workflow',
-                 input_auth_token=None):
+                 auth_token=None, user_id=None):
 
-        (mistral_url,
-         token,
-         project_id,
-         user_id) = self.authenticate(mistral_url, username,
-                                      api_key, project_name,
-                                      auth_url, project_id,
-                                      endpoint_type, service_type,
-                                      input_auth_token)
+        if mistral_url and not isinstance(mistral_url, six.string_types):
+            raise RuntimeError('Mistral url should be string')
+
+        if auth_url:
+            (mistral_url, auth_token, project_id, user_id) = \
+                self.authenticate(mistral_url, username, api_key,
+                                  project_name, auth_url, project_id,
+                                  endpoint_type, service_type, auth_token,
+                                  user_id)
+
+        if not mistral_url:
+            mistral_url = "http://localhost:8989/v1"
 
         self.http_client = httpclient.HTTPClient(mistral_url,
-                                                 token,
+                                                 auth_token,
                                                  project_id,
                                                  user_id)
         # Create all resource managers.
@@ -53,34 +57,42 @@ class Client(object):
     def authenticate(self, mistral_url=None, username=None, api_key=None,
                      project_name=None, auth_url=None, project_id=None,
                      endpoint_type='publicURL', service_type='workflow',
-                     input_auth_token=None):
-        if mistral_url and not isinstance(mistral_url, six.string_types):
-            raise RuntimeError('Mistral url should be string')
-        if ((isinstance(project_name, six.string_types) and project_name) or
-                (isinstance(project_id, six.string_types) and project_id)):
-            if project_name and project_id:
-                raise RuntimeError('Only project name or '
-                                   'project id should be set')
+                     auth_token=None, user_id=None):
 
-            if "v2.0" in auth_url:
-                raise RuntimeError('Mistral supports only v3  '
-                                   'keystone API.')
+        if (not (project_name or project_id) or
+            not (isinstance(project_name, six.string_types) or
+                 isinstance(project_id, six.string_types))):
+            raise RuntimeError('Either project name or project id should'
+                               ' be non-empty string')
+        if project_name and project_id:
+            raise RuntimeError('Only project name or '
+                               'project id should be set')
 
-            keystone = keystone_client.Client(username=username,
-                                              password=api_key,
-                                              token=input_auth_token,
-                                              tenant_id=project_id,
-                                              tenant_name=project_name,
-                                              auth_url=auth_url)
+        if (not (username or user_id) or
+            not (isinstance(username, six.string_types) or
+                 isinstance(user_id, six.string_types))):
+            raise RuntimeError('Either user name or user id should'
+                               ' be non-empty string')
+        if username and user_id:
+            raise RuntimeError('Only user name or user id'
+                               ' should be set')
 
-            keystone.authenticate()
-            token = keystone.auth_token
-            user_id = keystone.user_id
-            if project_name and not project_id:
-                project_id = keystone.project_id
-        else:
-            raise RuntimeError('Project name or project id should'
-                               ' not be empty and should be non-empty string')
+        if "v2.0" in auth_url:
+            raise RuntimeError('Mistral supports only v3  '
+                               'keystone API.')
+
+        keystone = keystone_client.Client(username=username,
+                                          user_id=user_id,
+                                          password=api_key,
+                                          token=auth_token,
+                                          project_id=project_id,
+                                          project_name=project_name,
+                                          auth_url=auth_url)
+
+        keystone.authenticate()
+        token = keystone.auth_token
+        user_id = keystone.user_id
+        project_id = keystone.project_id
 
         if not mistral_url:
             catalog = keystone.service_catalog.get_endpoints(service_type)
@@ -89,8 +101,5 @@ class Client(object):
                     if str(e_type).lower() == str(endpoint_type).lower():
                         mistral_url = endpoint
                         break
-
-        if not mistral_url:
-            mistral_url = "http://localhost:8989/v1"
 
         return mistral_url, token, project_id, user_id

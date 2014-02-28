@@ -18,7 +18,7 @@ import requests
 
 
 class HTTPClient(object):
-    def __init__(self, base_url, token, project_id, user_id):
+    def __init__(self, base_url, token=None, project_id=None, user_id=None):
         self.base_url = base_url
         self.token = token
         self.project_id = project_id
@@ -51,12 +51,17 @@ class HTTPClient(object):
     def _update_headers(self, headers):
         if not headers:
             headers = {}
+
         token = headers.get('x-auth-token', self.token)
-        headers['x-auth-token'] = token
+        if token:
+            headers['x-auth-token'] = token
 
         project_id = headers.get('X-Project-Id', self.project_id)
-        headers['X-Project-Id'] = project_id
+        if project_id:
+            headers['X-Project-Id'] = project_id
 
         user_id = headers.get('X-User-Id', self.user_id)
-        headers['X-User-Id'] = user_id
+        if user_id:
+            headers['X-User-Id'] = user_id
+
         return headers
