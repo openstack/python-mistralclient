@@ -15,8 +15,10 @@
 #    limitations under the License.
 
 import unittest2
+import json
 
 from mistralclient.tests import base
+from mistralclient.api.executions import Execution
 
 # TODO: Later we need additional tests verifying all the errors etc.
 
@@ -37,85 +39,103 @@ EXECS = [
     }
 ]
 
+URL_TEMPLATE = '/workbooks/%s/executions'
+URL_TEMPLATE_ID = '/workbooks/%s/executions/%s'
+
 
 class TestExecutions(base.BaseClientTest):
     def test_create(self):
-        self.mock_http_post(json=EXECS[0])
+        mock = self.mock_http_post(content=EXECS[0])
+        body = {
+            'task': EXECS[0]['target_task'],
+            'context': EXECS[0]['context'],
+            'workbook_name': EXECS[0]['workbook_name']
+        }
 
         ex = self.executions.create(EXECS[0]['workbook_name'],
                                     EXECS[0]['target_task'],
                                     EXECS[0]['context'])
 
         self.assertIsNotNone(ex)
-        self.assertEqual(EXECS[0]['id'], ex.id)
-        self.assertEqual(EXECS[0]['workbook_name'], ex.workbook_name)
-        self.assertEqual(EXECS[0]['target_task'], ex.target_task)
-        self.assertEqual(EXECS[0]['state'], ex.state)
-        self.assertEqual(EXECS[0]['context'], ex.context)
+        self.assertEquals(Execution(self.executions, EXECS[0]).__dict__,
+                          ex.__dict__)
+        mock.assert_called_once_with(
+            URL_TEMPLATE % EXECS[0]['workbook_name'],
+            json.dumps(body))
 
     def test_create_with_empty_context(self):
-        execs = EXECS[0].copy()
-        execs.pop('context')
-        self.mock_http_post(json=execs)
-        ex = self.executions.create(execs['workbook_name'],
-                                    execs['target_task'])
-        with self.assertRaises(AttributeError):
-            ex.context
+        mock = self.mock_http_post(content=EXECS[0])
+        body = {
+            'task': EXECS[0]['target_task'],
+            'workbook_name': EXECS[0]['workbook_name']
+        }
+
+        self.executions.create(EXECS[0]['workbook_name'],
+                               EXECS[0]['target_task'])
+
+        mock.assert_called_once_with(
+            URL_TEMPLATE % EXECS[0]['workbook_name'],
+            json.dumps(body))
 
     @unittest2.expectedFailure
     def test_create_failure1(self):
+        self.mock_http_post(content=EXECS[0])
         self.executions.create(EXECS[0]['workbook_name'],
                                EXECS[0]['target_task'],
                                "sdfsdf")
 
     @unittest2.expectedFailure
     def test_create_failure2(self):
+        self.mock_http_post(content=EXECS[0])
         self.executions.create(EXECS[0]['workbook_name'],
                                EXECS[0]['target_task'],
                                list('343', 'sdfsd'))
 
     def test_update(self):
-        self.mock_http_put(json=EXECS[0])
+        mock = self.mock_http_put(content=EXECS[0])
+        body = {
+            'workbook_name': EXECS[0]['workbook_name'],
+            'id': EXECS[0]['id'],
+            'state': EXECS[0]['state']
+        }
 
         ex = self.executions.update(EXECS[0]['workbook_name'],
                                     EXECS[0]['id'],
                                     EXECS[0]['state'])
 
         self.assertIsNotNone(ex)
-        self.assertEqual(EXECS[0]['id'], ex.id)
-        self.assertEqual(EXECS[0]['workbook_name'], ex.workbook_name)
-        self.assertEqual(EXECS[0]['target_task'], ex.target_task)
-        self.assertEqual(EXECS[0]['state'], ex.state)
-        self.assertEqual(EXECS[0]['context'], ex.context)
+        self.assertEquals(Execution(self.executions, EXECS[0]).__dict__,
+                          ex.__dict__)
+        mock.assert_called_once_with(
+            URL_TEMPLATE_ID % (EXECS[0]['workbook_name'], EXECS[0]['id']),
+            json.dumps(body))
 
     def test_list(self):
-        self.mock_http_get(json={'executions': EXECS})
+        mock = self.mock_http_get(content={'executions': EXECS})
 
         executions = self.executions.list(EXECS[0]['workbook_name'])
 
         self.assertEqual(1, len(executions))
-
         ex = executions[0]
 
-        self.assertEqual(EXECS[0]['id'], ex.id)
-        self.assertEqual(EXECS[0]['workbook_name'], ex.workbook_name)
-        self.assertEqual(EXECS[0]['target_task'], ex.target_task)
-        self.assertEqual(EXECS[0]['state'], ex.state)
-        self.assertEqual(EXECS[0]['context'], ex.context)
+        self.assertEquals(Execution(self.executions, EXECS[0]).__dict__,
+                          ex.__dict__)
+        mock.assert_called_once_with(URL_TEMPLATE % EXECS[0]['workbook_name'])
 
     def test_get(self):
-        self.mock_http_get(json=EXECS[0])
+        mock = self.mock_http_get(content=EXECS[0])
 
         ex = self.executions.get(EXECS[0]['workbook_name'], EXECS[0]['id'])
 
-        self.assertEqual(EXECS[0]['id'], ex.id)
-        self.assertEqual(EXECS[0]['workbook_name'], ex.workbook_name)
-        self.assertEqual(EXECS[0]['target_task'], ex.target_task)
-        self.assertEqual(EXECS[0]['state'], ex.state)
-        self.assertEqual(EXECS[0]['context'], ex.context)
+        self.assertEquals(Execution(self.executions, EXECS[0]).__dict__,
+                          ex.__dict__)
+        mock.assert_called_once_with(
+            URL_TEMPLATE_ID % (EXECS[0]['workbook_name'], EXECS[0]['id']))
 
     def test_delete(self):
-        self.mock_http_delete(status_code=204)
+        mock = self.mock_http_delete(status_code=204)
 
-        # Just make sure it doesn't throw any exceptions.
         self.executions.delete(EXECS[0]['workbook_name'], EXECS[0]['id'])
+
+        mock.assert_called_once_with(
+            URL_TEMPLATE_ID % (EXECS[0]['workbook_name'], EXECS[0]['id']))

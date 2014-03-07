@@ -14,7 +14,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import json
+
 from mistralclient.tests import base
+from mistralclient.api.listeners import Listener
 
 # TODO: later we need additional tests verifying all the errors etc.
 
@@ -27,62 +30,85 @@ LISTENERS = [
     }
 ]
 
+URL_TEMPLATE = '/workbooks/%s/listeners'
+URL_TEMPLATE_ID = '/workbooks/%s/listeners/%s'
+
 
 class TestListeners(base.BaseClientTest):
     def test_create(self):
-        self.mock_http_post(json=LISTENERS[0])
+        mock = self.mock_http_post(content=LISTENERS[0])
+        body = {
+            'workbook_name': LISTENERS[0]['workbook_name'],
+            'description': LISTENERS[0]['description'],
+            'webhook': LISTENERS[0]['webhook'],
+            'events': None
+        }
 
         lsnr = self.listeners.create(LISTENERS[0]['workbook_name'],
                                      LISTENERS[0]['webhook'],
                                      LISTENERS[0]['description'])
 
         self.assertIsNotNone(lsnr)
-        self.assertEqual(LISTENERS[0]['id'], lsnr.id)
-        self.assertEqual(LISTENERS[0]['workbook_name'], lsnr.workbook_name)
-        self.assertEqual(LISTENERS[0]['webhook'], lsnr.webhook)
-        self.assertEqual(LISTENERS[0]['description'], lsnr.description)
+        self.assertEquals(Listener(self.listeners, LISTENERS[0]).__dict__,
+                          lsnr.__dict__)
+        mock.assert_called_once_with(
+            URL_TEMPLATE % (LISTENERS[0]['workbook_name']),
+            json.dumps(body))
 
     def test_update(self):
-        self.mock_http_put(json=LISTENERS[0])
+        mock = self.mock_http_put(content=LISTENERS[0])
+        body = {
+            'id': LISTENERS[0]['id'],
+            'workbook_name': LISTENERS[0]['workbook_name'],
+            'description': LISTENERS[0]['description'],
+            'webhook': LISTENERS[0]['webhook'],
+            'events': None
+        }
 
         lsnr = self.listeners.update(LISTENERS[0]['workbook_name'],
+                                     LISTENERS[0]['id'],
                                      LISTENERS[0]['webhook'],
                                      LISTENERS[0]['description'])
 
         self.assertIsNotNone(lsnr)
-        self.assertEqual(LISTENERS[0]['id'], lsnr.id)
-        self.assertEqual(LISTENERS[0]['workbook_name'], lsnr.workbook_name)
-        self.assertEqual(LISTENERS[0]['webhook'], lsnr.webhook)
-        self.assertEqual(LISTENERS[0]['description'], lsnr.description)
+        self.assertEquals(Listener(self.listeners, LISTENERS[0]).__dict__,
+                          lsnr.__dict__)
+        mock.assert_called_once_with(
+            URL_TEMPLATE_ID % (LISTENERS[0]['workbook_name'],
+                               LISTENERS[0]['id']),
+            json.dumps(body))
 
     def test_list(self):
-        self.mock_http_get(json={'listeners': LISTENERS})
+        mock = self.mock_http_get(content={'listeners': LISTENERS})
 
         listeners = self.listeners.list(LISTENERS[0]['workbook_name'])
 
         self.assertEqual(1, len(listeners))
-
         lsnr = listeners[0]
 
-        self.assertEqual(LISTENERS[0]['id'], lsnr.id)
-        self.assertEqual(LISTENERS[0]['workbook_name'], lsnr.workbook_name)
-        self.assertEqual(LISTENERS[0]['webhook'], lsnr.webhook)
-        self.assertEqual(LISTENERS[0]['description'], lsnr.description)
+        self.assertEquals(Listener(self.listeners, LISTENERS[0]).__dict__,
+                          lsnr.__dict__)
+        mock.assert_called_once_with(
+            URL_TEMPLATE % (LISTENERS[0]['workbook_name']))
 
     def test_get(self):
-        self.mock_http_get(json=LISTENERS[0])
+        mock = self.mock_http_get(content=LISTENERS[0])
 
         lsnr = self.listeners.get(LISTENERS[0]['workbook_name'],
                                   LISTENERS[0]['id'])
 
-        self.assertEqual(LISTENERS[0]['id'], lsnr.id)
-        self.assertEqual(LISTENERS[0]['workbook_name'], lsnr.workbook_name)
-        self.assertEqual(LISTENERS[0]['webhook'], lsnr.webhook)
-        self.assertEqual(LISTENERS[0]['description'], lsnr.description)
+        self.assertEquals(Listener(self.listeners, LISTENERS[0]).__dict__,
+                          lsnr.__dict__)
+        mock.assert_called_once_with(
+            URL_TEMPLATE_ID % (LISTENERS[0]['workbook_name'],
+                               LISTENERS[0]['id']))
 
     def test_delete(self):
-        self.mock_http_delete(status_code=204)
+        mock = self.mock_http_delete(status_code=204)
 
-        # Just make sure it doesn't throw any exceptions.
         self.listeners.delete(LISTENERS[0]['workbook_name'],
                               LISTENERS[0]['id'])
+
+        mock.assert_called_once_with(
+            URL_TEMPLATE_ID % (LISTENERS[0]['workbook_name'],
+                               LISTENERS[0]['id']))

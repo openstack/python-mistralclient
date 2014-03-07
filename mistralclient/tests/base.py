@@ -16,6 +16,7 @@
 
 import unittest2
 import mock
+import json
 
 from mistralclient.api import client
 
@@ -23,13 +24,12 @@ from mistralclient.api import client
 class FakeResponse(object):
     """Fake response for testing Mistral Client."""
 
-    def __init__(self, status_code, json_values={}, content=None):
+    def __init__(self, status_code, content=None):
         self.status_code = status_code
-        self.json_values = json_values
         self.content = content
 
     def json(self):
-        return self.json_values
+        return json.loads(self.content)
 
 
 class BaseClientTest(unittest2.TestCase):
@@ -41,21 +41,38 @@ class BaseClientTest(unittest2.TestCase):
         self.tasks = self._client.tasks
         self.listeners = self._client.listeners
 
-    def mock_http_get(self, json, status_code=200):
+    def mock_http_get(self, content, status_code=200):
+        if isinstance(content, dict):
+            content = json.dumps(content)
+
         self._client.http_client.get = \
-            mock.MagicMock(return_value=FakeResponse(status_code, json))
+            mock.MagicMock(return_value=FakeResponse(status_code, content))
 
-    def mock_http_post(self, json, status_code=201):
+        return self._client.http_client.get
+
+    def mock_http_post(self, content, status_code=201):
+        if isinstance(content, dict):
+            content = json.dumps(content)
+
         self._client.http_client.post = \
-            mock.MagicMock(return_value=FakeResponse(status_code, json))
+            mock.MagicMock(return_value=FakeResponse(status_code, content))
 
-    def mock_http_put(self, json, status_code=200):
+        return self._client.http_client.post
+
+    def mock_http_put(self, content, status_code=200):
+        if isinstance(content, dict):
+            content = json.dumps(content)
+
         self._client.http_client.put = \
-            mock.MagicMock(return_value=FakeResponse(status_code, json))
+            mock.MagicMock(return_value=FakeResponse(status_code, content))
+
+        return self._client.http_client.put
 
     def mock_http_delete(self, status_code=204):
         self._client.http_client.delete = \
             mock.MagicMock(return_value=FakeResponse(status_code))
+
+        return self._client.http_client.delete
 
 
 class BaseCommandTest(unittest2.TestCase):

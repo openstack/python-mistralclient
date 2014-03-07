@@ -14,8 +14,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import mock
+import json
+
 from mistralclient.tests import base
+from mistralclient.api.workbooks import Workbook
 
 # TODO: later we need additional tests verifying all the errors etc.
 
@@ -52,71 +54,82 @@ Workflow:
             param2: 42
 """
 
+URL_TEMPLATE = '/workbooks'
+URL_TEMPLATE_NAME = '/workbooks/%s'
+URL_TEMPLATE_DEFINITION = '/workbooks/%s/definition'
+
 
 class TestWorkbooks(base.BaseClientTest):
     def test_create(self):
-        self.mock_http_post(json=WORKBOOKS[0])
+        mock = self.mock_http_post(content=WORKBOOKS[0])
 
         wb = self.workbooks.create(WORKBOOKS[0]['name'],
                                    WORKBOOKS[0]['description'],
                                    WORKBOOKS[0]['tags'])
 
         self.assertIsNotNone(wb)
-        self.assertEqual(WORKBOOKS[0]['name'], wb.name)
-        self.assertEqual(WORKBOOKS[0]['description'], wb.description)
-        self.assertEqual(WORKBOOKS[0]['tags'], wb.tags)
+        self.assertEquals(Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
+                          wb.__dict__)
+        mock.assert_called_once_with(URL_TEMPLATE, json.dumps(WORKBOOKS[0]))
 
     def test_update(self):
-        self.mock_http_put(json=WORKBOOKS[0])
+        mock = self.mock_http_put(content=WORKBOOKS[0])
 
         wb = self.workbooks.update(WORKBOOKS[0]['name'],
                                    WORKBOOKS[0]['description'],
                                    WORKBOOKS[0]['tags'])
 
         self.assertIsNotNone(wb)
-        self.assertEqual(WORKBOOKS[0]['name'], wb.name)
-        self.assertEqual(WORKBOOKS[0]['description'], wb.description)
-        self.assertEqual(WORKBOOKS[0]['tags'], wb.tags)
+        self.assertEquals(Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
+                          wb.__dict__)
+        mock.assert_called_once_with(
+            URL_TEMPLATE_NAME % WORKBOOKS[0]['name'],
+            json.dumps(WORKBOOKS[0]))
 
     def test_list(self):
-        self.mock_http_get(json={'workbooks': WORKBOOKS})
+        mock = self.mock_http_get(content={'workbooks': WORKBOOKS})
 
         workbooks = self.workbooks.list()
 
         self.assertEqual(1, len(workbooks))
-
         wb = workbooks[0]
 
-        self.assertEqual(WORKBOOKS[0]['name'], wb.name)
-        self.assertEqual(WORKBOOKS[0]['description'], wb.description)
-        self.assertEqual(WORKBOOKS[0]['tags'], wb.tags)
+        self.assertEquals(Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
+                          wb.__dict__)
+        mock.assert_called_once_with(URL_TEMPLATE)
 
     def test_get(self):
-        self.mock_http_get(json=WORKBOOKS[0])
+        mock = self.mock_http_get(content=WORKBOOKS[0])
 
         wb = self.workbooks.get(WORKBOOKS[0]['name'])
 
         self.assertIsNotNone(wb)
-        self.assertEqual(WORKBOOKS[0]['name'], wb.name)
-        self.assertEqual(WORKBOOKS[0]['description'], wb.description)
-        self.assertEqual(WORKBOOKS[0]['tags'], wb.tags)
+        self.assertEquals(Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
+                          wb.__dict__)
+        mock.assert_called_once_with(URL_TEMPLATE_NAME % WORKBOOKS[0]['name'])
 
     def test_delete(self):
-        self.mock_http_delete(status_code=204)
+        mock = self.mock_http_delete(status_code=204)
 
-        # Just make sure it doesn't throw any exceptions.
         self.workbooks.delete(WORKBOOKS[0]['name'])
 
-    def test_upload_definition(self):
-        self.mock_http_put(None, status_code=200)
+        mock.assert_called_once_with(URL_TEMPLATE_NAME % WORKBOOKS[0]['name'])
 
-        # Just make sure it doesn't throw any exceptions.
+    def test_upload_definition(self):
+        mock = self.mock_http_put(None, status_code=200)
+
         self.workbooks.upload_definition("my_workbook", WB_DEF)
 
+        mock.assert_called_once_with(
+            URL_TEMPLATE_DEFINITION % WORKBOOKS[0]['name'],
+            WB_DEF,
+            headers={'content-type': 'text/plain'})
+
     def test_get_definition(self):
-        self._client.http_client.get =\
-            mock.MagicMock(return_value=base.FakeResponse(200, None, WB_DEF))
+        mock = self.mock_http_get(status_code=200, content=WB_DEF)
 
         text = self.workbooks.get_definition("my_workbook")
 
         self.assertEqual(WB_DEF, text)
+        mock.assert_called_once_with(URL_TEMPLATE_DEFINITION
+                                     % WORKBOOKS[0]['name'])
