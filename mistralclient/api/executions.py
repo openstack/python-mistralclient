@@ -28,14 +28,17 @@ class ExecutionManager(base.ResourceManager):
     resource_class = Execution
 
     def _get_context_as_str(self, context):
-        msg = 'Context must be a dictionary or json compatible string.'
-        context_as_str = str(context)
+        msg = 'Context must be a dictionary or json compatible string:'
 
         try:
-            json.loads(context_as_str)
+            if isinstance(context, dict):
+                context = json.dumps(context)
+            else:
+                json.loads(context)
         except Exception as e:
-            raise ex.IllegalArgumentException(msg + e)
-        return context_as_str
+            raise ex.IllegalArgumentException(' '.join((msg, str(e))))
+
+        return context
 
     def create(self, workbook_name, task, context=None):
         self._ensure_not_empty(workbook_name=workbook_name, task=task)
@@ -45,7 +48,7 @@ class ExecutionManager(base.ResourceManager):
             'task': task
         }
 
-        if context is not None:
+        if context:
             data['context'] = self._get_context_as_str(context)
 
         return self._create('/workbooks/%s/executions' % workbook_name, data)
