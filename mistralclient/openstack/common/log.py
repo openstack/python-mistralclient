@@ -163,6 +163,7 @@ log_opts = [
                     'qpid=WARN',
                     'sqlalchemy=WARN',
                     'suds=INFO',
+                    'oslo.messaging=INFO',
                     'iso8601=WARN',
                     'requests.packages.urllib3.connectionpool=WARN'
                 ],
@@ -495,10 +496,16 @@ def _find_facility_from_conf():
 class RFCSysLogHandler(logging.handlers.SysLogHandler):
     def __init__(self, *args, **kwargs):
         self.binary_name = _get_binary_name()
-        super(RFCSysLogHandler, self).__init__(*args, **kwargs)
+        # Do not use super() unless type(logging.handlers.SysLogHandler)
+        #  is 'type' (Python 2.7).
+        # Use old style calls, if the type is 'classobj' (Python 2.6)
+        logging.handlers.SysLogHandler.__init__(self, *args, **kwargs)
 
     def format(self, record):
-        msg = super(RFCSysLogHandler, self).format(record)
+        # Do not use super() unless type(logging.handlers.SysLogHandler)
+        #  is 'type' (Python 2.7).
+        # Use old style calls, if the type is 'classobj' (Python 2.6)
+        msg = logging.handlers.SysLogHandler.format(self, record)
         msg = self.binary_name + ' ' + msg
         return msg
 
@@ -650,7 +657,7 @@ class ContextFormatter(logging.Formatter):
         # NOTE(sdague): default the fancier formatting params
         # to an empty string so we don't throw an exception if
         # they get used
-        for key in ('instance', 'color'):
+        for key in ('instance', 'color', 'user_identity'):
             if key not in record.__dict__:
                 record.__dict__[key] = ''
 
