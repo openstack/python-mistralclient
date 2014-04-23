@@ -103,16 +103,20 @@ class Create(ShowCommand):
             help='Execution task')
         parser.add_argument(
             'context',
-            type=json.loads,
             help='Execution context')
 
         return parser
 
     def take_action(self, parsed_args):
+        try:
+            ctx = json.loads(parsed_args.context)
+        except:
+            ctx = open(parsed_args.context).read()
+
         execution = ExecutionManager(self.app.client)\
             .create(parsed_args.workbook,
                     parsed_args.task,
-                    parsed_args.context)
+                    ctx)
 
         return format(execution)
 

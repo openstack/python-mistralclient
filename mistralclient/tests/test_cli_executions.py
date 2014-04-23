@@ -14,11 +14,14 @@
 #    under the License.
 #
 
+import pkg_resources as pkg
+
 import mock
 
 from mistralclient.tests import base
 from mistralclient.commands import executions
 from mistralclient.api.executions import Execution
+from mistralclient import version
 
 EXECUTION = Execution(mock, {
     'id': '123',
@@ -30,11 +33,21 @@ EXECUTION = Execution(mock, {
 
 class TestCLIExecutions(base.BaseCommandTest):
     @mock.patch('mistralclient.api.executions.ExecutionManager.create')
-    def test_create(self, mock):
+    def test_create_ctx_string(self, mock):
         mock.return_value = EXECUTION
 
         result = self.call(executions.Create,
                            app_args=['name', 'id', '{ "context": true }'])
+
+        self.assertEqual(('123', 'some', 'else', 'RUNNING'), result[1])
+
+    @mock.patch('mistralclient.api.executions.ExecutionManager.create')
+    def test_create_ctx_file(self, mock):
+        mock.return_value = EXECUTION
+        path = pkg.resource_filename(version.version_info.package,
+                                     'tests/resources/ctx.json')
+        result = self.call(executions.Create,
+                           app_args=['name', 'id', path])
 
         self.assertEqual(('123', 'some', 'else', 'RUNNING'), result[1])
 
