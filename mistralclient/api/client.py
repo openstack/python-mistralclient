@@ -79,7 +79,8 @@ class Client(object):
 
         if "v2.0" in auth_url:
             raise RuntimeError('Mistral supports only v3  '
-                               'keystone API.')
+                               'keystone API. Please see help and '
+                               'configure the correct auth url.')
 
         keystone = keystone_client.Client(username=username,
                                           user_id=user_id,

@@ -88,8 +88,14 @@ class Create(ShowCommand):
             help='Workbook description')
         parser.add_argument(
             'tags',
-            nargs='*',
-            help='Workbook tags')
+            nargs='?',
+            help='Workbook tags separated by ","')
+        parser.add_argument(
+            'definition',
+            nargs='?',
+            type=argparse.FileType('r'),
+            help='Workbook definition file'
+        )
 
         return parser
 
@@ -97,7 +103,12 @@ class Create(ShowCommand):
         workbook = WorkbookManager(self.app.client)\
             .create(parsed_args.name,
                     parsed_args.description,
-                    parsed_args.tags)
+                    str(parsed_args.tags).split(','))
+
+        if parsed_args.definition:
+            WorkbookManager(self.app.client)\
+                .upload_definition(parsed_args.name,
+                                   parsed_args.definition.read())
 
         return format(workbook)
 
