@@ -96,11 +96,12 @@ class Client(object):
         project_id = keystone.project_id
 
         if not mistral_url:
-            catalog = keystone.service_catalog.get_endpoints(service_type)
+            catalog = keystone.service_catalog.get_endpoints(
+                service_type=service_type,
+                endpoint_type=endpoint_type
+            )
             if service_type in catalog:
-                for e_type, endpoint in catalog.get[service_type][0].items():
-                    if str(e_type).lower() == str(endpoint_type).lower():
-                        mistral_url = endpoint
-                        break
+                service = catalog.get(service_type)
+                mistral_url = service[0].get('url') if service else None
 
         return mistral_url, token, project_id, user_id
