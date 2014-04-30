@@ -1,5 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
+import yaml
 
 from horizon import exceptions
 from horizon import forms
@@ -13,9 +14,9 @@ class ExecuteForm(forms.SelfHandlingForm):
                                     required=True,
                                     widget=forms.TextInput(
                                         attrs={'readonly': 'readonly'}))
-    task = forms.CharField(label=_("Task"),
-                           required=True,
-                           help_text=_("Name of the task to stop"))
+    task = forms.ChoiceField(label=_("Task"),
+                             required=True,
+                             help_text=_("Task to start the execution"))
     context = forms.CharField(label=_("Context"),
                               required=False,
                               initial="{}",
@@ -23,6 +24,15 @@ class ExecuteForm(forms.SelfHandlingForm):
 
     def __init__(self, request, *args, **kwargs):
         super(ExecuteForm, self).__init__(request, *args, **kwargs)
+        client = api.mistralclient(request)
+        workbook_definition = client.workbooks.get_definition(
+            kwargs['initial']['workbook_name'])
+        workbook = yaml.safe_load(workbook_definition)
+
+        task_choices = [('', _("Select a task"))]
+        for task in workbook['Workflow']['tasks']:
+            task_choices.append((task, task))
+        self.fields['task'].choices = task_choices
 
     def handle(self, request, data):
         try:

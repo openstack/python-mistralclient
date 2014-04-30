@@ -1,8 +1,8 @@
 from django.conf.urls import patterns  # noqa
 from django.conf.urls import url  # noqa
 
-from demo_dashboard.dashboards.mistral.workbooks.views \
-    import IndexView, ExecuteView
+from demo_dashboard.dashboards.mistral.workbooks.views import IndexView
+from demo_dashboard.dashboards.mistral.workbooks.views import ExecuteView
 
 WORKBOOKS = r'^(?P<workbook_name>[^/]+)/%s$'
 
