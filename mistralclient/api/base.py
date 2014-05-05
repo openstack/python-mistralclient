@@ -133,8 +133,11 @@ class ResourceManager(object):
         return self.resource_class.resource_name + 's'
 
     def _raise_api_exception(self, resp):
-        error_data = get_json(resp)
-        raise APIException(error_data["faultstring"])
+        try:
+            error_data = get_json(resp).get("faultstring")
+        except ValueError:
+            error_data = resp.content
+        raise APIException(error_data)
 
 
 def get_json(response):
