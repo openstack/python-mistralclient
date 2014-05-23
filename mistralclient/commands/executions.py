@@ -30,7 +30,7 @@ def format(execution=None):
     columns = (
         'ID',
         'Workbook',
-        'Target',
+        'Task',
         'State'
     )
 
