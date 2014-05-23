@@ -62,12 +62,19 @@ class WorkbookManager(base.ResourceManager):
     def upload_definition(self, name, text):
         self._ensure_not_empty(name=name)
 
-        self.client.http_client.put('/workbooks/%s/definition' % name,
-                                    text,
-                                    headers={'content-type': 'text/plain'})
+        resp = self.client.http_client.put('/workbooks/%s/definition' % name,
+                                           text,
+                                           headers={'content-type':
+                                                    'text/plain'})
+
+        if resp.status_code != 200:
+            self._raise_api_exception(resp)
 
     def get_definition(self, name):
         self._ensure_not_empty(name=name)
 
-        return self.client.http_client.get('/workbooks/%s/definition'
-                                           % name).content
+        resp = self.client.http_client.get('/workbooks/%s/definition'
+                                           % name)
+        if resp.status_code != 200:
+            self._raise_api_exception(resp)
+        return resp.content
