@@ -68,8 +68,8 @@ class TestWorkbooks(base.BaseClientTest):
                                    WORKBOOKS[0]['tags'])
 
         self.assertIsNotNone(wb)
-        self.assertEquals(Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
-                          wb.__dict__)
+        self.assertEqual(Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
+                         wb.__dict__)
         mock.assert_called_once_with(URL_TEMPLATE, json.dumps(WORKBOOKS[0]))
 
     def test_update(self):
@@ -80,8 +80,8 @@ class TestWorkbooks(base.BaseClientTest):
                                    WORKBOOKS[0]['tags'])
 
         self.assertIsNotNone(wb)
-        self.assertEquals(Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
-                          wb.__dict__)
+        self.assertEqual(Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
+                         wb.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE_NAME % WORKBOOKS[0]['name'],
             json.dumps(WORKBOOKS[0]))
@@ -94,8 +94,8 @@ class TestWorkbooks(base.BaseClientTest):
         self.assertEqual(1, len(workbooks))
         wb = workbooks[0]
 
-        self.assertEquals(Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
-                          wb.__dict__)
+        self.assertEqual(Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
+                         wb.__dict__)
         mock.assert_called_once_with(URL_TEMPLATE)
 
     def test_get(self):
@@ -104,8 +104,8 @@ class TestWorkbooks(base.BaseClientTest):
         wb = self.workbooks.get(WORKBOOKS[0]['name'])
 
         self.assertIsNotNone(wb)
-        self.assertEquals(Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
-                          wb.__dict__)
+        self.assertEqual(Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
+                         wb.__dict__)
         mock.assert_called_once_with(URL_TEMPLATE_NAME % WORKBOOKS[0]['name'])
 
     def test_delete(self):

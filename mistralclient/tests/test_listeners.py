@@ -49,8 +49,8 @@ class TestListeners(base.BaseClientTest):
                                      LISTENERS[0]['description'])
 
         self.assertIsNotNone(lsnr)
-        self.assertEquals(Listener(self.listeners, LISTENERS[0]).__dict__,
-                          lsnr.__dict__)
+        self.assertEqual(Listener(self.listeners, LISTENERS[0]).__dict__,
+                         lsnr.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE % (LISTENERS[0]['workbook_name']),
             json.dumps(body))
@@ -71,8 +71,8 @@ class TestListeners(base.BaseClientTest):
                                      LISTENERS[0]['description'])
 
         self.assertIsNotNone(lsnr)
-        self.assertEquals(Listener(self.listeners, LISTENERS[0]).__dict__,
-                          lsnr.__dict__)
+        self.assertEqual(Listener(self.listeners, LISTENERS[0]).__dict__,
+                         lsnr.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % (LISTENERS[0]['workbook_name'],
                                LISTENERS[0]['id']),
@@ -86,8 +86,8 @@ class TestListeners(base.BaseClientTest):
         self.assertEqual(1, len(listeners))
         lsnr = listeners[0]
 
-        self.assertEquals(Listener(self.listeners, LISTENERS[0]).__dict__,
-                          lsnr.__dict__)
+        self.assertEqual(Listener(self.listeners, LISTENERS[0]).__dict__,
+                         lsnr.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE % (LISTENERS[0]['workbook_name']))
 
@@ -97,8 +97,8 @@ class TestListeners(base.BaseClientTest):
         lsnr = self.listeners.get(LISTENERS[0]['workbook_name'],
                                   LISTENERS[0]['id'])
 
-        self.assertEquals(Listener(self.listeners, LISTENERS[0]).__dict__,
-                          lsnr.__dict__)
+        self.assertEqual(Listener(self.listeners, LISTENERS[0]).__dict__,
+                         lsnr.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % (LISTENERS[0]['workbook_name'],
                                LISTENERS[0]['id']))

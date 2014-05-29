@@ -57,8 +57,8 @@ class TestExecutions(base.BaseClientTest):
                                     EXECS[0]['context'])
 
         self.assertIsNotNone(ex)
-        self.assertEquals(Execution(self.executions, EXECS[0]).__dict__,
-                          ex.__dict__)
+        self.assertEqual(Execution(self.executions, EXECS[0]).__dict__,
+                         ex.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE % EXECS[0]['workbook_name'],
             json.dumps(body))
@@ -104,8 +104,8 @@ class TestExecutions(base.BaseClientTest):
                                     EXECS[0]['state'])
 
         self.assertIsNotNone(ex)
-        self.assertEquals(Execution(self.executions, EXECS[0]).__dict__,
-                          ex.__dict__)
+        self.assertEqual(Execution(self.executions, EXECS[0]).__dict__,
+                         ex.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % (EXECS[0]['workbook_name'], EXECS[0]['id']),
             json.dumps(body))
@@ -118,8 +118,8 @@ class TestExecutions(base.BaseClientTest):
         self.assertEqual(1, len(executions))
         ex = executions[0]
 
-        self.assertEquals(Execution(self.executions, EXECS[0]).__dict__,
-                          ex.__dict__)
+        self.assertEqual(Execution(self.executions, EXECS[0]).__dict__,
+                         ex.__dict__)
         mock.assert_called_once_with(URL_TEMPLATE % EXECS[0]['workbook_name'])
 
     def test_get(self):
@@ -127,8 +127,8 @@ class TestExecutions(base.BaseClientTest):
 
         ex = self.executions.get(EXECS[0]['workbook_name'], EXECS[0]['id'])
 
-        self.assertEquals(Execution(self.executions, EXECS[0]).__dict__,
-                          ex.__dict__)
+        self.assertEqual(Execution(self.executions, EXECS[0]).__dict__,
+                         ex.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % (EXECS[0]['workbook_name'], EXECS[0]['id']))
 

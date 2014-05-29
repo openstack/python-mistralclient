@@ -54,7 +54,7 @@ class TestTasks(base.BaseClientTest):
                                  TASKS[0]['state'])
 
         self.assertIsNotNone(task)
-        self.assertEquals(Task(self.tasks, TASKS[0]).__dict__, task.__dict__)
+        self.assertEqual(Task(self.tasks, TASKS[0]).__dict__, task.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % (TASKS[0]['workbook_name'],
                                TASKS[0]['execution_id'],
@@ -70,7 +70,7 @@ class TestTasks(base.BaseClientTest):
         self.assertEqual(1, len(tasks))
         task = tasks[0]
 
-        self.assertEquals(Task(self.tasks, TASKS[0]).__dict__, task.__dict__)
+        self.assertEqual(Task(self.tasks, TASKS[0]).__dict__, task.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE % (TASKS[0]['workbook_name'],
                             TASKS[0]['execution_id']))
@@ -82,7 +82,7 @@ class TestTasks(base.BaseClientTest):
                               TASKS[0]['execution_id'],
                               TASKS[0]['id'])
 
-        self.assertEquals(Task(self.tasks, TASKS[0]).__dict__, task.__dict__)
+        self.assertEqual(Task(self.tasks, TASKS[0]).__dict__, task.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % (TASKS[0]['workbook_name'],
                                TASKS[0]['execution_id'],
