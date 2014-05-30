@@ -26,7 +26,7 @@ EXECS = [
     {
         'id': "123",
         'workbook_name': "my_workbook",
-        'target_task': 'my_task',
+        'task': 'my_task',
         'state': 'RUNNING',
         'context': """
             {
@@ -47,13 +47,13 @@ class TestExecutions(base.BaseClientTest):
     def test_create(self):
         mock = self.mock_http_post(content=EXECS[0])
         body = {
-            'task': EXECS[0]['target_task'],
+            'task': EXECS[0]['task'],
             'context': EXECS[0]['context'],
             'workbook_name': EXECS[0]['workbook_name']
         }
 
         ex = self.executions.create(EXECS[0]['workbook_name'],
-                                    EXECS[0]['target_task'],
+                                    EXECS[0]['task'],
                                     EXECS[0]['context'])
 
         self.assertIsNotNone(ex)
@@ -66,12 +66,12 @@ class TestExecutions(base.BaseClientTest):
     def test_create_with_empty_context(self):
         mock = self.mock_http_post(content=EXECS[0])
         body = {
-            'task': EXECS[0]['target_task'],
+            'task': EXECS[0]['task'],
             'workbook_name': EXECS[0]['workbook_name']
         }
 
         self.executions.create(EXECS[0]['workbook_name'],
-                               EXECS[0]['target_task'])
+                               EXECS[0]['task'])
 
         mock.assert_called_once_with(
             URL_TEMPLATE % EXECS[0]['workbook_name'],
@@ -81,14 +81,14 @@ class TestExecutions(base.BaseClientTest):
     def test_create_failure1(self):
         self.mock_http_post(content=EXECS[0])
         self.executions.create(EXECS[0]['workbook_name'],
-                               EXECS[0]['target_task'],
+                               EXECS[0]['task'],
                                "sdfsdf")
 
     @unittest2.expectedFailure
     def test_create_failure2(self):
         self.mock_http_post(content=EXECS[0])
         self.executions.create(EXECS[0]['workbook_name'],
-                               EXECS[0]['target_task'],
+                               EXECS[0]['task'],
                                list('343', 'sdfsd'))
 
     def test_update(self):
