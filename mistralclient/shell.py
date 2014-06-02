@@ -18,10 +18,10 @@
 Command-line interface to the Mistral APIs
 """
 
+import logging
 import sys
 
 from mistralclient.openstack.common.cliutils import env
-from mistralclient.openstack.common import log as logging
 
 from mistralclient.api.client import Client
 

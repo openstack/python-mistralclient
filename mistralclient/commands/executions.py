@@ -15,12 +15,12 @@
 #
 
 import json
+import logging
 
 from cliff.command import Command as BaseCommand
 from cliff.lister import Lister as ListCommand
 from cliff.show import ShowOne as ShowCommand
 
-from mistralclient.openstack.common import log as logging
 from mistralclient.api.executions import ExecutionManager
 
 LOG = logging.getLogger(__name__)

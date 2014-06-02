@@ -14,10 +14,11 @@
 #    under the License.
 #
 
+import logging
+
 from cliff.lister import Lister as ListCommand
 from cliff.show import ShowOne as ShowCommand
 
-from mistralclient.openstack.common import log as logging
 from mistralclient.api.tasks import TaskManager
 
 LOG = logging.getLogger(__name__)

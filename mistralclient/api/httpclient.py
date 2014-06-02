@@ -16,7 +16,7 @@
 
 import requests
 
-from mistralclient.openstack.common import log as logging
+import logging
 
 
 LOG = logging.getLogger(__name__)
