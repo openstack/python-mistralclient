@@ -21,7 +21,6 @@ import mock
 from mistralclient.tests import base
 from mistralclient.commands import executions
 from mistralclient.api.executions import Execution
-from mistralclient import version
 
 EXECUTION = Execution(mock, {
     'id': '123',
@@ -44,7 +43,7 @@ class TestCLIExecutions(base.BaseCommandTest):
     @mock.patch('mistralclient.api.executions.ExecutionManager.create')
     def test_create_ctx_file(self, mock):
         mock.return_value = EXECUTION
-        path = pkg.resource_filename(version.version_info.package,
+        path = pkg.resource_filename('mistralclient',
                                      'tests/resources/ctx.json')
         result = self.call(executions.Create,
                            app_args=['name', 'id', path])
