@@ -94,8 +94,6 @@ class TestExecutions(base.BaseClientTest):
     def test_update(self):
         mock = self.mock_http_put(content=EXECS[0])
         body = {
-            'workbook_name': EXECS[0]['workbook_name'],
-            'id': EXECS[0]['id'],
             'state': EXECS[0]['state']
         }
 

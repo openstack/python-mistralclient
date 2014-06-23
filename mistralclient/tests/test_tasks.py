@@ -42,9 +42,6 @@ class TestTasks(base.BaseClientTest):
     def test_update(self):
         mock = self.mock_http_put(content=TASKS[0])
         body = {
-            'workbook_name': TASKS[0]['workbook_name'],
-            'execution_id': TASKS[0]['execution_id'],
-            'id': TASKS[0]['id'],
             'state': TASKS[0]['state']
         }
 

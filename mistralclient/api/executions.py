@@ -54,30 +54,43 @@ class ExecutionManager(base.ResourceManager):
         return self._create('/workbooks/%s/executions' % workbook_name, data)
 
     def update(self, workbook_name, id, state):
-        self._ensure_not_empty(workbook_name=workbook_name, id=id,
-                               state=state)
+        self._ensure_not_empty(id=id, state=state)
 
         data = {
-            'workbook_name': workbook_name,
-            'id': id,
             'state': state
         }
 
-        return self._update('/workbooks/%s/executions/%s' %
-                            (workbook_name, id), data)
+        if workbook_name:
+            uri = '/workbooks/%s/executions/%s' % (workbook_name, id)
+        else:
+            uri = '/executions/%s' % id
+
+        return self._update(uri, data)
 
     def list(self, workbook_name):
-        self._ensure_not_empty(workbook_name=workbook_name)
+        if workbook_name:
+            uri = '/workbooks/%s/executions' % workbook_name
+        else:
+            uri = '/executions'
 
-        return self._list('/workbooks/%s/executions' % workbook_name,
-                          'executions')
+        return self._list(uri, 'executions')
 
     def get(self, workbook_name, id):
-        self._ensure_not_empty(workbook_name=workbook_name, id=id)
+        self._ensure_not_empty(id=id)
 
-        return self._get('/workbooks/%s/executions/%s' % (workbook_name, id))
+        if workbook_name:
+            uri = '/workbooks/%s/executions/%s' % (workbook_name, id)
+        else:
+            uri = '/executions/%s' % id
+
+        return self._get(uri)
 
     def delete(self, workbook_name, id):
-        self._ensure_not_empty(workbook_name=workbook_name, id=id)
+        self._ensure_not_empty(id=id)
 
-        self._delete('/workbooks/%s/executions/%s' % (workbook_name, id))
+        if workbook_name:
+            uri = '/workbooks/%s/executions/%s' % (workbook_name, id)
+        else:
+            uri = '/executions/%s' % id
+
+        self._delete(uri)

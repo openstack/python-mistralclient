@@ -25,33 +25,45 @@ class TaskManager(base.ResourceManager):
     resource_class = Task
 
     def update(self, workbook_name, execution_id, id, state):
-        self._ensure_not_empty(workbook_name=workbook_name,
-                               execution_id=execution_id,
-                               id=id,
-                               state=state)
+        self._ensure_not_empty(id=id, state=state)
 
         data = {
-            'workbook_name': workbook_name,
-            'execution_id': execution_id,
-            'id': id,
             'state': state
         }
 
-        return self._update('/workbooks/%s/executions/%s/tasks/%s' %
-                            (workbook_name, execution_id, id), data)
+        if execution_id:
+            if workbook_name:
+                uri = '/workbooks/%s/executions/%s/tasks/%s' % \
+                      (workbook_name, execution_id, id)
+            else:
+                uri = '/executions/%s/tasks/%s' % (execution_id, id)
+        else:
+            uri = '/tasks/%s' % id
+
+        return self._update(uri, data)
 
     def list(self, workbook_name, execution_id):
-        self._ensure_not_empty(workbook_name=workbook_name,
-                               execution_id=execution_id)
+        if execution_id:
+            if workbook_name:
+                uri = '/workbooks/%s/executions/%s/tasks' % \
+                      (workbook_name, execution_id)
+            else:
+                uri = '/executions/%s/tasks' % execution_id
+        else:
+            uri = '/tasks'
 
-        return self._list('/workbooks/%s/executions/%s/tasks' %
-                          (workbook_name, execution_id),
-                          'tasks')
+        return self._list(uri, 'tasks')
 
     def get(self, workbook_name, execution_id, id):
-        self._ensure_not_empty(workbook_name=workbook_name,
-                               execution_id=execution_id,
-                               id=id)
+        self._ensure_not_empty(id=id)
 
-        return self._get('/workbooks/%s/executions/%s/tasks/%s' %
-                         (workbook_name, execution_id, id))
+        if execution_id:
+            if workbook_name:
+                uri = '/workbooks/%s/executions/%s/tasks/%s' % \
+                      (workbook_name, execution_id, id)
+            else:
+                uri = '/executions/%s/tasks/%s' % (execution_id, id)
+        else:
+            uri = '/tasks/%s' % id
+
+        return self._get(uri)
