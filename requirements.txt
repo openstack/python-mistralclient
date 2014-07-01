@@ -1,4 +1,4 @@
 pbr>=0.6,!=0.7,<1.0
 requests>=1.1
-python-keystoneclient>=0.7.0
-cliff>=1.4.3
+python-keystoneclient>=0.9.0
+cliff>=1.6.0

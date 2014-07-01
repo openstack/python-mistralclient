@@ -40,7 +40,7 @@ class ListenerManager(base.ResourceManager):
 
     def update(self, workbook_name, id, webhook=None, description=None,
                events=None):
-        #TODO: need to describe what events is
+        # TODO: need to describe what events is
         self._ensure_not_empty(workbook_name=workbook_name, id=id)
 
         data = {
