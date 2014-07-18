@@ -40,6 +40,16 @@ class MistralBase(testtools.TestCase):
         for wb in cls.mistral_client.workbooks.list():
             cls.mistral_client.workbooks.delete(wb.name)
 
+    def tearDown(self):
+        super(MistralBase, self).tearDown()
+        for ex in self.mistral_client.executions.list(None):
+            self.mistral_client.executions.delete(None, ex.id)
+
+    def create_execution(self):
+        self.mistral_client.workbooks.upload_definition("wb", self.definition)
+        execution = self.mistral_client.executions.create("wb", "hello")
+        return execution
+
     def assert_item_in_list(self, items, **props):
         def _matches(item, **props):
             for prop_name, prop_val in props.iteritems():

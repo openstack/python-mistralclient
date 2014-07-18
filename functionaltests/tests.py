@@ -34,3 +34,69 @@ class Workbooks(MistralBase):
             self.mistral_client.workbooks.get_definition("wb")
 
         self.assertEqual(self.definition, received_definition)
+
+
+class Executions(MistralBase):
+
+    def test_create_execution(self):
+        execution = self.create_execution()
+        self.assertEqual("wb", execution.workbook_name)
+        self.assertNotEqual(execution.id, None)
+
+    def test_update_execution(self):
+        execution = self.create_execution()
+        updated_exec = self.mistral_client.executions.update(
+            "wb", execution.id, "ERROR")
+        self.assertEqual("ERROR", updated_exec.state)
+        updated_exec = self.mistral_client.executions.update(
+            None, execution.id, "SUCCESS")
+        self.assertEqual("SUCCESS", updated_exec.state)
+
+    def test_list_executions(self):
+        execution = self.create_execution()
+        exec_list = self.mistral_client.executions.list(None)
+        self.assertTrue(self.assert_item_in_list(
+            exec_list, id=execution.id))
+        exec_list = self.mistral_client.executions.list("wb")
+        self.assertTrue(self.assert_item_in_list(
+            exec_list, id=execution.id, workbook_name="wb"))
+
+    def test_get_execution(self):
+        execution = self.create_execution()
+        received_exec = self.mistral_client.executions.get(None, execution.id)
+        self.assertEqual(execution.id, received_exec.id)
+        received_exec = self.mistral_client.executions.get("wb", execution.id)
+        self.assertEqual(execution.id, received_exec.id)
+
+
+class Tasks(MistralBase):
+
+    def test_list_tasks(self):
+        execution = self.create_execution()
+        tasks_list = self.mistral_client.tasks.list(None, None)
+        self.assertIsInstance(tasks_list, list)
+        tasks_list = self.mistral_client.tasks.list(
+            execution.workbook_name, None)
+        self.assertIsInstance(tasks_list, list)
+        tasks_list = self.mistral_client.tasks.list(None, execution.id)
+        self.assertIsInstance(tasks_list, list)
+        tasks_list = self.mistral_client.tasks.list(
+            execution.workbook_name, execution.id)
+        self.assertIsInstance(tasks_list, list)
+
+    def test_get_task(self):
+        execution = self.create_execution()
+        task = self.mistral_client.tasks.list(None, None)[-1]
+        received_task = self.mistral_client.tasks.get(None, None, task.id)
+        self.assertEqual("hello", received_task.name)
+        task = self.mistral_client.tasks.list("wb", None)[-1]
+        received_task = self.mistral_client.tasks.get("wb", None, task.id)
+        self.assertEqual("hello", received_task.name)
+        task = self.mistral_client.tasks.list(None, execution.id)[-1]
+        received_task = self.mistral_client.tasks.get(
+            None, execution.id, task.id)
+        self.assertEqual("hello", received_task.name)
+        task = self.mistral_client.tasks.list("wb", execution.id)[-1]
+        received_task = self.mistral_client.tasks.get(
+            "wb", execution.id, task.id)
+        self.assertEqual("hello", received_task.name)
