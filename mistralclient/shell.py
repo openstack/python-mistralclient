@@ -70,6 +70,12 @@ class MistralShell(App):
         for k, v in self.commands.items():
             self.command_manager.add_command(k, v)
 
+    def configure_logging(self):
+        super(MistralShell, self).configure_logging()
+        logging.getLogger('iso8601').setLevel(logging.WARNING)
+        if self.options.verbose_level <= 1:
+            logging.getLogger('requests').setLevel(logging.WARNING)
+
     def build_option_parser(self, description, version,
                             argparse_kwargs=None):
         """Return an argparse option parser for this application.
