@@ -30,7 +30,7 @@ class MistralBase(testtools.TestCase):
         cls.definition = open(os.path.join(
             __location, 'hello.yaml'), 'rb').read()
 
-        cls.wb = cls.mistral_client_workbooks.create(
+        cls.wb = cls.mistral_client.workbooks.create(
             "wb", "Description", ["tags"])
 
     @classmethod
