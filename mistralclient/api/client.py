@@ -16,8 +16,6 @@
 
 import six
 
-from keystoneclient.v3 import client as keystone_client
-
 from mistralclient.api import httpclient
 from mistralclient.api import workbooks
 from mistralclient.api import executions
@@ -77,18 +75,17 @@ class Client(object):
             raise RuntimeError('Only user name or user id'
                                ' should be set')
 
-        if "v2.0" in auth_url:
-            raise RuntimeError('Mistral supports only v3  '
-                               'keystone API. Please see help and '
-                               'configure the correct auth url.')
+        keystone_client = _get_keystone_client(auth_url)
 
-        keystone = keystone_client.Client(username=username,
-                                          user_id=user_id,
-                                          password=api_key,
-                                          token=auth_token,
-                                          project_id=project_id,
-                                          project_name=project_name,
-                                          auth_url=auth_url)
+        keystone = keystone_client.Client(
+            username=username,
+            user_id=user_id,
+            password=api_key,
+            token=auth_token,
+            tenant_id=project_id,
+            tenant_name=project_name,
+            auth_url=auth_url,
+            endpoint=auth_url)
 
         keystone.authenticate()
         token = keystone.auth_token
@@ -105,3 +102,11 @@ class Client(object):
                 mistral_url = service[0].get('url') if service else None
 
         return mistral_url, token, project_id, user_id
+
+
+def _get_keystone_client(auth_url):
+    if "v2.0" in auth_url:
+        from keystoneclient.v2_0 import client
+    else:
+        from keystoneclient.v3 import client
+    return client
