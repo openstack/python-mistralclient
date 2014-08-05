@@ -4,6 +4,7 @@ import testtools
 from tempest import clients
 from tempest.common import rest_client
 
+from mistralclient.api import base
 from mistralclient.api import client as mclient
 
 
@@ -43,7 +44,18 @@ class MistralBase(testtools.TestCase):
     def tearDown(self):
         super(MistralBase, self).tearDown()
         for ex in self.mistral_client.executions.list(None):
-            self.mistral_client.executions.delete(None, ex.id)
+            # TODO(akuznetsova): remove try/except after
+            # https://bugs.launchpad.net/mistral/+bug/1353306
+            # will be fixed
+            """ try/except construction was added because of problem
+                with concurrent transactions in sqlite and appropriate
+                error: APIException: (OperationalError) database is locked.
+                This isn't a tests problem, so they are considered passed.
+            """
+            try:
+                self.mistral_client.executions.delete(None, ex.id)
+            except base.APIException:
+                pass
 
     def create_execution(self):
         self.mistral_client.workbooks.upload_definition("wb", self.definition)
