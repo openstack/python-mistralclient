@@ -15,6 +15,7 @@
 import os
 
 from tempest import cli
+from tempest import exceptions
 
 
 class MistralCLIAuth(cli.ClientTestBase):
@@ -154,6 +155,7 @@ class ExecutionCLITests(ClientTestBase):
 
     def setUp(self):
         super(ExecutionCLITests, self).setUp()
+
         self.mistral('workbook-create', params='wb')
         self.mistral('workbook-upload-definition',
                      params='"wb" "{0}"'.format(self.definition))
@@ -255,3 +257,111 @@ class TaskCLITests(ClientTestBase):
 
         self.assertEqual(task_id, gotten_id)
         self.assertEqual('wb', wb)
+
+
+class NegativeCLITests(ClientTestBase):
+    """This class contains negative tests."""
+
+    def test_wb_list_extra_param(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'workbook-list', params='param')
+
+    def test_wb_get_unexist_wb(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'workbook-get', params='wb')
+
+    def test_wb_get_without_param(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'workbook-get')
+
+    def test_wb_create_same_name(self):
+        self.mistral('workbook-create', params='wb')
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'workbook-create', params='wb')
+
+    def test_wb_create_with_wrong_path_to_definition(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral,
+                          'workbook-create', params='wb pam pam pam')
+
+    def test_wb_delete_unexist_wb(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'workbook-delete', params='wb')
+
+    def test_wb_update_unexist_wb(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'workbook-update', params='wb pam pam')
+
+    def test_wb_upload_definition_unexist_wb(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral,
+                          'workbook-upload-definition', params='wb')
+
+    def test_wb_upload_definition_using_wrong_path(self):
+        self.mistral('workbook-create', params='wb')
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral,
+                          'workbook-upload-definition', params='wb param')
+
+    def test_wb_get_definition_wb_without_definition(self):
+        self.mistral('workbook-create', params='wb')
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'workbook-get-definition', params='wb')
+
+    def test_ex_list_unexist_wb(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'execution-list', params='wb')
+
+    def test_ex_create_unexist_wb(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'execution-create', params='wb')
+
+    def test_ex_create_unexist_task(self):
+        self.mistral('workbook-create', params='wb')
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral,
+                          'execution-create', params='wb param {}')
+
+    def test_ex_create_without_context(self):
+        self.mistral('workbook-create', params='wb')
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'execution-create', params='wb param')
+
+    def test_ex_create_wrong_context_format(self):
+        self.mistral('workbook-create', params='wb')
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral,
+                          'execution-create', params='wb param pam')
+
+    def test_ex_get_from_nonexist_wb(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'execution-get', params='wb id')
+
+    def test_ex_get_nonexist_execution(self):
+        self.mistral('workbook-create', params='wb')
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'execution-get', params='wb id')
+
+    def test_ex_update_set_wrong_state(self):
+        self.mistral('workbook-create', params='wb')
+        self.mistral('workbook-upload-definition',
+                     params='"wb" "{0}"'.format(self.definition))
+
+        execution = self.parser.listing(self.mistral(
+            'execution-create', params='"wb" "hello" "{}"'))
+        exec_id = self.get_value_of_field(execution, 'ID')
+
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'execution-update',
+                          params='"wb" "{0}" "OK"'.format(exec_id))
+
+    def test_task_get_nonexisting_task(self):
+        self.mistral('workbook-create', params='wb')
+        self.mistral('workbook-upload-definition',
+                     params='"wb" "{0}"'.format(self.definition))
+
+        self.mistral('execution-create', params='"wb" "hello" "{}"')
+
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'task-get',
+                          params='"wb" "hello" "id"')
