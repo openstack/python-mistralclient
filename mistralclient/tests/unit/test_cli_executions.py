@@ -18,7 +18,7 @@ import pkg_resources as pkg
 
 import mock
 
-from mistralclient.tests import base
+from mistralclient.tests.unit import base
 from mistralclient.commands import executions
 from mistralclient.api.executions import Execution
 
@@ -44,7 +44,7 @@ class TestCLIExecutions(base.BaseCommandTest):
     def test_create_ctx_file(self, mock):
         mock.return_value = EXECUTION
         path = pkg.resource_filename('mistralclient',
-                                     'tests/resources/ctx.json')
+                                     'tests/unit/resources/ctx.json')
         result = self.call(executions.Create,
                            app_args=['name', 'id', path])
 

@@ -15,7 +15,7 @@
 import unittest2
 import json
 
-from mistralclient.tests import base
+from mistralclient.tests.unit import base
 from mistralclient.api.executions import Execution
 
 # TODO: Later we need additional tests verifying all the errors etc.

@@ -25,11 +25,8 @@ class MistralBase(testtools.TestCase):
         mgr = clients.Manager()
         cls.mistral_client = ClientAuth(mgr.auth_provider).mistral_client
 
-        __location = os.path.realpath(os.path.join(os.getcwd(),
-                                                   os.path.dirname(__file__)))
-
-        cls.definition = open(os.path.join(
-            __location, 'hello.yaml'), 'rb').read()
+        cls.definition = open(os.path.relpath(
+            'functionaltests/hello.yaml', os.getcwd()), 'rb').read()
 
         cls.wb = cls.mistral_client.workbooks.create(
             "wb", "Description", ["tags"])

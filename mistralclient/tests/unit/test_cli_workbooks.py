@@ -16,7 +16,7 @@
 
 import mock
 
-from mistralclient.tests import base
+from mistralclient.tests.unit import base
 
 from mistralclient.commands import workbooks
 from mistralclient.api.workbooks import Workbook
