@@ -19,7 +19,7 @@ import mock
 from mistralclient.tests.unit import base
 
 from mistralclient.commands import tasks
-from mistralclient.api.tasks import Task
+from mistralclient.api.v1.tasks import Task
 
 TASK = Task(mock, {
     'id': '123',
@@ -33,7 +33,7 @@ TASK = Task(mock, {
 
 
 class TestCLIExecutions(base.BaseCommandTest):
-    @mock.patch('mistralclient.api.tasks.TaskManager.update')
+    @mock.patch('mistralclient.api.v1.tasks.TaskManager.update')
     def test_update(self, mock):
         mock.return_value = TASK
 
@@ -44,7 +44,7 @@ class TestCLIExecutions(base.BaseCommandTest):
             ('123', 'some', 'thing', 'else', 'keeps', 'RUNNING', 'a, b'),
             result[1])
 
-    @mock.patch('mistralclient.api.tasks.TaskManager.list')
+    @mock.patch('mistralclient.api.v1.tasks.TaskManager.list')
     def test_list(self, mock):
         mock.return_value = (TASK,)
 
@@ -54,7 +54,7 @@ class TestCLIExecutions(base.BaseCommandTest):
             [('123', 'some', 'thing', 'else', 'keeps', 'RUNNING', 'a, b')],
             result[1])
 
-    @mock.patch('mistralclient.api.tasks.TaskManager.get')
+    @mock.patch('mistralclient.api.v1.tasks.TaskManager.get')
     def test_get(self, mock):
         mock.return_value = TASK
 

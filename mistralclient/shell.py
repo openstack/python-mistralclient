@@ -23,7 +23,7 @@ import sys
 
 from mistralclient.openstack.common.cliutils import env
 
-from mistralclient.api.client import Client
+from mistralclient.api import client
 
 import mistralclient.commands.workbooks
 import mistralclient.commands.executions
@@ -188,15 +188,15 @@ class MistralShell(App):
         return parser
 
     def initialize_app(self, argv):
-        self.client = Client(mistral_url=self.options.mistral_url,
-                             username=self.options.username,
-                             api_key=self.options.password,
-                             project_name=self.options.tenant_name,
-                             auth_url=self.options.auth_url,
-                             project_id=self.options.tenant_id,
-                             endpoint_type='publicURL',
-                             service_type='workflow',
-                             auth_token=self.options.token)
+        self.client = client.client(mistral_url=self.options.mistral_url,
+                                    username=self.options.username,
+                                    api_key=self.options.password,
+                                    project_name=self.options.tenant_name,
+                                    auth_url=self.options.auth_url,
+                                    project_id=self.options.tenant_id,
+                                    endpoint_type='publicURL',
+                                    service_type='workflow',
+                                    auth_token=self.options.token)
 
 
 def main(argv=sys.argv[1:]):

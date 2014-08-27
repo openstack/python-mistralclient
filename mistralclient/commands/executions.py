@@ -21,7 +21,7 @@ from cliff.command import Command as BaseCommand
 from cliff.lister import Lister as ListCommand
 from cliff.show import ShowOne as ShowCommand
 
-from mistralclient.api.executions import ExecutionManager
+from mistralclient.api.v1.executions import ExecutionManager
 
 LOG = logging.getLogger(__name__)
 

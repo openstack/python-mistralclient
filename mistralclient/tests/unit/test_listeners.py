@@ -15,7 +15,7 @@
 import json
 
 from mistralclient.tests.unit import base
-from mistralclient.api.listeners import Listener
+from mistralclient.api.v1.listeners import Listener
 
 # TODO: later we need additional tests verifying all the errors etc.
 

@@ -19,7 +19,7 @@ import mock
 from mistralclient.tests.unit import base
 
 from mistralclient.commands import workbooks
-from mistralclient.api.workbooks import Workbook
+from mistralclient.api.v1.workbooks import Workbook
 
 WORKBOOK = Workbook(mock, {
     'name': 'a',
@@ -29,7 +29,7 @@ WORKBOOK = Workbook(mock, {
 
 
 class TestCLIWorkbooks(base.BaseCommandTest):
-    @mock.patch('mistralclient.api.workbooks.WorkbookManager.create')
+    @mock.patch('mistralclient.api.v1.workbooks.WorkbookManager.create')
     def test_create(self, mock):
         mock.return_value = WORKBOOK
 
@@ -37,7 +37,7 @@ class TestCLIWorkbooks(base.BaseCommandTest):
 
         self.assertEqual(('a', 'some', 'a, b'), result[1])
 
-    @mock.patch('mistralclient.api.workbooks.WorkbookManager.update')
+    @mock.patch('mistralclient.api.v1.workbooks.WorkbookManager.update')
     def test_update(self, mock):
         mock.return_value = WORKBOOK
 
@@ -45,7 +45,7 @@ class TestCLIWorkbooks(base.BaseCommandTest):
 
         self.assertEqual(('a', 'some', 'a, b'), result[1])
 
-    @mock.patch('mistralclient.api.workbooks.WorkbookManager.list')
+    @mock.patch('mistralclient.api.v1.workbooks.WorkbookManager.list')
     def test_list(self, mock):
         mock.return_value = (WORKBOOK,)
 
@@ -53,7 +53,7 @@ class TestCLIWorkbooks(base.BaseCommandTest):
 
         self.assertEqual([('a', 'some', 'a, b')], result[1])
 
-    @mock.patch('mistralclient.api.workbooks.WorkbookManager.get')
+    @mock.patch('mistralclient.api.v1.workbooks.WorkbookManager.get')
     def test_get(self, mock):
         mock.return_value = WORKBOOK
 
@@ -61,13 +61,13 @@ class TestCLIWorkbooks(base.BaseCommandTest):
 
         self.assertEqual(('a', 'some', 'a, b'), result[1])
 
-    @mock.patch('mistralclient.api.workbooks.WorkbookManager.delete')
+    @mock.patch('mistralclient.api.v1.workbooks.WorkbookManager.delete')
     def test_delete(self, mock):
         self.assertIsNone(self.call(workbooks.Delete, app_args=['name']))
 
     @mock.patch('argparse.open', create=True)
     @mock.patch(
-        'mistralclient.api.workbooks.WorkbookManager.upload_definition'
+        'mistralclient.api.v1.workbooks.WorkbookManager.upload_definition'
     )
     def test_upload_definition(self, mock, mock_open):
         mock.return_value = WORKBOOK
@@ -78,7 +78,8 @@ class TestCLIWorkbooks(base.BaseCommandTest):
 
         self.assertIsNone(result)
 
-    @mock.patch('mistralclient.api.workbooks.WorkbookManager.get_definition')
+    @mock.patch('mistralclient.api.v1.workbooks.'
+                'WorkbookManager.get_definition')
     def test_get_definition(self, mock):
         mock.return_value = 'sometext'
 

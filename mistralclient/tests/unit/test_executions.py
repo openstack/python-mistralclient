@@ -16,7 +16,7 @@ import unittest2
 import json
 
 from mistralclient.tests.unit import base
-from mistralclient.api.executions import Execution
+from mistralclient.api.v1.executions import Execution
 
 # TODO: Later we need additional tests verifying all the errors etc.
 
@@ -55,11 +55,14 @@ class TestExecutions(base.BaseClientTest):
                                     EXECS[0]['context'])
 
         self.assertIsNotNone(ex)
-        self.assertEqual(Execution(self.executions, EXECS[0]).__dict__,
-                         ex.__dict__)
-        mock.assert_called_once_with(
-            URL_TEMPLATE % EXECS[0]['workbook_name'],
-            json.dumps(body))
+        self.assertDictEqual(Execution(self.executions, EXECS[0]).__dict__,
+                             ex.__dict__)
+
+        arg_body = mock.call_args[0][1]
+        url = mock.call_args[0][0]
+
+        self.assertEqual(url, URL_TEMPLATE % EXECS[0]['workbook_name'])
+        self.assertDictEqual(json.loads(arg_body), body)
 
     def test_create_with_empty_context(self):
         mock = self.mock_http_post(content=EXECS[0])
@@ -71,9 +74,11 @@ class TestExecutions(base.BaseClientTest):
         self.executions.create(EXECS[0]['workbook_name'],
                                EXECS[0]['task'])
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE % EXECS[0]['workbook_name'],
-            json.dumps(body))
+        arg_body = mock.call_args[0][1]
+        url = mock.call_args[0][0]
+
+        self.assertEqual(url, URL_TEMPLATE % EXECS[0]['workbook_name'])
+        self.assertDictEqual(json.loads(arg_body), body)
 
     @unittest2.expectedFailure
     def test_create_failure1(self):

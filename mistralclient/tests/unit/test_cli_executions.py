@@ -20,7 +20,7 @@ import mock
 
 from mistralclient.tests.unit import base
 from mistralclient.commands import executions
-from mistralclient.api.executions import Execution
+from mistralclient.api.v1.executions import Execution
 
 EXECUTION = Execution(mock, {
     'id': '123',
@@ -31,7 +31,7 @@ EXECUTION = Execution(mock, {
 
 
 class TestCLIExecutions(base.BaseCommandTest):
-    @mock.patch('mistralclient.api.executions.ExecutionManager.create')
+    @mock.patch('mistralclient.api.v1.executions.ExecutionManager.create')
     def test_create_ctx_string(self, mock):
         mock.return_value = EXECUTION
 
@@ -40,7 +40,7 @@ class TestCLIExecutions(base.BaseCommandTest):
 
         self.assertEqual(('123', 'some', 'else', 'RUNNING'), result[1])
 
-    @mock.patch('mistralclient.api.executions.ExecutionManager.create')
+    @mock.patch('mistralclient.api.v1.executions.ExecutionManager.create')
     def test_create_ctx_file(self, mock):
         mock.return_value = EXECUTION
         path = pkg.resource_filename('mistralclient',
@@ -50,7 +50,7 @@ class TestCLIExecutions(base.BaseCommandTest):
 
         self.assertEqual(('123', 'some', 'else', 'RUNNING'), result[1])
 
-    @mock.patch('mistralclient.api.executions.ExecutionManager.update')
+    @mock.patch('mistralclient.api.v1.executions.ExecutionManager.update')
     def test_update(self, mock):
         mock.return_value = EXECUTION
 
@@ -59,7 +59,7 @@ class TestCLIExecutions(base.BaseCommandTest):
 
         self.assertEqual(('123', 'some', 'else', 'RUNNING'), result[1])
 
-    @mock.patch('mistralclient.api.executions.ExecutionManager.list')
+    @mock.patch('mistralclient.api.v1.executions.ExecutionManager.list')
     def test_list(self, mock):
         mock.return_value = (EXECUTION,)
 
@@ -67,7 +67,7 @@ class TestCLIExecutions(base.BaseCommandTest):
 
         self.assertEqual([('123', 'some', 'else', 'RUNNING')], result[1])
 
-    @mock.patch('mistralclient.api.executions.ExecutionManager.get')
+    @mock.patch('mistralclient.api.v1.executions.ExecutionManager.get')
     def test_get(self, mock):
         mock.return_value = EXECUTION
 
@@ -75,7 +75,7 @@ class TestCLIExecutions(base.BaseCommandTest):
 
         self.assertEqual(('123', 'some', 'else', 'RUNNING'), result[1])
 
-    @mock.patch('mistralclient.api.executions.ExecutionManager.delete')
+    @mock.patch('mistralclient.api.v1.executions.ExecutionManager.delete')
     def test_delete(self, mock):
         result = self.call(executions.Delete, app_args=['name', 'id'])
 

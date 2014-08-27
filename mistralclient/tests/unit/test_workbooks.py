@@ -15,7 +15,7 @@
 import json
 
 from mistralclient.tests.unit import base
-from mistralclient.api.workbooks import Workbook
+from mistralclient.api.v1.workbooks import Workbook
 
 # TODO: later we need additional tests verifying all the errors etc.
 

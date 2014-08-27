@@ -5,7 +5,7 @@ from tempest import clients
 from tempest.common import rest_client
 
 from mistralclient.api import base
-from mistralclient.api import client as mclient
+from mistralclient.api.v1 import client as mclient
 
 
 class ClientAuth(rest_client.RestClient):

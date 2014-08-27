@@ -16,7 +16,7 @@ import unittest2
 import mock
 import json
 
-from mistralclient.api import client
+from mistralclient.api.v1 import client
 
 
 class FakeResponse(object):

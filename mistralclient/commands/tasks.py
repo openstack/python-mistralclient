@@ -19,7 +19,7 @@ import logging
 from cliff.lister import Lister as ListCommand
 from cliff.show import ShowOne as ShowCommand
 
-from mistralclient.api.tasks import TaskManager
+from mistralclient.api.v1.tasks import TaskManager
 
 LOG = logging.getLogger(__name__)
 
