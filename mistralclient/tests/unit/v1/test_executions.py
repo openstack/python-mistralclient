@@ -15,7 +15,7 @@
 import unittest2
 import json
 
-from mistralclient.tests.unit import base
+from mistralclient.tests.unit.v1 import base
 from mistralclient.api.v1.executions import Execution
 
 # TODO: Later we need additional tests verifying all the errors etc.
@@ -41,13 +41,13 @@ URL_TEMPLATE = '/workbooks/%s/executions'
 URL_TEMPLATE_ID = '/workbooks/%s/executions/%s'
 
 
-class TestExecutions(base.BaseClientTest):
+class TestExecutions(base.BaseClientV1Test):
     def test_create(self):
         mock = self.mock_http_post(content=EXECS[0])
         body = {
+            'workbook_name': EXECS[0]['workbook_name'],
             'task': EXECS[0]['task'],
-            'context': EXECS[0]['context'],
-            'workbook_name': EXECS[0]['workbook_name']
+            'context': EXECS[0]['context']
         }
 
         ex = self.executions.create(EXECS[0]['workbook_name'],
@@ -67,8 +67,8 @@ class TestExecutions(base.BaseClientTest):
     def test_create_with_empty_context(self):
         mock = self.mock_http_post(content=EXECS[0])
         body = {
-            'task': EXECS[0]['task'],
-            'workbook_name': EXECS[0]['workbook_name']
+            'workbook_name': EXECS[0]['workbook_name'],
+            'task': EXECS[0]['task']
         }
 
         self.executions.create(EXECS[0]['workbook_name'],

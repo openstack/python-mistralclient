@@ -14,7 +14,7 @@
 
 import json
 
-from mistralclient.tests.unit import base
+from mistralclient.tests.unit.v1 import base
 from mistralclient.api.v1.tasks import Task
 
 # TODO: later we need additional tests verifying all the errors etc.
@@ -36,7 +36,7 @@ URL_TEMPLATE = '/workbooks/%s/executions/%s/tasks'
 URL_TEMPLATE_ID = '/workbooks/%s/executions/%s/tasks/%s'
 
 
-class TestTasks(base.BaseClientTest):
+class TestTasks(base.BaseClientV1Test):
     def test_update(self):
         mock = self.mock_http_put(content=TASKS[0])
         body = {

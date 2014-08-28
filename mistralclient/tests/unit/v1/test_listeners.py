@@ -14,7 +14,7 @@
 
 import json
 
-from mistralclient.tests.unit import base
+from mistralclient.tests.unit.v1 import base
 from mistralclient.api.v1.listeners import Listener
 
 # TODO: later we need additional tests verifying all the errors etc.
@@ -32,7 +32,7 @@ URL_TEMPLATE = '/workbooks/%s/listeners'
 URL_TEMPLATE_ID = '/workbooks/%s/listeners/%s'
 
 
-class TestListeners(base.BaseClientTest):
+class TestListeners(base.BaseClientV1Test):
     def test_create(self):
         mock = self.mock_http_post(content=LISTENERS[0])
         body = {

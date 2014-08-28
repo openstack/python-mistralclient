@@ -16,8 +16,6 @@ import unittest2
 import mock
 import json
 
-from mistralclient.api.v1 import client
-
 
 class FakeResponse(object):
     """Fake response for testing Mistral Client."""
@@ -31,13 +29,7 @@ class FakeResponse(object):
 
 
 class BaseClientTest(unittest2.TestCase):
-    def setUp(self):
-        self._client = client.Client(project_name="test",
-                                     mistral_url="test")
-        self.workbooks = self._client.workbooks
-        self.executions = self._client.executions
-        self.tasks = self._client.tasks
-        self.listeners = self._client.listeners
+    _client = None
 
     def mock_http_get(self, content, status_code=200):
         if isinstance(content, dict):

@@ -14,7 +14,7 @@
 
 import json
 
-from mistralclient.tests.unit import base
+from mistralclient.tests.unit.v1 import base
 from mistralclient.api.v1.workbooks import Workbook
 
 # TODO: later we need additional tests verifying all the errors etc.
@@ -57,7 +57,7 @@ URL_TEMPLATE_NAME = '/workbooks/%s'
 URL_TEMPLATE_DEFINITION = '/workbooks/%s/definition'
 
 
-class TestWorkbooks(base.BaseClientTest):
+class TestWorkbooks(base.BaseClientV1Test):
     def test_create(self):
         mock = self.mock_http_post(content=WORKBOOKS[0])
 
