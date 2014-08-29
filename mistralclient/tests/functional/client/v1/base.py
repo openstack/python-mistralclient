@@ -13,7 +13,8 @@ class ClientAuth(rest_client.RestClient):
         super(ClientAuth, self).__init__(auth_provider)
 
         self.mistral_client = mclient.Client(
-            auth_token=self.auth_provider.get_token())
+            auth_token=self.auth_provider.get_token(),
+            mistral_url="http://localhost:8989/v1")
 
 
 class MistralBase(testtools.TestCase):

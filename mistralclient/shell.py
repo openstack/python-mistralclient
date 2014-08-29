@@ -25,50 +25,34 @@ from mistralclient.openstack.common.cliutils import env
 
 from mistralclient.api import client
 
-import mistralclient.commands.workbooks
-import mistralclient.commands.executions
-import mistralclient.commands.tasks
+import mistralclient.commands.v1.workbooks
+import mistralclient.commands.v1.executions
+import mistralclient.commands.v1.tasks
+import mistralclient.commands.v2.workbooks
+import mistralclient.commands.v2.workflows
+import mistralclient.commands.v2.executions
+import mistralclient.commands.v2.tasks
 
-from cliff.app import App
-from cliff.help import HelpAction
-from cliff.commandmanager import CommandManager
+from cliff import app
+from cliff import help
+from cliff import commandmanager
 
 import argparse
 
 LOG = logging.getLogger(__name__)
 
 
-class MistralShell(App):
+class MistralShell(app.App):
 
     def __init__(self):
         super(MistralShell, self).__init__(
             description=__doc__.strip(),
             version='0.1',
-            command_manager=CommandManager('mistral.cli'),
+            command_manager=commandmanager.CommandManager('mistral.cli'),
         )
 
-        self.commands = {
-            'workbook-list': mistralclient.commands.workbooks.List,
-            'workbook-get': mistralclient.commands.workbooks.Get,
-            'workbook-create': mistralclient.commands.workbooks.Create,
-            'workbook-delete': mistralclient.commands.workbooks.Delete,
-            'workbook-update': mistralclient.commands.workbooks.Update,
-            'workbook-upload-definition':
-            mistralclient.commands.workbooks.UploadDefinition,
-            'workbook-get-definition':
-            mistralclient.commands.workbooks.GetDefinition,
-            'execution-list': mistralclient.commands.executions.List,
-            'execution-get': mistralclient.commands.executions.Get,
-            'execution-create': mistralclient.commands.executions.Create,
-            'execution-delete': mistralclient.commands.executions.Delete,
-            'execution-update': mistralclient.commands.executions.Update,
-            'task-list': mistralclient.commands.tasks.List,
-            'task-get': mistralclient.commands.tasks.Get,
-            'task-update': mistralclient.commands.tasks.Update,
-        }
-
-        for k, v in self.commands.items():
-            self.command_manager.add_command(k, v)
+        # Set v2 commands by default
+        self._set_shell_commands(self._get_commands_v2())
 
     def configure_logging(self):
         super(MistralShell, self).configure_logging()
@@ -125,7 +109,7 @@ class MistralShell(App):
         )
         parser.add_argument(
             '-h', '--help',
-            action=HelpAction,
+            action=help.HelpAction,
             nargs=0,
             default=self,  # tricky
             help="Show this help message and exit.",
@@ -140,7 +124,7 @@ class MistralShell(App):
             '--os-mistral-url',
             action='store',
             dest='mistral_url',
-            default=env('OS_MISTRAL_URL', default='http://localhost:8989/v1'),
+            default=env('OS_MISTRAL_URL', default='http://localhost:8989/v2'),
             help='Mistral API host (Env: OS_MISTRAL_URL)'
         )
         parser.add_argument(
@@ -188,6 +172,10 @@ class MistralShell(App):
         return parser
 
     def initialize_app(self, argv):
+        self._clear_shell_commands()
+        self._set_shell_commands(self._get_commands(
+            client.determine_client_version(self.options.mistral_url)))
+
         self.client = client.client(mistral_url=self.options.mistral_url,
                                     username=self.options.username,
                                     api_key=self.options.password,
@@ -197,6 +185,81 @@ class MistralShell(App):
                                     endpoint_type='publicURL',
                                     service_type='workflow',
                                     auth_token=self.options.token)
+
+    def _set_shell_commands(self, cmds_dict):
+        for k, v in cmds_dict.items():
+            self.command_manager.add_command(k, v)
+
+    def _clear_shell_commands(self):
+        exclude_cmds = ['help', 'complete']
+
+        cmds = self.command_manager.commands.copy()
+        for k, v in cmds.items():
+            if k not in exclude_cmds:
+                self.command_manager.commands.pop(k)
+
+    def _get_commands(self, version):
+        if version == 1:
+            return self._get_commands_v1()
+        else:
+            return self._get_commands_v2()
+
+    def _get_commands_v1(self):
+        return {
+            'workbook-list': mistralclient.commands.v1.workbooks.List,
+            'workbook-get': mistralclient.commands.v1.workbooks.Get,
+            'workbook-create': mistralclient.commands.v1.workbooks.Create,
+            'workbook-delete': mistralclient.commands.v1.workbooks.Delete,
+            'workbook-update': mistralclient.commands.v1.workbooks.Update,
+            'workbook-upload-definition':
+            mistralclient.commands.v1.workbooks.UploadDefinition,
+            'workbook-get-definition':
+            mistralclient.commands.v1.workbooks.GetDefinition,
+            'execution-list': mistralclient.commands.v1.executions.List,
+            'execution-get': mistralclient.commands.v1.executions.Get,
+            'execution-create': mistralclient.commands.v1.executions.Create,
+            'execution-delete': mistralclient.commands.v1.executions.Delete,
+            'execution-update': mistralclient.commands.v1.executions.Update,
+            'task-list': mistralclient.commands.v1.tasks.List,
+            'task-get': mistralclient.commands.v1.tasks.Get,
+            'task-update': mistralclient.commands.v1.tasks.Update,
+        }
+
+    def _get_commands_v2(self):
+        return {
+            'workbook-list': mistralclient.commands.v2.workbooks.List,
+            'workbook-get': mistralclient.commands.v2.workbooks.Get,
+            'workbook-create': mistralclient.commands.v2.workbooks.Create,
+            'workbook-delete': mistralclient.commands.v2.workbooks.Delete,
+            'workbook-update': mistralclient.commands.v2.workbooks.Update,
+            'workbook-upload-definition':
+            mistralclient.commands.v2.workbooks.UploadDefinition,
+            'workbook-get-definition':
+            mistralclient.commands.v2.workbooks.GetDefinition,
+            'execution-list': mistralclient.commands.v2.executions.List,
+            'execution-get': mistralclient.commands.v2.executions.Get,
+            'execution-get-input':
+            mistralclient.commands.v2.executions.GetInput,
+            'execution-get-output':
+            mistralclient.commands.v2.executions.GetOutput,
+            'execution-create': mistralclient.commands.v2.executions.Create,
+            'execution-delete': mistralclient.commands.v2.executions.Delete,
+            'execution-update': mistralclient.commands.v2.executions.Update,
+            'task-list': mistralclient.commands.v2.tasks.List,
+            'task-get': mistralclient.commands.v2.tasks.Get,
+            'task-get-output': mistralclient.commands.v2.tasks.GetOutput,
+            'task-get-result': mistralclient.commands.v2.tasks.GetResult,
+            'task-update': mistralclient.commands.v2.tasks.Update,
+            'workflow-list': mistralclient.commands.v2.workflows.List,
+            'workflow-get': mistralclient.commands.v2.workflows.Get,
+            'workflow-create': mistralclient.commands.v2.workflows.Create,
+            'workflow-delete': mistralclient.commands.v2.workflows.Delete,
+            'workflow-update': mistralclient.commands.v2.workflows.Update,
+            'workflow-upload-definition':
+            mistralclient.commands.v2.workflows.UploadDefinition,
+            'workflow-get-definition':
+            mistralclient.commands.v2.workflows.GetDefinition
+        }
 
 
 def main(argv=sys.argv[1:]):

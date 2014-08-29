@@ -19,7 +19,7 @@ import pkg_resources as pkg
 import mock
 
 from mistralclient.tests.unit import base
-from mistralclient.commands import executions
+from mistralclient.commands.v1 import executions
 from mistralclient.api.v1.executions import Execution
 
 EXECUTION = Execution(mock, {

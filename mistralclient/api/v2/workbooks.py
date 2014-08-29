@@ -22,12 +22,11 @@ class Workbook(base.Resource):
 class WorkbookManager(base.ResourceManager):
     resource_class = Workbook
 
-    def create(self, name, definition=None, description=None, tags=None):
+    def create(self, name, tags=None, definition=None):
         self._ensure_not_empty(name=name)
 
         data = {
             'name': name,
-            'description': description,
             'tags': tags,
         }
 
@@ -36,12 +35,11 @@ class WorkbookManager(base.ResourceManager):
 
         return self._create('/workbooks', data)
 
-    def update(self, name, definition=None, description=None, tags=None):
+    def update(self, name, tags=None, definition=None):
         self._ensure_not_empty(name=name)
 
         data = {
             'name': name,
-            'description': description,
             'tags': tags,
         }
 

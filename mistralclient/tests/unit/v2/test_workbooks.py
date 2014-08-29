@@ -45,7 +45,6 @@ Workflows:
 
 WORKBOOK = {
     'name': "my_workbook",
-    'description': "My cool Mistral workbook",
     'tags': ['deployment', 'demo'],
     'definition': WB_DEF
 }
@@ -61,9 +60,8 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         mock = self.mock_http_post(content=WORKBOOK)
 
         wb = self.workbooks.create(WORKBOOK['name'],
-                                   WORKBOOK['definition'],
-                                   WORKBOOK['description'],
-                                   WORKBOOK['tags'])
+                                   WORKBOOK['tags'],
+                                   WORKBOOK['definition'])
 
         self.assertIsNotNone(wb)
         self.assertEqual(workbooks.Workbook(self.workbooks,
@@ -74,9 +72,8 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         mock = self.mock_http_put(content=WORKBOOK)
 
         wb = self.workbooks.update(WORKBOOK['name'],
-                                   WORKBOOK['definition'],
-                                   description=WORKBOOK['description'],
-                                   tags=WORKBOOK['tags'])
+                                   WORKBOOK['tags'],
+                                   WORKBOOK['definition'])
 
         self.assertIsNotNone(wb)
         self.assertEqual(workbooks.Workbook(self.workbooks,

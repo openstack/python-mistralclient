@@ -22,24 +22,22 @@ class Workflow(base.Resource):
 class WorkflowManager(base.ResourceManager):
     resource_class = Workflow
 
-    def create(self, name, definition, description=None, tags=None):
+    def create(self, name, definition, tags=None):
         self._ensure_not_empty(name=name, definition=definition)
 
         data = {
             'name': name,
             'definition': definition,
-            'description': description,
             'tags': tags,
         }
 
         return self._create('/workflows', data)
 
-    def update(self, name, definition=None, description=None, tags=None):
+    def update(self, name, definition=None, tags=None):
         self._ensure_not_empty(name=name)
 
         data = {
             'name': name,
-            'description': description,
             'tags': tags,
         }
 

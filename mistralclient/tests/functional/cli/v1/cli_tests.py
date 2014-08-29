@@ -18,13 +18,18 @@ from tempest import cli
 from tempest import exceptions
 
 
+MISTRAL_URL = "http://localhost:8989/v1"
+
+
 class MistralCLIAuth(cli.ClientTestBase):
 
     def mistral(self, action, flags='', params='', admin=True, fail_ok=False,
                 keystone_version=3):
         """Executes Mistral command."""
+        mistral_url_op = "--os-mistral-url %s" % MISTRAL_URL
         return self.cmd_with_auth(
-            'mistral', action, flags, params, admin, fail_ok, keystone_version)
+            'mistral %s' % mistral_url_op, action, flags, params, admin,
+            fail_ok, keystone_version)
 
 
 class SimpleMistralCLITests(MistralCLIAuth):
@@ -33,24 +38,6 @@ class SimpleMistralCLITests(MistralCLIAuth):
     @classmethod
     def setUpClass(cls):
         super(SimpleMistralCLITests, cls).setUpClass()
-
-    def test_command_help(self):
-        mistral_help = self.mistral('--help')
-
-        self.assertIn('Command-line interface to the Mistral APIs',
-                      mistral_help)
-        self.assertIn('Commands:', mistral_help)
-
-        expected_commands = ('complete', 'execution-create',
-                             'execution-delete', 'execution-get',
-                             'execution-list', 'execution-update',
-                             'help', 'task-get', 'task-list',
-                             'task-update', 'workbook-create',
-                             'workbook-delete', 'workbook-get',
-                             'workbook-get-definition', 'workbook-list',
-                             'workbook-update', 'workbook-upload-definition')
-        for command in expected_commands:
-            self.assertIn(command, mistral_help)
 
     def test_workbooks_list(self):
         workbooks = self.parser.listing(self.mistral('workbook-list'))
