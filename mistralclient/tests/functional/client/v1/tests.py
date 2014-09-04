@@ -12,7 +12,7 @@ class Workbooks(MistralBase):
         self.mistral_client.workbooks.create("new_wb")
         wbs_with_new_wb = self.mistral_client.workbooks.list()
 
-        self.assertEqual(len(wbs)+1, len(wbs_with_new_wb))
+        self.assertEqual(len(wbs) + 1, len(wbs_with_new_wb))
         self.assertTrue(self.assert_item_in_list(
             wbs_with_new_wb, name="new_wb"))
 
