@@ -15,6 +15,7 @@
 import six
 
 from mistralclient.api import httpclient
+from mistralclient.api.v2 import actions
 from mistralclient.api.v2 import workbooks
 from mistralclient.api.v2 import executions
 from mistralclient.api.v2 import tasks
@@ -48,6 +49,7 @@ class Client(object):
         self.workbooks = workbooks.WorkbookManager(self)
         self.executions = executions.ExecutionManager(self)
         self.tasks = tasks.TaskManager(self)
+        self.actions = actions.ActionManager(self)
         self.workflows = workflows.WorkflowManager(self)
 
     def authenticate(self, mistral_url=None, username=None, api_key=None,

@@ -28,10 +28,11 @@ from mistralclient.api import client
 import mistralclient.commands.v1.workbooks
 import mistralclient.commands.v1.executions
 import mistralclient.commands.v1.tasks
-import mistralclient.commands.v2.workbooks
-import mistralclient.commands.v2.workflows
+import mistralclient.commands.v2.actions
 import mistralclient.commands.v2.executions
 import mistralclient.commands.v2.tasks
+import mistralclient.commands.v2.workbooks
+import mistralclient.commands.v2.workflows
 
 from cliff import app
 from cliff import help
@@ -204,7 +205,8 @@ class MistralShell(app.App):
         else:
             return self._get_commands_v2()
 
-    def _get_commands_v1(self):
+    @staticmethod
+    def _get_commands_v1():
         return {
             'workbook-list': mistralclient.commands.v1.workbooks.List,
             'workbook-get': mistralclient.commands.v1.workbooks.Get,
@@ -225,7 +227,8 @@ class MistralShell(app.App):
             'task-update': mistralclient.commands.v1.tasks.Update,
         }
 
-    def _get_commands_v2(self):
+    @staticmethod
+    def _get_commands_v2():
         return {
             'workbook-list': mistralclient.commands.v2.workbooks.List,
             'workbook-get': mistralclient.commands.v2.workbooks.Get,
@@ -250,6 +253,15 @@ class MistralShell(app.App):
             'task-get-output': mistralclient.commands.v2.tasks.GetOutput,
             'task-get-result': mistralclient.commands.v2.tasks.GetResult,
             'task-update': mistralclient.commands.v2.tasks.Update,
+            'action-list': mistralclient.commands.v2.actions.List,
+            'action-get': mistralclient.commands.v2.actions.Get,
+            'action-create': mistralclient.commands.v2.actions.Create,
+            'action-delete': mistralclient.commands.v2.actions.Delete,
+            'action-update': mistralclient.commands.v2.actions.Update,
+            'action-upload-definition':
+            mistralclient.commands.v2.actions.UploadDefinition,
+            'action-get-definition':
+            mistralclient.commands.v2.actions.GetDefinition,
             'workflow-list': mistralclient.commands.v2.workflows.List,
             'workflow-get': mistralclient.commands.v2.workflows.Get,
             'workflow-create': mistralclient.commands.v2.workflows.Create,
