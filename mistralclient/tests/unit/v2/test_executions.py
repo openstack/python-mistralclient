@@ -24,14 +24,12 @@ EXEC = {
     'id': "123",
     'workflow_name': 'my_wf',
     'state': 'RUNNING',
-    'workflow_input': """
-        {
-            "person": {
-                "first_name": "John",
-                "last_name": "Doe"
-            }
+    'input': {
+        "person": {
+            "first_name": "John",
+            "last_name": "Doe"
         }
-    """
+    }
 }
 
 
@@ -44,11 +42,11 @@ class TestExecutionsV2(base.BaseClientV2Test):
         mock = self.mock_http_post(content=EXEC)
         body = {
             'workflow_name': EXEC['workflow_name'],
-            'workflow_input': EXEC['workflow_input'],
+            'input': json.dumps(EXEC['input']),
         }
 
         ex = self.executions.create(EXEC['workflow_name'],
-                                    EXEC['workflow_input'])
+                                    EXEC['input'])
 
         self.assertIsNotNone(ex)
         self.assertEqual(executions.Execution(self.executions, EXEC).__dict__,

@@ -12,6 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import json
+
 from mistralclient.api import base
 
 
@@ -28,9 +30,10 @@ class ExecutionManager(base.ResourceManager):
         data = {'workflow_name': workflow_name}
 
         if workflow_input:
-            data.update({'workflow_input': workflow_input})
+            data.update({'input': json.dumps(workflow_input)})
 
-        data.update(params)
+        if params:
+            data.update({'params': json.dumps(params)})
 
         return self._create('/executions', data)
 
