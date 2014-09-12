@@ -27,6 +27,7 @@ class MistralCLIAuth(cli.ClientTestBase):
                 keystone_version=3):
         """Executes Mistral command."""
         mistral_url_op = "--os-mistral-url %s" % MISTRAL_URL
+
         return self.cmd_with_auth(
             'mistral %s' % mistral_url_op, action, flags, params, admin,
             fail_ok, keystone_version)
@@ -71,8 +72,11 @@ class ClientTestBase(MistralCLIAuth):
     def setUpClass(cls):
         super(ClientTestBase, cls).setUpClass()
 
-        cls.definition = os.path.relpath(
-            'functionaltests/hello2.yaml', os.getcwd())
+        cls.wb_def = os.path.relpath(
+            'functionaltests/resources/v2/wb_v2.yaml', os.getcwd())
+
+        cls.wf_def = os.path.relpath(
+            'functionaltests/resources/v2/wf_v2.yaml', os.getcwd())
 
     def tearDown(self):
         super(ClientTestBase, self).tearDown()
@@ -105,7 +109,7 @@ class WorkbookCLITests(ClientTestBase):
 
     def test_workbook_create_delete(self):
         wb1 = self.mistral_command(
-            'workbook-create', params='wb wb_tag {0}'.format(self.definition))
+            'workbook-create', params='wb wb_tag {0}'.format(self.wb_def))
         self.assertTableStruct(wb1, ['Field', 'Value'])
 
         wfs = self.mistral_command('workflow-list')
@@ -161,7 +165,7 @@ class WorkbookCLITests(ClientTestBase):
     def test_workbook_upload_get_definition(self):
         self.mistral('workbook-create', params='wb')
         self.mistral('workbook-upload-definition',
-                     params='wb {0}'.format(self.definition))
+                     params='wb {0}'.format(self.wb_def))
 
         definition = self.mistral_command('workbook-get-definition',
                                           params='wb')
@@ -177,7 +181,7 @@ class WorkflowCLITests(ClientTestBase):
 
     def test_workflow_create_delete(self):
         wf = self.mistral_command(
-            'workflow-create', params='wf wf_tag {0}'.format(self.definition))
+            'workflow-create', params='wf wf_tag {0}'.format(self.wf_def))
         self.assertTableStruct(wf, ['Field', 'Value'])
 
         name = self.get_value_of_field(wf, "Name")
@@ -192,7 +196,7 @@ class WorkflowCLITests(ClientTestBase):
 
     def test_workflow_update(self):
         self.mistral(
-            'workflow-create', params='wf wf_tag {0}'.format(self.definition))
+            'workflow-create', params='wf wf_tag {0}'.format(self.wf_def))
 
         wf = self.mistral_command('workflow-update', params='wf tag')
         self.assertTableStruct(wf, ['Field', 'Value'])
@@ -205,7 +209,7 @@ class WorkflowCLITests(ClientTestBase):
 
     def test_workflow_get(self):
         created = self.mistral_command(
-            'workflow-create', params='wf wf_tag {0}'.format(self.definition))
+            'workflow-create', params='wf wf_tag {0}'.format(self.wf_def))
 
         fetched = self.mistral_command('workflow-get', params='wf')
 
@@ -221,10 +225,10 @@ class WorkflowCLITests(ClientTestBase):
 
     def test_workflow_upload_get_definition(self):
         self.mistral(
-            'workflow-create', params='wf wf_tag {0}'.format(self.definition))
+            'workflow-create', params='wf wf_tag {0}'.format(self.wf_def))
         self.mistral(
             'workflow-upload-definition',
-            params='wf {0}'.format(self.definition))
+            params='wf {0}'.format(self.wf_def))
 
         definition = self.mistral_command(
             'workflow-get-definition', params='wf')
@@ -238,7 +242,7 @@ class ExecutionCLITests(ClientTestBase):
         super(ExecutionCLITests, self).setUp()
 
         self.mistral(
-            'workbook-create', params='wb wb_tag {0}'.format(self.definition))
+            'workbook-create', params='wb wb_tag {0}'.format(self.wb_def))
 
     def tearDown(self):
         super(ExecutionCLITests, self).tearDown()

@@ -64,8 +64,8 @@ class ClientTestBase(MistralCLIAuth):
     def setUpClass(cls):
         super(ClientTestBase, cls).setUpClass()
 
-        cls.definition = os.path.relpath(
-            'functionaltests/hello.yaml', os.getcwd())
+        cls.wb_def = os.path.relpath(
+            'functionaltests/resources/v1/wb_v1.yaml', os.getcwd())
 
     def tearDown(self):
         super(ClientTestBase, self).tearDown()
@@ -131,7 +131,7 @@ class WorkbookCLITests(ClientTestBase):
 
         self.parser.listing(self.mistral(
             'workbook-upload-definition',
-            params='"wb" "{0}"'.format(self.definition)))
+            params='"wb" "{0}"'.format(self.wb_def)))
 
         definition = self.mistral('workbook-get-definition', params='wb')
         self.assertNotIn('404 Not Found', definition)
@@ -145,7 +145,7 @@ class ExecutionCLITests(ClientTestBase):
 
         self.mistral('workbook-create', params='wb')
         self.mistral('workbook-upload-definition',
-                     params='"wb" "{0}"'.format(self.definition))
+                     params='"wb" "{0}"'.format(self.wb_def))
 
     def tearDown(self):
         super(ExecutionCLITests, self).tearDown()
@@ -225,7 +225,7 @@ class TaskCLITests(ClientTestBase):
     def test_get_task(self):
         self.mistral('workbook-create', params='wb')
         self.mistral('workbook-upload-definition',
-                     params='"wb" "{0}"'.format(self.definition))
+                     params='"wb" "{0}"'.format(self.wb_def))
 
         execution = self.parser.listing(self.mistral(
             'execution-create', params='"wb" "hello" "{}"'))
@@ -332,7 +332,7 @@ class NegativeCLITests(ClientTestBase):
     def test_ex_update_set_wrong_state(self):
         self.mistral('workbook-create', params='wb')
         self.mistral('workbook-upload-definition',
-                     params='"wb" "{0}"'.format(self.definition))
+                     params='"wb" "{0}"'.format(self.wb_def))
 
         execution = self.parser.listing(self.mistral(
             'execution-create', params='"wb" "hello" "{}"'))
@@ -345,7 +345,7 @@ class NegativeCLITests(ClientTestBase):
     def test_task_get_nonexisting_task(self):
         self.mistral('workbook-create', params='wb')
         self.mistral('workbook-upload-definition',
-                     params='"wb" "{0}"'.format(self.definition))
+                     params='"wb" "{0}"'.format(self.wb_def))
 
         self.mistral('execution-create', params='"wb" "hello" "{}"')
 
