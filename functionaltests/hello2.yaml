@@ -1,0 +1,11 @@
+Version: '2.0'
+
+Workflows:
+  wf1:
+    type: direct
+    start-task: hello
+    tasks:
+      hello:
+        action: std.echo output="Hello"
+        publish:
+            result: $
