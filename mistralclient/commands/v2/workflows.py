@@ -154,7 +154,7 @@ class Update(show.ShowOne):
         if parsed_args.definition:
             workflow = workflows.WorkflowManager(self.app.client)\
                 .update(parsed_args.name,
-                        parsed_args.definition.read(),
+                        open(parsed_args.definition).read(),
                         str(parsed_args.tags).split(','))
         else:
             workflow = workflows.WorkflowManager(self.app.client)\
