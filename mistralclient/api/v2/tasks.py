@@ -31,8 +31,13 @@ class TaskManager(base.ResourceManager):
 
         return self._update('/tasks/%s' % id, data)
 
-    def list(self):
-        return self._list('/tasks', response_key='tasks')
+    def list(self, execution_id=None):
+        url = '/tasks'
+
+        if execution_id:
+            url = '/executions/%s/tasks' % execution_id
+
+        return self._list(url, response_key='tasks')
 
     def get(self, id):
         self._ensure_not_empty(id=id)
