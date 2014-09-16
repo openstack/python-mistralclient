@@ -14,6 +14,7 @@
 #    under the License.
 #
 
+import json
 import mock
 
 from mistralclient.tests.unit import base
@@ -21,14 +22,28 @@ from mistralclient.tests.unit import base
 from mistralclient.commands.v2 import tasks as task_cmd
 from mistralclient.api.v2 import tasks
 
-TASK = tasks.Task(mock, {
+TASK_DICT = {
     'id': '123',
     'name': 'some',
     'wf_name': 'thing',
     'execution_id': '321',
     'state': 'RUNNING',
-    'parameters': {},
-})
+}
+
+TASK_RESULT = {"test": "is", "passed": "successfully"}
+TASK_PARAMETERS = {"param1": "val1", "param2": 2}
+
+TASK_WITH_RESULT_DICT = TASK_DICT.copy()
+TASK_WITH_RESULT_DICT.update({'result': json.dumps(TASK_RESULT)})
+TASK_WITH_OUTPUT_DICT = TASK_DICT.copy()
+TASK_WITH_OUTPUT_DICT.update({'output': json.dumps(TASK_RESULT)})
+TASK_WITH_PARAMETERS_DICT = TASK_DICT.copy()
+TASK_WITH_PARAMETERS_DICT.update({'parameters': json.dumps(TASK_PARAMETERS)})
+
+TASK = tasks.Task(mock, TASK_DICT)
+TASK_WITH_RESULT = tasks.Task(mock, TASK_WITH_RESULT_DICT)
+TASK_WITH_OUTPUT = tasks.Task(mock, TASK_WITH_OUTPUT_DICT)
+TASK_WITH_PARAMETERS = tasks.Task(mock, TASK_WITH_PARAMETERS_DICT)
 
 
 class TestCLIT1asksV2(base.BaseCommandTest):
@@ -39,7 +54,7 @@ class TestCLIT1asksV2(base.BaseCommandTest):
         result = self.call(task_cmd.Update,
                            app_args=['id', 'ERROR'])
 
-        self.assertEqual(('123', 'some', 'thing', '321', 'RUNNING', {}),
+        self.assertEqual(('123', 'some', 'thing', '321', 'RUNNING'),
                          result[1])
 
     @mock.patch('mistralclient.api.v2.tasks.TaskManager.list')
@@ -48,7 +63,7 @@ class TestCLIT1asksV2(base.BaseCommandTest):
 
         result = self.call(task_cmd.List)
 
-        self.assertEqual([('123', 'some', 'thing', '321', 'RUNNING', {})],
+        self.assertEqual([('123', 'some', 'thing', '321', 'RUNNING')],
                          result[1])
 
     @mock.patch('mistralclient.api.v2.tasks.TaskManager.get')
@@ -57,5 +72,32 @@ class TestCLIT1asksV2(base.BaseCommandTest):
 
         result = self.call(task_cmd.Get, app_args=['id'])
 
-        self.assertEqual(('123', 'some', 'thing', '321', 'RUNNING', {}),
+        self.assertEqual(('123', 'some', 'thing', '321', 'RUNNING'),
                          result[1])
+
+    @mock.patch('mistralclient.api.v2.tasks.TaskManager.get')
+    def test_get_result(self, mock):
+        mock.return_value = TASK_WITH_RESULT
+
+        self.call(task_cmd.GetResult, app_args=['id'])
+
+        self.app.stdout.write.assert_called_with(
+            json.dumps(TASK_RESULT, indent=4) + "\n")
+
+    @mock.patch('mistralclient.api.v2.tasks.TaskManager.get')
+    def test_get_output(self, mock):
+        mock.return_value = TASK_WITH_OUTPUT
+
+        self.call(task_cmd.GetOutput, app_args=['id'])
+
+        self.app.stdout.write.assert_called_with(
+            json.dumps(TASK_RESULT, indent=4) + "\n")
+
+    @mock.patch('mistralclient.api.v2.tasks.TaskManager.get')
+    def test_get_parameters(self, mock):
+        mock.return_value = TASK_WITH_PARAMETERS
+
+        self.call(task_cmd.GetParameters, app_args=['id'])
+
+        self.app.stdout.write.assert_called_with(
+            json.dumps(TASK_PARAMETERS, indent=4) + "\n")
