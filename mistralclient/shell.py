@@ -248,6 +248,8 @@ class MistralShell(app.App):
             'task-list': mistralclient.commands.v2.tasks.List,
             'task-get': mistralclient.commands.v2.tasks.Get,
             'task-get-output': mistralclient.commands.v2.tasks.GetOutput,
+            'task-get-parameters':
+            mistralclient.commands.v2.tasks.GetParameters,
             'task-get-result': mistralclient.commands.v2.tasks.GetResult,
             'task-update': mistralclient.commands.v2.tasks.Update,
             'workflow-list': mistralclient.commands.v2.workflows.List,
