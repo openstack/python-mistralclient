@@ -22,12 +22,11 @@ from mistralclient.api.v2 import workbooks
 
 WB_DEF = """
 ---
-Version: 2.0
+version: 2.0
 
-Workflows:
+workflows:
   wf1:
     type: direct
-    start_task: task1
     parameters:
       - param1
       - param2

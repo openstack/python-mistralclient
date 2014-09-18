@@ -63,7 +63,7 @@ class SimpleMistralCLITests(MistralCLIAuth):
             self.mistral('task-list'))
         self.assertTableStruct(tasks,
                                ['ID', 'Name', 'Workflow name', 'Execution ID',
-                                'State', 'Parameters'])
+                                'State'])
 
 
 class ClientTestBase(MistralCLIAuth):

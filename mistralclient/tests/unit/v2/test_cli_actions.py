@@ -31,7 +31,7 @@ ACTION_DICT = {
 
 ACTION_DEF = """
 ---
-Version: '2.0'
+version: '2.0'
 
 base: std.echo
 base-parameters:

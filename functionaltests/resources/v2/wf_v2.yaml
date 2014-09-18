@@ -2,7 +2,6 @@
 version: '2.0'
 
 type: direct
-start-task: hello
 tasks:
   hello:
     action: std.echo output="Hello"
