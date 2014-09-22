@@ -152,20 +152,21 @@ class GetResult(command.Command):
         self.app.stdout.write(result or "\n")
 
 
-class GetParameters(command.Command):
-    """Show task parameters."""
+class GetInput(command.Command):
+    """Show task input."""
 
     def get_parser(self, prog_name):
-        parser = super(GetParameters, self).get_parser(prog_name)
+        parser = super(GetInput, self).get_parser(prog_name)
         parser.add_argument(
             'id',
-            help='Task ID')
+            help='Task ID'
+        )
 
         return parser
 
     def take_action(self, parsed_args):
         result = tasks.TaskManager(self.app.client)\
-            .get(parsed_args.id).parameters
+            .get(parsed_args.id).input
 
         try:
             result = json.loads(result)
