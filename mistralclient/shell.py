@@ -235,8 +235,6 @@ class MistralShell(app.App):
             'workbook-create': mistralclient.commands.v2.workbooks.Create,
             'workbook-delete': mistralclient.commands.v2.workbooks.Delete,
             'workbook-update': mistralclient.commands.v2.workbooks.Update,
-            'workbook-upload-definition':
-            mistralclient.commands.v2.workbooks.UploadDefinition,
             'workbook-get-definition':
             mistralclient.commands.v2.workbooks.GetDefinition,
             'execution-list': mistralclient.commands.v2.executions.List,

@@ -70,9 +70,12 @@ class Get(show.ShowOne):
 
     def get_parser(self, prog_name):
         parser = super(Get, self).get_parser(prog_name)
+
         parser.add_argument(
             'name',
-            help='Workbook name')
+            help='Workbook name'
+        )
+
         return parser
 
     def take_action(self, parsed_args):
@@ -87,16 +90,9 @@ class Create(show.ShowOne):
 
     def get_parser(self, prog_name):
         parser = super(Create, self).get_parser(prog_name)
-        parser.add_argument(
-            'name',
-            help='Workbook name')
-        parser.add_argument(
-            'tags',
-            nargs='?',
-            help='Workbook tags separated by ","')
+
         parser.add_argument(
             'definition',
-            nargs='?',
             type=argparse.FileType('r'),
             help='Workbook definition file'
         )
@@ -104,15 +100,8 @@ class Create(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        if parsed_args.definition:
-            workbook = workbooks.WorkbookManager(self.app.client)\
-                .create(parsed_args.name,
-                        str(parsed_args.tags).split(','),
-                        parsed_args.definition.read())
-        else:
-            workbook = workbooks.WorkbookManager(self.app.client)\
-                .create(parsed_args.name,
-                        str(parsed_args.tags).split(','), None)
+        workbook = workbooks.WorkbookManager(self.app.client)\
+            .create(parsed_args.definition.read())
 
         return format(workbook)
 
@@ -122,9 +111,8 @@ class Delete(command.Command):
 
     def get_parser(self, prog_name):
         parser = super(Delete, self).get_parser(prog_name)
-        parser.add_argument(
-            'name',
-            help='Workbook name')
+
+        parser.add_argument('name', help='Workbook name')
 
         return parser
 
@@ -137,16 +125,9 @@ class Update(show.ShowOne):
 
     def get_parser(self, prog_name):
         parser = super(Update, self).get_parser(prog_name)
-        parser.add_argument(
-            'name',
-            help='Workbook name')
-        parser.add_argument(
-            'tags',
-            nargs='?',
-            help='Workbook tags separated by ","')
+
         parser.add_argument(
             'definition',
-            nargs='?',
             type=argparse.FileType('r'),
             help='Workbook definition file'
         )
@@ -154,40 +135,10 @@ class Update(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        if parsed_args.definition:
-            workbook = workbooks.WorkbookManager(self.app.client)\
-                .update(parsed_args.name,
-                        str(parsed_args.tags).split(','),
-                        parsed_args.definition.read())
-            return format(workbook)
-        else:
-            workbook = workbooks.WorkbookManager(self.app.client)\
-                .update(parsed_args.name,
-                        tags=str(parsed_args.tags).split(','))
-            return format(workbook)
-
-
-class UploadDefinition(command.Command):
-    """Upload workbook definition."""
-
-    def get_parser(self, prog_name):
-        parser = super(UploadDefinition, self).get_parser(prog_name)
-        parser.add_argument(
-            'name',
-            help='Workbook name')
-        parser.add_argument(
-            'path',
-            type=argparse.FileType('r'),
-            help='Workbook definition file')
-
-        return parser
-
-    def take_action(self, parsed_args):
         workbook = workbooks.WorkbookManager(self.app.client)\
-            .update(parsed_args.name,
-                    definition=parsed_args.path.read())
+            .update(parsed_args.definition.read())
 
-        self.app.stdout.write(workbook.definition or "\n")
+        return format(workbook)
 
 
 class GetDefinition(command.Command):
@@ -195,9 +146,8 @@ class GetDefinition(command.Command):
 
     def get_parser(self, prog_name):
         parser = super(GetDefinition, self).get_parser(prog_name)
-        parser.add_argument(
-            'name',
-            help='Workbook name')
+
+        parser.add_argument('name', help='Workbook name')
 
         return parser
 

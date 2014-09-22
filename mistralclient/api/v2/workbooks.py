@@ -22,31 +22,15 @@ class Workbook(base.Resource):
 class WorkbookManager(base.ResourceManager):
     resource_class = Workbook
 
-    def create(self, name, tags=None, definition=None):
-        self._ensure_not_empty(name=name)
+    def create(self, definition):
+        self._ensure_not_empty(definition=definition)
 
-        data = {
-            'name': name,
-            'tags': tags,
-        }
+        return self._create('/workbooks', {'definition': definition})
 
-        if definition:
-            data.update({'definition': definition})
+    def update(self, definition):
+        self._ensure_not_empty(definition=definition)
 
-        return self._create('/workbooks', data)
-
-    def update(self, name, tags=None, definition=None):
-        self._ensure_not_empty(name=name)
-
-        data = {
-            'name': name,
-            'tags': tags,
-        }
-
-        if definition:
-            data.update({'definition': definition})
-
-        return self._update('/workbooks/%s' % name, data)
+        return self._update('/workbooks', {'definition': definition})
 
     def list(self):
         return self._list('/workbooks', response_key='workbooks')

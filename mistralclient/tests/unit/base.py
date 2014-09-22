@@ -72,5 +72,7 @@ class BaseCommandTest(unittest2.TestCase):
 
     def call(self, command, app_args=[], prog_name=''):
         cmd = command(self.app, app_args)
+
         parsed_args = cmd.get_parser(prog_name).parse_args(app_args)
+
         return cmd.take_action(parsed_args)

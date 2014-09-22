@@ -24,62 +24,58 @@ WB_DEF = """
 ---
 version: 2.0
 
+name: wb
+
 workflows:
   wf1:
     type: direct
-    parameters:
+    input:
       - param1
       - param2
 
     tasks:
       task1:
         action: std.http url="localhost:8989"
-        on-success: test_subsequent
+        on-success:
+          - test_subsequent
 
       test_subsequent:
-        action: std.http url="http://some_url"
-        parameters:
-          server_id: 1
+        action: std.http url="http://some_url" server_id=1
 """
 
-WORKBOOK = {
-    'name': "my_workbook",
-    'tags': ['deployment', 'demo'],
-    'definition': WB_DEF
-}
+WORKBOOK = {'definition': WB_DEF}
 
 
 URL_TEMPLATE = '/workbooks'
 URL_TEMPLATE_NAME = '/workbooks/%s'
-URL_TEMPLATE_DEFINITION = '/workbooks/%s/definition'
 
 
 class TestWorkbooksV2(base.BaseClientV2Test):
     def test_create(self):
         mock = self.mock_http_post(content=WORKBOOK)
 
-        wb = self.workbooks.create(WORKBOOK['name'],
-                                   WORKBOOK['tags'],
-                                   WORKBOOK['definition'])
+        wb = self.workbooks.create(WORKBOOK['definition'])
 
         self.assertIsNotNone(wb)
-        self.assertEqual(workbooks.Workbook(self.workbooks,
-                                            WORKBOOK).__dict__, wb.__dict__)
+        self.assertEqual(
+            workbooks.Workbook(self.workbooks, WORKBOOK).__dict__,
+            wb.__dict__
+        )
+
         mock.assert_called_once_with(URL_TEMPLATE, json.dumps(WORKBOOK))
 
     def test_update(self):
         mock = self.mock_http_put(content=WORKBOOK)
 
-        wb = self.workbooks.update(WORKBOOK['name'],
-                                   WORKBOOK['tags'],
-                                   WORKBOOK['definition'])
+        wb = self.workbooks.update(WORKBOOK['definition'])
 
         self.assertIsNotNone(wb)
-        self.assertEqual(workbooks.Workbook(self.workbooks,
-                                            WORKBOOK).__dict__, wb.__dict__)
-        mock.assert_called_once_with(
-            URL_TEMPLATE_NAME % WORKBOOK['name'],
-            json.dumps(WORKBOOK))
+        self.assertEqual(
+            workbooks.Workbook(self.workbooks, WORKBOOK).__dict__,
+            wb.__dict__
+        )
+
+        mock.assert_called_once_with(URL_TEMPLATE, json.dumps(WORKBOOK))
 
     def test_list(self):
         mock = self.mock_http_get(content={'workbooks': [WORKBOOK]})
@@ -87,25 +83,32 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         workbook_list = self.workbooks.list()
 
         self.assertEqual(1, len(workbook_list))
+
         wb = workbook_list[0]
 
-        self.assertEqual(workbooks.Workbook(self.workbooks,
-                                            WORKBOOK).__dict__, wb.__dict__)
+        self.assertEqual(
+            workbooks.Workbook(self.workbooks, WORKBOOK).__dict__,
+            wb.__dict__
+        )
+
         mock.assert_called_once_with(URL_TEMPLATE)
 
     def test_get(self):
         mock = self.mock_http_get(content=WORKBOOK)
 
-        wb = self.workbooks.get(WORKBOOK['name'])
+        wb = self.workbooks.get('wb')
 
         self.assertIsNotNone(wb)
-        self.assertEqual(workbooks.Workbook(self.workbooks,
-                                            WORKBOOK).__dict__, wb.__dict__)
-        mock.assert_called_once_with(URL_TEMPLATE_NAME % WORKBOOK['name'])
+        self.assertEqual(
+            workbooks.Workbook(self.workbooks, WORKBOOK).__dict__,
+            wb.__dict__
+        )
+
+        mock.assert_called_once_with(URL_TEMPLATE_NAME % 'wb')
 
     def test_delete(self):
         mock = self.mock_http_delete(status_code=204)
 
-        self.workbooks.delete(WORKBOOK['name'])
+        self.workbooks.delete('wb')
 
-        mock.assert_called_once_with(URL_TEMPLATE_NAME % WORKBOOK['name'])
+        mock.assert_called_once_with(URL_TEMPLATE_NAME % 'wb')

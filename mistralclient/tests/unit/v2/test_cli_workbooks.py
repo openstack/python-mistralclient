@@ -31,7 +31,12 @@ WORKBOOK_DICT = {
 
 
 WB_DEF = """
-Workflows:
+---
+version: '2.0
+
+name: wb
+
+workflows:
   wf1:
     tasks:
       task1:
@@ -45,19 +50,23 @@ WORKBOOK_WITH_DEF = workbooks.Workbook(mock, WB_WITH_DEF_DICT)
 
 
 class TestCLIWorkbooksV2(base.BaseCommandTest):
+    @mock.patch('argparse.open', create=True)
     @mock.patch('mistralclient.api.v2.workbooks.WorkbookManager.create')
-    def test_create(self, mock):
+    def test_create(self, mock, mock_open):
         mock.return_value = WORKBOOK
+        mock_open.return_value = mock.MagicMock(spec=file)
 
-        result = self.call(workbook_cmd.Create, app_args=['name'])
+        result = self.call(workbook_cmd.Create, app_args=['wb.yaml'])
 
         self.assertEqual(('a', 'a, b', '1', '1'), result[1])
 
+    @mock.patch('argparse.open', create=True)
     @mock.patch('mistralclient.api.v2.workbooks.WorkbookManager.update')
-    def test_update(self, mock):
+    def test_update(self, mock, mock_open):
         mock.return_value = WORKBOOK
+        mock_open.return_value = mock.MagicMock(spec=file)
 
-        result = self.call(workbook_cmd.Update, app_args=['name'])
+        result = self.call(workbook_cmd.Update, app_args=['definition'])
 
         self.assertEqual(('a', 'a, b', '1', '1'), result[1])
 
@@ -81,21 +90,7 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
     def test_delete(self, mock):
         self.assertIsNone(self.call(workbook_cmd.Delete, app_args=['name']))
 
-    @mock.patch('argparse.open', create=True)
-    @mock.patch(
-        'mistralclient.api.v2.workbooks.WorkbookManager.update'
-    )
-    def test_upload_definition(self, mock, mock_open):
-        mock.return_value = WORKBOOK_WITH_DEF
-        mock_open.return_value = mock.MagicMock(spec=file)
-
-        result = self.call(workbook_cmd.UploadDefinition,
-                           app_args=['name', '1.txt'])
-
-        self.assertIsNone(result)
-
-    @mock.patch('mistralclient.api.v2.workbooks.'
-                'WorkbookManager.get')
+    @mock.patch('mistralclient.api.v2.workbooks.WorkbookManager.get')
     def test_get_definition(self, mock):
         mock.return_value = WORKBOOK_WITH_DEF
 

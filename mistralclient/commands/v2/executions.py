@@ -69,9 +69,7 @@ class Get(show.ShowOne):
     def get_parser(self, prog_name):
         parser = super(Get, self).get_parser(prog_name)
 
-        parser.add_argument(
-            'id',
-            help='Execution identifier')
+        parser.add_argument('id', help='Execution identifier')
 
         return parser
 
@@ -87,17 +85,21 @@ class Create(show.ShowOne):
 
     def get_parser(self, prog_name):
         parser = super(Create, self).get_parser(prog_name)
+
         parser.add_argument(
             'workflow_name',
-            help='Execution workflow')
+            help='Execution workflow'
+        )
         parser.add_argument(
             'workflow_input',
             nargs='?',
-            help='Workflow input')
+            help='Workflow input'
+        )
         parser.add_argument(
             'params',
             nargs='?',
-            help='Workflow additional parameters')
+            help='Workflow additional parameters'
+        )
 
         return parser
 
@@ -132,9 +134,7 @@ class Delete(command.Command):
     def get_parser(self, prog_name):
         parser = super(Delete, self).get_parser(prog_name)
 
-        parser.add_argument(
-            'id',
-            help='Execution identifier')
+        parser.add_argument('id', help='Execution identifier')
 
         return parser
 
@@ -150,11 +150,13 @@ class Update(show.ShowOne):
 
         parser.add_argument(
             'id',
-            help='Execution identifier')
+            help='Execution identifier'
+        )
         parser.add_argument(
             'state',
             choices=['RUNNING', 'SUSPENDED', 'STOPPED', 'SUCCESS', 'ERROR'],
-            help='Execution state')
+            help='Execution state'
+        )
 
         return parser
 
@@ -171,9 +173,8 @@ class GetInput(command.Command):
 
     def get_parser(self, prog_name):
         parser = super(GetInput, self).get_parser(prog_name)
-        parser.add_argument(
-            'id',
-            help='Execution ID')
+
+        parser.add_argument('id', help='Execution ID')
 
         return parser
 
@@ -195,9 +196,8 @@ class GetOutput(command.Command):
 
     def get_parser(self, prog_name):
         parser = super(GetOutput, self).get_parser(prog_name)
-        parser.add_argument(
-            'id',
-            help='Execution ID')
+
+        parser.add_argument('id', help='Execution ID')
 
         return parser
 
