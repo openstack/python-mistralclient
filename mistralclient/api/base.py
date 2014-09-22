@@ -107,11 +107,11 @@ class ResourceManager(object):
     def _list(self, url, response_key=None):
         resp = self.client.http_client.get(url)
 
-        if resp.status_code == 200:
-            return [self.resource_class(self, resource_data)
-                    for resource_data in extract_json(resp, response_key)]
-        else:
+        if resp.status_code != 200:
             self._raise_api_exception(resp)
+
+        return [self.resource_class(self, resource_data)
+                for resource_data in extract_json(resp, response_key)]
 
     def _get(self, url, response_key=None):
         resp = self.client.http_client.get(url)

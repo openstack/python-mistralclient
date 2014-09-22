@@ -12,6 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import json
+
 from mistralclient.api import base
 
 
@@ -22,29 +24,33 @@ class Workflow(base.Resource):
 class WorkflowManager(base.ResourceManager):
     resource_class = Workflow
 
-    def create(self, name, definition, tags=None):
-        self._ensure_not_empty(name=name, definition=definition)
+    def create(self, definition):
+        self._ensure_not_empty(definition=definition)
 
-        data = {
-            'name': name,
-            'definition': definition,
-            'tags': tags,
-        }
+        resp = self.client.http_client.post(
+            '/workflows',
+            json.dumps({'definition': definition})
+        )
 
-        return self._create('/workflows', data)
+        if resp.status_code != 201:
+            self._raise_api_exception(resp)
 
-    def update(self, name, definition=None, tags=None):
-        self._ensure_not_empty(name=name)
+        return [self.resource_class(self, resource_data)
+                for resource_data in base.extract_json(resp, 'workflows')]
 
-        data = {
-            'name': name,
-            'tags': tags,
-        }
+    def update(self, definition):
+        self._ensure_not_empty(definition=definition)
 
-        if definition:
-            data.update({'definition': definition})
+        resp = self.client.http_client.put(
+            '/workflows',
+            json.dumps({'definition': definition})
+        )
 
-        return self._update('/workflows/%s' % name, data)
+        if resp.status_code != 200:
+            self._raise_api_exception(resp)
+
+        return [self.resource_class(self, resource_data)
+                for resource_data in base.extract_json(resp, 'workflows')]
 
     def list(self):
         return self._list('/workflows', response_key='workflows')

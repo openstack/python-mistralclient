@@ -35,10 +35,12 @@ def format(workflow=None):
     )
 
     if workflow:
+        tags = getattr(workflow, 'tags', None) or []
+
         data = (
             workflow.name,
-            ', '.join(workflow.tags or '') or '<none>',
-            workflow.created_at,
+            ', '.join(tags) or '<none>',
+            workflow.created_at
         )
 
         if hasattr(workflow, 'updated_at'):
@@ -55,10 +57,9 @@ class List(lister.Lister):
     """List all workflows."""
 
     def take_action(self, parsed_args):
-        data = [
-            format(workflow)[1] for workflow
-            in workflows.WorkflowManager(self.app.client).list()
-        ]
+        wf_list = workflows.WorkflowManager(self.app.client).list()
+
+        data = [format(wf)[1] for wf in wf_list]
 
         if data:
             return format()[0], data
@@ -77,27 +78,19 @@ class Get(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        workflow = workflows.WorkflowManager(self.app.client).get(
-            parsed_args.name)
+        wf = workflows.WorkflowManager(self.app.client).get(parsed_args.name)
 
-        return format(workflow)
+        return format(wf)
 
 
-class Create(show.ShowOne):
+class Create(lister.Lister):
     """Create new workflow."""
 
     def get_parser(self, prog_name):
         parser = super(Create, self).get_parser(prog_name)
 
-        parser.add_argument('name', help='Workflow name')
-        parser.add_argument(
-            'tags',
-            nargs='?',
-            help='Workflow tags separated by ","'
-        )
         parser.add_argument(
             'definition',
-            nargs='?',
             type=argparse.FileType('r'),
             help='Workflow definition file'
         )
@@ -109,12 +102,15 @@ class Create(show.ShowOne):
             raise RuntimeError("You must provide path to workflow "
                                "definition file.")
 
-        workflow = workflows.WorkflowManager(self.app.client)\
-            .create(parsed_args.name,
-                    parsed_args.definition.read(),
-                    str(parsed_args.tags).split(','))
+        wf_list = workflows.WorkflowManager(self.app.client)\
+            .create(parsed_args.definition.read())
 
-        return format(workflow)
+        data = [format(wf)[1] for wf in wf_list]
+
+        if data:
+            return format()[0], data
+        else:
+            return format()
 
 
 class Delete(command.Command):
@@ -131,62 +127,30 @@ class Delete(command.Command):
         workflows.WorkflowManager(self.app.client).delete(parsed_args.name)
 
 
-class Update(show.ShowOne):
+class Update(lister.Lister):
     """Update workflow."""
 
     def get_parser(self, prog_name):
         parser = super(Update, self).get_parser(prog_name)
 
-        parser.add_argument('name', help='Workflow name')
-        parser.add_argument(
-            'tags',
-            nargs='?',
-            help='Workflow tags separated by ","'
-        )
         parser.add_argument(
             'definition',
-            nargs='?',
+            type=argparse.FileType('r'),
             help='Workflow definition'
         )
 
         return parser
 
     def take_action(self, parsed_args):
-        if parsed_args.definition:
-            workflow = workflows.WorkflowManager(self.app.client)\
-                .update(parsed_args.name,
-                        open(parsed_args.definition).read(),
-                        str(parsed_args.tags).split(','))
+        wf_list = workflows.WorkflowManager(self.app.client)\
+            .update(parsed_args.definition.read())
+
+        data = [format(wf)[1] for wf in wf_list]
+
+        if data:
+            return format()[0], data
         else:
-            workflow = workflows.WorkflowManager(self.app.client)\
-                .update(parsed_args.name,
-                        None,
-                        str(parsed_args.tags).split(','))
-
-        return format(workflow)
-
-
-class UploadDefinition(command.Command):
-    """Upload workflow definition."""
-
-    def get_parser(self, prog_name):
-        parser = super(UploadDefinition, self).get_parser(prog_name)
-
-        parser.add_argument('name', help='Workflow name')
-        parser.add_argument(
-            'path',
-            type=argparse.FileType('r'),
-            help='Workflow definition file'
-        )
-
-        return parser
-
-    def take_action(self, parsed_args):
-        workflow = workflows.WorkflowManager(self.app.client)\
-            .update(parsed_args.name,
-                    definition=parsed_args.path.read())
-
-        self.app.stdout.write(workflow.definition or "\n")
+            return format()
 
 
 class GetDefinition(command.Command):

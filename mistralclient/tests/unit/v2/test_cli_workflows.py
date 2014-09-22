@@ -30,9 +30,12 @@ WORKFLOW_DICT = {
 }
 
 WF_DEF = """
-tasks:
-  task1:
-    action: nova.servers_get server="1"
+version: '2.0'
+
+flow:
+  tasks:
+    task1:
+      action: nova.servers_get server="1"
 """
 
 WF_WITH_DEF_DICT = WORKFLOW_DICT.copy()
@@ -45,21 +48,22 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
     @mock.patch('argparse.open', create=True)
     @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.create')
     def test_create(self, mock, mock_open):
-        mock.return_value = WORKFLOW
+        mock.return_value = (WORKFLOW,)
         mock_open.return_value = mock.MagicMock(spec=file)
 
-        result = self.call(workflow_cmd.Create,
-                           app_args=['name', 'tag', '1.txt'])
+        result = self.call(workflow_cmd.Create, app_args=['1.txt'])
 
-        self.assertEqual(('a', 'a, b', '1', '1'), result[1])
+        self.assertEqual([('a', 'a, b', '1', '1')], result[1])
 
+    @mock.patch('argparse.open', create=True)
     @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.update')
-    def test_update(self, mock):
-        mock.return_value = WORKFLOW
+    def test_update(self, mock, mock_open):
+        mock.return_value = (WORKFLOW,)
+        mock_open.return_value = mock.MagicMock(spec=file)
 
-        result = self.call(workflow_cmd.Update, app_args=['name'])
+        result = self.call(workflow_cmd.Update, app_args=['1.txt'])
 
-        self.assertEqual(('a', 'a, b', '1', '1'), result[1])
+        self.assertEqual([('a', 'a, b', '1', '1')], result[1])
 
     @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.list')
     def test_list(self, mock):
@@ -80,20 +84,6 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
     @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.delete')
     def test_delete(self, mock):
         self.assertIsNone(self.call(workflow_cmd.Delete, app_args=['name']))
-
-    @mock.patch('argparse.open', create=True)
-    @mock.patch(
-        'mistralclient.api.v2.workflows.WorkflowManager.update'
-    )
-    def test_upload_definition(self, mock, mock_open):
-        mock.return_value = WORKFLOW_WITH_DEF
-        mock_open.return_value = mock.MagicMock(spec=file)
-
-        result = self.call(workflow_cmd.UploadDefinition,
-                           app_args=['name', '1.txt'])
-
-        self.assertIsNone(result)
-        self.app.stdout.write.assert_called_with(WF_DEF)
 
     @mock.patch('mistralclient.api.v2.workflows.'
                 'WorkflowManager.get')

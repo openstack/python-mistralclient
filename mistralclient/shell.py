@@ -268,8 +268,6 @@ class MistralShell(app.App):
             'workflow-create': mistralclient.commands.v2.workflows.Create,
             'workflow-delete': mistralclient.commands.v2.workflows.Delete,
             'workflow-update': mistralclient.commands.v2.workflows.Update,
-            'workflow-upload-definition':
-            mistralclient.commands.v2.workflows.UploadDefinition,
             'workflow-get-definition':
             mistralclient.commands.v2.workflows.GetDefinition
         }
