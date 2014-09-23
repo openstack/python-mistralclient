@@ -75,6 +75,9 @@ class ClientTestBase(MistralCLIAuth):
         cls.wb_def = os.path.relpath(
             'functionaltests/resources/v2/wb_v2.yaml', os.getcwd())
 
+        cls.wb_with_tags_def = os.path.relpath(
+            'functionaltests/resources/v2/wb_with_tags_v2.yaml', os.getcwd())
+
         cls.wf_def = os.path.relpath(
             'functionaltests/resources/v2/wf_v2.yaml', os.getcwd())
 
@@ -108,48 +111,44 @@ class WorkbookCLITests(ClientTestBase):
         super(WorkbookCLITests, cls).setUpClass()
 
     def test_workbook_create_delete(self):
-        wb1 = self.mistral_command(
-            'workbook-create', params='wb wb_tag {0}'.format(self.wb_def))
-        self.assertTableStruct(wb1, ['Field', 'Value'])
+        wb = self.mistral_command(
+            'workbook-create', params='{0}'.format(self.wb_def))
+        self.assertTableStruct(wb, ['Field', 'Value'])
 
         wfs = self.mistral_command('workflow-list')
         self.assertIn('wb.wf1', [wf['Name'] for wf in wfs])
 
-        wb2 = self.mistral_command(
-            'workbook-create', params='wb_without_def wb_tag')
-
-        name1 = self.get_value_of_field(wb1, "Name")
-        name2 = self.get_value_of_field(wb2, "Name")
-        self.assertEqual('wb', name1)
-        self.assertEqual('wb_without_def', name2)
+        name = self.get_value_of_field(wb, "Name")
+        self.assertEqual('wb', name)
 
         wbs = self.mistral_command('workbook-list')
         self.assertIn('wb', [workbook['Name'] for workbook in wbs])
-        self.assertIn('wb_without_def',
-                      [workbook['Name'] for workbook in wbs])
 
         self.mistral_command('workbook-delete', params='wb')
-        self.mistral_command('workbook-delete', params='wb_without_def')
 
         wbs = self.mistral_command('workbook-list')
         self.assertNotIn('wb', [workbook['Name'] for workbook in wbs])
-        self.assertNotIn('wb_without_def',
-                         [workbook['Name'] for workbook in wbs])
 
     def test_workbook_update(self):
-        self.mistral_command('workbook-create', params='wb')
+        wb = self.mistral_command(
+            'workbook-create', params='{0}'.format(self.wb_def))
 
-        wb = self.mistral_command('workbook-update', params='wb tag')
+        tags = self.get_value_of_field(wb, 'Tags')
+        self.assertNotIn('tag', tags)
+
+        wb = self.mistral_command(
+            'workbook-update', params='{0}'.format(self.wb_with_tags_def))
         self.assertTableStruct(wb, ['Field', 'Value'])
 
         name = self.get_value_of_field(wb, 'Name')
-        tags = self.get_value_of_field(wb, "Tags")
+        tags = self.get_value_of_field(wb, 'Tags')
 
         self.assertEqual('wb', name)
         self.assertIn('tag', tags)
 
     def test_workbook_get(self):
-        created = self.mistral_command('workbook-create', params='wb')
+        created = self.mistral_command(
+            'workbook-create', params='{0}'.format(self.wb_with_tags_def))
         fetched = self.mistral_command('workbook-get', params='wb')
 
         created_wb_name = self.get_value_of_field(created, 'Name')
@@ -162,10 +161,8 @@ class WorkbookCLITests(ClientTestBase):
 
         self.assertEqual(created_wb_tag, fetched_wb_tag)
 
-    def test_workbook_upload_get_definition(self):
-        self.mistral('workbook-create', params='wb')
-        self.mistral('workbook-upload-definition',
-                     params='wb {0}'.format(self.wb_def))
+    def test_workbook_get_definition(self):
+        self.mistral('workbook-create', params='{0}'.format(self.wb_def))
 
         definition = self.mistral_command('workbook-get-definition',
                                           params='wb')
@@ -242,7 +239,7 @@ class ExecutionCLITests(ClientTestBase):
         super(ExecutionCLITests, self).setUp()
 
         self.mistral(
-            'workbook-create', params='wb wb_tag {0}'.format(self.wb_def))
+            'workbook-create', params='{0}'.format(self.wb_def))
 
     def tearDown(self):
         super(ExecutionCLITests, self).tearDown()
@@ -333,14 +330,15 @@ class NegativeCLITests(ClientTestBase):
                           self.mistral, 'workbook-get')
 
     def test_wb_create_same_name(self):
-        self.mistral('workbook-create', params='wb')
+        self.mistral('workbook-create', params='{0}'.format(self.wb_def))
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral, 'workbook-create', params='wb')
+                          self.mistral, 'workbook-create',
+                          params='{0}'.format(self.wb_def))
 
     def test_wb_create_with_wrong_path_to_definition(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral,
-                          'workbook-create', params='wb pam pam pam')
+                          'workbook-create', params='wb')
 
     def test_wb_delete_unexist_wb(self):
         self.assertRaises(exceptions.CommandFailed,
@@ -348,18 +346,7 @@ class NegativeCLITests(ClientTestBase):
 
     def test_wb_update_unexist_wb(self):
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral, 'workbook-update', params='wb tag def')
-
-    def test_wb_upload_definition_unexist_wb(self):
-        self.assertRaises(exceptions.CommandFailed,
-                          self.mistral,
-                          'workbook-upload-definition', params='wb')
-
-    def test_wb_upload_definition_using_wrong_path(self):
-        self.mistral('workbook-create', params='wb')
-        self.assertRaises(exceptions.CommandFailed,
-                          self.mistral,
-                          'workbook-upload-definition', params='wb tag def')
+                          self.mistral, 'workbook-update', params='wb')
 
     def test_wb_get_definition_unexist_wb(self):
         self.assertRaises(exceptions.CommandFailed,
@@ -415,7 +402,7 @@ class NegativeCLITests(ClientTestBase):
                           self.mistral, 'execution-create', params='wf')
 
     def test_ex_create_unexist_task(self):
-        self.mistral('workbook-create', params='wb')
+        self.mistral('workbook-create', params='{0}'.format(self.wb_def))
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral,
                           'execution-create', params='wb param {}')
@@ -426,6 +413,6 @@ class NegativeCLITests(ClientTestBase):
                           self.mistral, 'execution-create', params='wb.wf1')
 
     def test_ex_get_nonexist_execution(self):
-        self.mistral('workbook-create', params='wb')
+        self.mistral('workbook-create', params='{0}'.format(self.wb_def))
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral, 'execution-get', params='wb.wf1 id')
