@@ -49,7 +49,6 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
     @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.create')
     def test_create(self, mock, mock_open):
         mock.return_value = (WORKFLOW,)
-        mock_open.return_value = mock.MagicMock(spec=file)
 
         result = self.call(workflow_cmd.Create, app_args=['1.txt'])
 
@@ -59,7 +58,6 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
     @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.update')
     def test_update(self, mock, mock_open):
         mock.return_value = (WORKFLOW,)
-        mock_open.return_value = mock.MagicMock(spec=file)
 
         result = self.call(workflow_cmd.Update, app_args=['1.txt'])
 

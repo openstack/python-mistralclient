@@ -259,8 +259,6 @@ class MistralShell(app.App):
             'action-create': mistralclient.commands.v2.actions.Create,
             'action-delete': mistralclient.commands.v2.actions.Delete,
             'action-update': mistralclient.commands.v2.actions.Update,
-            'action-upload-definition':
-            mistralclient.commands.v2.actions.UploadDefinition,
             'action-get-definition':
             mistralclient.commands.v2.actions.GetDefinition,
             'workflow-list': mistralclient.commands.v2.workflows.List,

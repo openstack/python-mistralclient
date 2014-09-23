@@ -83,16 +83,14 @@ class Get(show.ShowOne):
         return format(action)
 
 
-class Create(show.ShowOne):
+class Create(lister.Lister):
     """Create new action."""
 
     def get_parser(self, prog_name):
         parser = super(Create, self).get_parser(prog_name)
 
-        parser.add_argument('name', help='Action name')
         parser.add_argument(
             'definition',
-            nargs='?',
             type=argparse.FileType('r'),
             help='Action definition file'
         )
@@ -104,11 +102,15 @@ class Create(show.ShowOne):
             raise RuntimeError("You must provide path to action "
                                "definition file.")
 
-        action = actions.ActionManager(self.app.client)\
-            .create(parsed_args.name,
-                    parsed_args.definition.read())
+        action_list = actions.ActionManager(self.app.client)\
+            .create(parsed_args.definition.read())
 
-        return format(action)
+        data = [format(action)[1] for action in action_list]
+
+        if data:
+            return format()[0], data
+        else:
+            return format()
 
 
 class Delete(command.Command):
@@ -125,16 +127,14 @@ class Delete(command.Command):
         actions.ActionManager(self.app.client).delete(parsed_args.name)
 
 
-class Update(show.ShowOne):
+class Update(lister.Lister):
     """Update action."""
 
     def get_parser(self, prog_name):
         parser = super(Update, self).get_parser(prog_name)
 
-        parser.add_argument('name', help='Action name')
         parser.add_argument(
             'definition',
-            nargs='?',
             type=argparse.FileType('r'),
             help='Action definition file'
         )
@@ -142,34 +142,15 @@ class Update(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        action = actions.ActionManager(self.app.client)\
-            .update(parsed_args.name,
-                    parsed_args.definition.read())
+        action_list = actions.ActionManager(self.app.client)\
+            .update(parsed_args.definition.read())
 
-        return format(action)
+        data = [format(action)[1] for action in action_list]
 
-
-class UploadDefinition(command.Command):
-    """Upload action definition."""
-
-    def get_parser(self, prog_name):
-        parser = super(UploadDefinition, self).get_parser(prog_name)
-
-        parser.add_argument('name', help='Action name')
-        parser.add_argument(
-            'path',
-            type=argparse.FileType('r'),
-            help='Action definition file'
-        )
-
-        return parser
-
-    def take_action(self, parsed_args):
-        action = actions.ActionManager(self.app.client)\
-            .update(parsed_args.name,
-                    definition=parsed_args.path.read())
-
-        self.app.stdout.write(action.definition or "\n")
+        if data:
+            return format()[0], data
+        else:
+            return format()
 
 
 class GetDefinition(command.Command):

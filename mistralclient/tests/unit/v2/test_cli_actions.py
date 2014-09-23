@@ -49,27 +49,20 @@ class TestCLIActionsV2(base.BaseCommandTest):
     @mock.patch('argparse.open', create=True)
     @mock.patch('mistralclient.api.v2.actions.ActionManager.create')
     def test_create(self, mock, mock_open):
-        mock.return_value = ACTION
-        mock_open.return_value = mock.MagicMock(spec=file)
+        mock.return_value = (ACTION,)
 
-        result = self.call(
-            action_cmd.Create,
-            app_args=['name', '1.txt']
-        )
+        result = self.call(action_cmd.Create, app_args=['1.txt'])
 
-        self.assertEqual(('a', 'My cool action', '1', '1'), result[1])
+        self.assertEqual([('a', 'My cool action', '1', '1')], result[1])
 
     @mock.patch('argparse.open', create=True)
     @mock.patch('mistralclient.api.v2.actions.ActionManager.update')
     def test_update(self, mock, mock_open):
-        mock.return_value = ACTION
+        mock.return_value = (ACTION,)
 
-        result = self.call(
-            action_cmd.Update,
-            app_args=['name', 'my_action.yaml']
-        )
+        result = self.call(action_cmd.Update, app_args=['my_action.yaml'])
 
-        self.assertEqual(('a', 'My cool action', '1', '1'), result[1])
+        self.assertEqual([('a', 'My cool action', '1', '1')], result[1])
 
     @mock.patch('mistralclient.api.v2.actions.ActionManager.list')
     def test_list(self, mock):
@@ -90,20 +83,6 @@ class TestCLIActionsV2(base.BaseCommandTest):
     @mock.patch('mistralclient.api.v2.actions.ActionManager.delete')
     def test_delete(self, mock):
         self.assertIsNone(self.call(action_cmd.Delete, app_args=['name']))
-
-    @mock.patch('argparse.open', create=True)
-    @mock.patch(
-        'mistralclient.api.v2.actions.ActionManager.update'
-    )
-    def test_upload_definition(self, mock, mock_open):
-        mock.return_value = ACTION_WITH_DEF
-        mock_open.return_value = mock.MagicMock(spec=file)
-
-        result = self.call(action_cmd.UploadDefinition,
-                           app_args=['name', '1.txt'])
-
-        self.assertIsNone(result)
-        self.app.stdout.write.assert_called_with(ACTION_DEF)
 
     @mock.patch('mistralclient.api.v2.actions.'
                 'ActionManager.get')
