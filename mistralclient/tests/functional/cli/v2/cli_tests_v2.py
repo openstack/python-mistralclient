@@ -178,11 +178,10 @@ class WorkflowCLITests(ClientTestBase):
 
     def test_workflow_create_delete(self):
         wf = self.mistral_command(
-            'workflow-create', params='wf wf_tag {0}'.format(self.wf_def))
-        self.assertTableStruct(wf, ['Field', 'Value'])
+            'workflow-create', params='{0}'.format(self.wf_def))
+        self.assertTableStruct(wf, ['Name', 'Created at', 'Updated at'])
 
-        name = self.get_value_of_field(wf, "Name")
-        self.assertEqual('wf', name)
+        self.assertEqual('wf', wf[0]['Name'])
 
         wfs = self.mistral_command('workflow-list')
         self.assertIn('wf', [workflow['Name'] for workflow in wfs])
@@ -193,39 +192,27 @@ class WorkflowCLITests(ClientTestBase):
 
     def test_workflow_update(self):
         self.mistral(
-            'workflow-create', params='wf wf_tag {0}'.format(self.wf_def))
+            'workflow-create', params='{0}'.format(self.wf_def))
 
-        wf = self.mistral_command('workflow-update', params='wf tag')
-        self.assertTableStruct(wf, ['Field', 'Value'])
+        wf = self.mistral_command(
+            'workflow-update', params='{0}'.format(self.wf_def))
+        self.assertTableStruct(wf, ['Name', 'Created at', 'Updated at'])
 
-        name = self.get_value_of_field(wf, 'Name')
-        tags = self.get_value_of_field(wf, "Tags")
-
-        self.assertEqual('wf', name)
-        self.assertIn('tag', tags)
+        self.assertEqual('wf', wf[0]['Name'])
 
     def test_workflow_get(self):
         created = self.mistral_command(
-            'workflow-create', params='wf wf_tag {0}'.format(self.wf_def))
+            'workflow-create', params='{0}'.format(self.wf_def))
 
         fetched = self.mistral_command('workflow-get', params='wf')
-
-        created_wf_name = self.get_value_of_field(created, 'Name')
+        created_wf_name = created[0]['Name']
         fetched_wf_name = self.get_value_of_field(fetched, 'Name')
 
         self.assertEqual(created_wf_name, fetched_wf_name)
 
-        created_wf_tag = self.get_value_of_field(created, 'Tags')
-        fetched_wf_tag = self.get_value_of_field(fetched, 'Tags')
-
-        self.assertEqual(created_wf_tag, fetched_wf_tag)
-
-    def test_workflow_upload_get_definition(self):
+    def test_workflow_get_definition(self):
         self.mistral(
-            'workflow-create', params='wf wf_tag {0}'.format(self.wf_def))
-        self.mistral(
-            'workflow-upload-definition',
-            params='wf {0}'.format(self.wf_def))
+            'workflow-create', params='{0}'.format(self.wf_def))
 
         definition = self.mistral_command(
             'workflow-get-definition', params='wf')
@@ -368,12 +355,12 @@ class NegativeCLITests(ClientTestBase):
     def test_wf_create_without_definition(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral,
-                          'workflow-create', params='wf tag')
+                          'workflow-create', params='')
 
     def test_wf_create_with_wrong_path_to_definition(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral,
-                          'workflow-create', params='wf tag def')
+                          'workflow-create', params='wf')
 
     def test_wf_delete_unexist_wf(self):
         self.assertRaises(exceptions.CommandFailed,
@@ -381,12 +368,7 @@ class NegativeCLITests(ClientTestBase):
 
     def test_wf_update_unexist_wf(self):
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral, 'workflow-update', params='wb tag def')
-
-    def test_wf_upload_definition_unexist_wf(self):
-        self.assertRaises(exceptions.CommandFailed,
-                          self.mistral,
-                          'workflow-upload-definition', params='wf')
+                          self.mistral, 'workflow-update', params='wf')
 
     def test_wf_get_definition_unexist_wf(self):
         self.assertRaises(exceptions.CommandFailed,
@@ -407,10 +389,11 @@ class NegativeCLITests(ClientTestBase):
                           self.mistral,
                           'execution-create', params='wb param {}')
 
-    def test_ex_create_without_context(self):
-        self.mistral('workbook-create', params='wb')
+    def test_ex_create_with_invalid_input(self):
+        self.mistral('workbook-create', params='{0}'.format(self.wb_def))
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral, 'execution-create', params='wb.wf1')
+                          self.mistral,
+                          'execution-create', params="wb.wf1 input")
 
     def test_ex_get_nonexist_execution(self):
         self.mistral('workbook-create', params='{0}'.format(self.wb_def))
