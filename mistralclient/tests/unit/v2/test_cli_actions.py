@@ -25,6 +25,7 @@ from mistralclient.api.v2 import actions
 ACTION_DICT = {
     'name': 'a',
     'description': 'My cool action',
+    'tags': ['test'],
     'created_at': '1',
     'updated_at': '1'
 }
@@ -53,7 +54,10 @@ class TestCLIActionsV2(base.BaseCommandTest):
 
         result = self.call(action_cmd.Create, app_args=['1.txt'])
 
-        self.assertEqual([('a', 'My cool action', '1', '1')], result[1])
+        self.assertEqual(
+            [('a', 'My cool action', 'test', '1', '1')],
+            result[1]
+        )
 
     @mock.patch('argparse.open', create=True)
     @mock.patch('mistralclient.api.v2.actions.ActionManager.update')
@@ -62,7 +66,10 @@ class TestCLIActionsV2(base.BaseCommandTest):
 
         result = self.call(action_cmd.Update, app_args=['my_action.yaml'])
 
-        self.assertEqual([('a', 'My cool action', '1', '1')], result[1])
+        self.assertEqual(
+            [('a', 'My cool action', 'test', '1', '1')],
+            result[1]
+        )
 
     @mock.patch('mistralclient.api.v2.actions.ActionManager.list')
     def test_list(self, mock):
@@ -70,7 +77,10 @@ class TestCLIActionsV2(base.BaseCommandTest):
 
         result = self.call(action_cmd.List)
 
-        self.assertEqual([('a', 'My cool action', '1', '1')], result[1])
+        self.assertEqual(
+            [('a', 'My cool action', 'test', '1', '1')],
+            result[1]
+        )
 
     @mock.patch('mistralclient.api.v2.actions.ActionManager.get')
     def test_get(self, mock):
@@ -78,7 +88,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
 
         result = self.call(action_cmd.Get, app_args=['name'])
 
-        self.assertEqual(('a', 'My cool action', '1', '1'), result[1])
+        self.assertEqual(('a', 'My cool action', 'test', '1', '1'), result[1])
 
     @mock.patch('mistralclient.api.v2.actions.ActionManager.delete')
     def test_delete(self, mock):
