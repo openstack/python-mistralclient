@@ -18,10 +18,10 @@ import argparse
 import logging
 
 from cliff import command
-from cliff import lister
 from cliff import show
 
 from mistralclient.api.v2 import actions
+from mistralclient.commands.v2 import base
 
 LOG = logging.getLogger(__name__)
 
@@ -55,19 +55,14 @@ def format(action=None):
     return columns, data
 
 
-class List(lister.Lister):
+class List(base.MistralLister):
     """List all actions."""
 
-    def take_action(self, parsed_args):
-        data = [
-            format(action)[1] for action
-            in actions.ActionManager(self.app.client).list()
-        ]
+    def _get_format_function(self):
+        return format
 
-        if data:
-            return format()[0], data
-        else:
-            return format()
+    def _get_resources(self, parsed_args):
+        return actions.ActionManager(self.app.client).list()
 
 
 class Get(show.ShowOne):
@@ -87,7 +82,7 @@ class Get(show.ShowOne):
         return format(action)
 
 
-class Create(lister.Lister):
+class Create(base.MistralLister):
     """Create new action."""
 
     def get_parser(self, prog_name):
@@ -101,20 +96,16 @@ class Create(lister.Lister):
 
         return parser
 
-    def take_action(self, parsed_args):
+    def _validate_parsed_args(self, parsed_args):
         if not parsed_args.definition:
-            raise RuntimeError("You must provide path to action "
-                               "definition file.")
+            raise RuntimeError("Provide action definition file.")
 
-        action_list = actions.ActionManager(self.app.client)\
+    def _get_format_function(self):
+        return format
+
+    def _get_resources(self, parsed_args):
+        return actions.ActionManager(self.app.client)\
             .create(parsed_args.definition.read())
-
-        data = [format(action)[1] for action in action_list]
-
-        if data:
-            return format()[0], data
-        else:
-            return format()
 
 
 class Delete(command.Command):
@@ -131,7 +122,7 @@ class Delete(command.Command):
         actions.ActionManager(self.app.client).delete(parsed_args.name)
 
 
-class Update(lister.Lister):
+class Update(base.MistralLister):
     """Update action."""
 
     def get_parser(self, prog_name):
@@ -145,16 +136,12 @@ class Update(lister.Lister):
 
         return parser
 
-    def take_action(self, parsed_args):
-        action_list = actions.ActionManager(self.app.client)\
-            .update(parsed_args.definition.read())
+    def _get_format_function(self):
+        return format
 
-        data = [format(action)[1] for action in action_list]
-
-        if data:
-            return format()[0], data
-        else:
-            return format()
+    def _get_resources(self, parsed_args):
+        return actions.ActionManager(self.app.client).\
+            update(parsed_args.definition.read())
 
 
 class GetDefinition(command.Command):

@@ -18,10 +18,10 @@ import json
 import logging
 
 from cliff import command
-from cliff import lister
 from cliff import show
 
 from mistralclient.api.v2 import executions
+from mistralclient.commands.v2 import base
 
 LOG = logging.getLogger(__name__)
 
@@ -50,17 +50,14 @@ def format(execution=None):
     return columns, data
 
 
-class List(lister.Lister):
+class List(base.MistralLister):
     """List all executions."""
 
-    def take_action(self, parsed_args):
-        data = [format(execution)[1] for execution
-                in executions.ExecutionManager(self.app.client).list()]
+    def _get_format_function(self):
+        return format
 
-        if data:
-            return format()[0], data
-        else:
-            return format()
+    def _get_resources(self, parsed_args):
+        return executions.ExecutionManager(self.app.client).list()
 
 
 class Get(show.ShowOne):
