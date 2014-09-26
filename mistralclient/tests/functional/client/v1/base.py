@@ -9,22 +9,29 @@ from mistralclient.api.v1 import client as mclient
 
 
 class ClientAuth(rest_client.RestClient):
-    def __init__(self, auth_provider):
+    def __init__(self, auth_provider, url):
         super(ClientAuth, self).__init__(auth_provider)
 
         self.mistral_client = mclient.Client(
             auth_token=self.auth_provider.get_token(),
-            mistral_url="http://localhost:8989/v1")
+            mistral_url=url)
 
 
 class MistralBase(testtools.TestCase):
+
+    _mistral_url = None
 
     @classmethod
     def setUpClass(cls):
         super(MistralBase, cls).setUpClass()
 
-        mgr = clients.Manager()
-        cls.mistral_client = ClientAuth(mgr.auth_provider).mistral_client
+        if 'WITHOUT_AUTH' in os.environ:
+            cls.mistral_client = mclient.Client(
+                mistral_url=cls._mistral_url)
+        else:
+            mgr = clients.Manager()
+            cls.mistral_client = ClientAuth(
+                mgr.auth_provider, cls._mistral_url).mistral_client
 
         cls.definition = open(os.path.relpath(
             'functionaltests/resources/v1/wb_v1.yaml',
