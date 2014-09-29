@@ -18,10 +18,10 @@ import argparse
 import logging
 
 from cliff import command
-from cliff import lister
 from cliff import show
 
 from mistralclient.api.v2 import workbooks
+from mistralclient.commands.v2 import base
 
 LOG = logging.getLogger(__name__)
 
@@ -52,17 +52,14 @@ def format(workbook=None):
     return columns, data
 
 
-class List(lister.Lister):
+class List(base.MistralLister):
     """List all workbooks."""
 
-    def take_action(self, parsed_args):
-        data = [format(workbook)[1] for workbook
-                in workbooks.WorkbookManager(self.app.client).list()]
+    def _get_format_function(self):
+        return format
 
-        if data:
-            return format()[0], data
-        else:
-            return format()
+    def _get_resources(self, parsed_args):
+        return workbooks.WorkbookManager(self.app.client).list()
 
 
 class Get(show.ShowOne):

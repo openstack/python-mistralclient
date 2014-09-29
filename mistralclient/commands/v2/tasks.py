@@ -18,10 +18,10 @@ import json
 import logging
 
 from cliff import command
-from cliff import lister
 from cliff import show
 
 from mistralclient.api.v2 import tasks
+from mistralclient.commands.v2 import base
 
 LOG = logging.getLogger(__name__)
 
@@ -49,17 +49,14 @@ def format(task=None):
     return columns, data
 
 
-class List(lister.Lister):
+class List(base.MistralLister):
     """List all tasks."""
 
-    def take_action(self, parsed_args):
-        data = [format(task)[1] for task
-                in tasks.TaskManager(self.app.client).list()]
+    def _get_format_function(self):
+        return format
 
-        if data:
-            return format()[0], data
-        else:
-            return format()
+    def _get_resources(self, parsed_args):
+        return tasks.TaskManager(self.app.client).list()
 
 
 class Get(show.ShowOne):

@@ -18,10 +18,10 @@ import argparse
 import logging
 
 from cliff import command
-from cliff import lister
 from cliff import show
 
 from mistralclient.api.v2 import workflows
+from mistralclient.commands.v2 import base
 
 LOG = logging.getLogger(__name__)
 
@@ -53,18 +53,14 @@ def format(workflow=None):
     return columns, data
 
 
-class List(lister.Lister):
+class List(base.MistralLister):
     """List all workflows."""
 
-    def take_action(self, parsed_args):
-        wf_list = workflows.WorkflowManager(self.app.client).list()
+    def _get_format_function(self):
+        return format
 
-        data = [format(wf)[1] for wf in wf_list]
-
-        if data:
-            return format()[0], data
-        else:
-            return format()
+    def _get_resources(self, parsed_args):
+        return workflows.WorkflowManager(self.app.client).list()
 
 
 class Get(show.ShowOne):
@@ -83,7 +79,7 @@ class Get(show.ShowOne):
         return format(wf)
 
 
-class Create(lister.Lister):
+class Create(base.MistralLister):
     """Create new workflow."""
 
     def get_parser(self, prog_name):
@@ -97,20 +93,17 @@ class Create(lister.Lister):
 
         return parser
 
-    def take_action(self, parsed_args):
+    def _get_format_function(self):
+        return format
+
+    def _validate_parsed_args(self, parsed_args):
         if not parsed_args.definition:
             raise RuntimeError("You must provide path to workflow "
                                "definition file.")
 
-        wf_list = workflows.WorkflowManager(self.app.client)\
-            .create(parsed_args.definition.read())
-
-        data = [format(wf)[1] for wf in wf_list]
-
-        if data:
-            return format()[0], data
-        else:
-            return format()
+    def _get_resources(self, parsed_args):
+        return workflows.WorkflowManager(self.app.client).\
+            create(parsed_args.definition.read())
 
 
 class Delete(command.Command):
@@ -127,7 +120,7 @@ class Delete(command.Command):
         workflows.WorkflowManager(self.app.client).delete(parsed_args.name)
 
 
-class Update(lister.Lister):
+class Update(base.MistralLister):
     """Update workflow."""
 
     def get_parser(self, prog_name):
@@ -141,16 +134,13 @@ class Update(lister.Lister):
 
         return parser
 
-    def take_action(self, parsed_args):
-        wf_list = workflows.WorkflowManager(self.app.client)\
-            .update(parsed_args.definition.read())
+    def _get_format_function(self):
+        return format
 
-        data = [format(wf)[1] for wf in wf_list]
-
-        if data:
-            return format()[0], data
-        else:
-            return format()
+    def _get_resources(self, parsed_args):
+        return workflows.WorkflowManager(self.app.client).update(
+            parsed_args.definition.read()
+        )
 
 
 class GetDefinition(command.Command):
