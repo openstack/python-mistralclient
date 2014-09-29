@@ -30,14 +30,18 @@ def format(action=None):
     columns = (
         'Name',
         'Description',
+        'Tags',
         'Created at',
         'Updated at'
     )
 
     if action:
+        tags = getattr(action, 'tags', None) or []
+
         data = (
             action.name,
             getattr(action, 'description', '<none>'),
+            ', '.join(tags) or '<none>',
             action.created_at,
         )
 
