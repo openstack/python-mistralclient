@@ -1,7 +1,12 @@
 from base import MistralBase
 
 
-class Workbooks(MistralBase):
+class MistralURLDefine(MistralBase):
+
+    _mistral_url = "http://localhost:8989/v1"
+
+
+class Workbooks(MistralURLDefine):
 
     def test_get_workbook_list(self):
         wbs = self.mistral_client.workbooks.list()
@@ -36,7 +41,7 @@ class Workbooks(MistralBase):
         self.assertEqual(self.definition, received_definition)
 
 
-class Executions(MistralBase):
+class Executions(MistralURLDefine):
 
     def test_create_execution(self):
         execution = self.create_execution()
@@ -69,7 +74,7 @@ class Executions(MistralBase):
         self.assertEqual(execution.id, received_exec.id)
 
 
-class Tasks(MistralBase):
+class Tasks(MistralURLDefine):
 
     def test_list_tasks(self):
         execution = self.create_execution()

@@ -14,27 +14,18 @@
 
 import os
 
-from tempest import cli
 from tempest import exceptions
+
+from mistralclient.tests.functional.cli import base
 
 
 MISTRAL_URL = "http://localhost:8989/v2"
 
 
-class MistralCLIAuth(cli.ClientTestBase):
-
-    def mistral(self, action, flags='', params='', admin=True, fail_ok=False,
-                keystone_version=3):
-        """Executes Mistral command."""
-        mistral_url_op = "--os-mistral-url %s" % MISTRAL_URL
-
-        return self.cmd_with_auth(
-            'mistral %s' % mistral_url_op, action, flags, params, admin,
-            fail_ok, keystone_version)
-
-
-class SimpleMistralCLITests(MistralCLIAuth):
+class SimpleMistralCLITests(base.MistralCLIAuth):
     """Basic tests, check '-list', '-help' commands."""
+
+    _mistral_url = MISTRAL_URL
 
     @classmethod
     def setUpClass(cls):
@@ -66,7 +57,9 @@ class SimpleMistralCLITests(MistralCLIAuth):
                                 'State'])
 
 
-class ClientTestBase(MistralCLIAuth):
+class ClientTestBase(base.MistralCLIAuth):
+
+    _mistral_url = MISTRAL_URL
 
     @classmethod
     def setUpClass(cls):
