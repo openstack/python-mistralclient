@@ -29,6 +29,7 @@ LOG = logging.getLogger(__name__)
 def format(action=None):
     columns = (
         'Name',
+        'Is system',
         'Description',
         'Tags',
         'Created at',
@@ -40,6 +41,7 @@ def format(action=None):
 
         data = (
             action.name,
+            action.is_system,
             getattr(action, 'description', '<none>'),
             ', '.join(tags) or '<none>',
             action.created_at,
