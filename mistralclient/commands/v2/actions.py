@@ -26,10 +26,22 @@ from mistralclient.commands.v2 import base
 LOG = logging.getLogger(__name__)
 
 
-def format(action=None):
+def _cut(string, length=25):
+    if string and len(string) > length:
+        return "%s..." % string[:length]
+    else:
+        return string
+
+
+def format_list(action=None):
+    return format(action, lister=True)
+
+
+def format(action=None, lister=False):
     columns = (
         'Name',
         'Is system',
+        'Input',
         'Description',
         'Tags',
         'Created at',
@@ -38,11 +50,14 @@ def format(action=None):
 
     if action:
         tags = getattr(action, 'tags', None) or []
+        input = action.input if not lister else _cut(action.input)
+        desc = action.description if not lister else _cut(action.description)
 
         data = (
             action.name,
             action.is_system,
-            getattr(action, 'description', '<none>'),
+            input,
+            desc,
             ', '.join(tags) or '<none>',
             action.created_at,
         )
@@ -61,7 +76,7 @@ class List(base.MistralLister):
     """List all actions."""
 
     def _get_format_function(self):
-        return format
+        return format_list
 
     def _get_resources(self, parsed_args):
         return actions.ActionManager(self.app.client).list()
