@@ -26,13 +26,6 @@ from mistralclient.commands.v2 import base
 LOG = logging.getLogger(__name__)
 
 
-def _cut(string, length=25):
-    if string and len(string) > length:
-        return "%s..." % string[:length]
-    else:
-        return string
-
-
 def format_list(action=None):
     return format(action, lister=True)
 
@@ -50,8 +43,9 @@ def format(action=None, lister=False):
 
     if action:
         tags = getattr(action, 'tags', None) or []
-        input = action.input if not lister else _cut(action.input)
-        desc = action.description if not lister else _cut(action.description)
+        input = action.input if not lister else base.cut(action.input)
+        desc = (action.description if not lister
+                else base.cut(action.description))
 
         data = (
             action.name,

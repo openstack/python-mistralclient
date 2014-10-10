@@ -26,10 +26,15 @@ from mistralclient.commands.v2 import base
 LOG = logging.getLogger(__name__)
 
 
-def format(workflow=None):
+def format_list(workflow=None):
+    return format(workflow, lister=True)
+
+
+def format(workflow=None, lister=False):
     columns = (
         'Name',
         'Tags',
+        'Input',
         'Created at',
         'Updated at'
     )
@@ -40,6 +45,7 @@ def format(workflow=None):
         data = (
             workflow.name,
             ', '.join(tags) or '<none>',
+            workflow.input if not lister else base.cut(workflow.input),
             workflow.created_at
         )
 
@@ -57,7 +63,7 @@ class List(base.MistralLister):
     """List all workflows."""
 
     def _get_format_function(self):
-        return format
+        return format_list
 
     def _get_resources(self, parsed_args):
         return workflows.WorkflowManager(self.app.client).list()

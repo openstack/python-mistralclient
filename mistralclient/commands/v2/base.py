@@ -46,3 +46,10 @@ class MistralLister(lister.Lister):
             return f()[0], data
         else:
             return f()
+
+
+def cut(string, length=25):
+    if string and len(string) > length:
+        return "%s..." % string[:length]
+    else:
+        return string
