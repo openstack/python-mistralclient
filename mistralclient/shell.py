@@ -29,6 +29,7 @@ import mistralclient.commands.v1.workbooks
 import mistralclient.commands.v1.executions
 import mistralclient.commands.v1.tasks
 import mistralclient.commands.v2.actions
+import mistralclient.commands.v2.cron_triggers
 import mistralclient.commands.v2.executions
 import mistralclient.commands.v2.tasks
 import mistralclient.commands.v2.workbooks
@@ -237,15 +238,22 @@ class MistralShell(app.App):
             'workbook-update': mistralclient.commands.v2.workbooks.Update,
             'workbook-get-definition':
             mistralclient.commands.v2.workbooks.GetDefinition,
+            'workflow-list': mistralclient.commands.v2.workflows.List,
+            'workflow-get': mistralclient.commands.v2.workflows.Get,
+            'workflow-create': mistralclient.commands.v2.workflows.Create,
+            'workflow-delete': mistralclient.commands.v2.workflows.Delete,
+            'workflow-update': mistralclient.commands.v2.workflows.Update,
+            'workflow-get-definition':
+            mistralclient.commands.v2.workflows.GetDefinition,
+            'execution-create': mistralclient.commands.v2.executions.Create,
+            'execution-delete': mistralclient.commands.v2.executions.Delete,
+            'execution-update': mistralclient.commands.v2.executions.Update,
             'execution-list': mistralclient.commands.v2.executions.List,
             'execution-get': mistralclient.commands.v2.executions.Get,
             'execution-get-input':
             mistralclient.commands.v2.executions.GetInput,
             'execution-get-output':
             mistralclient.commands.v2.executions.GetOutput,
-            'execution-create': mistralclient.commands.v2.executions.Create,
-            'execution-delete': mistralclient.commands.v2.executions.Delete,
-            'execution-update': mistralclient.commands.v2.executions.Update,
             'task-list': mistralclient.commands.v2.tasks.List,
             'task-get': mistralclient.commands.v2.tasks.Get,
             'task-get-input': mistralclient.commands.v2.tasks.GetInput,
@@ -259,13 +267,12 @@ class MistralShell(app.App):
             'action-update': mistralclient.commands.v2.actions.Update,
             'action-get-definition':
             mistralclient.commands.v2.actions.GetDefinition,
-            'workflow-list': mistralclient.commands.v2.workflows.List,
-            'workflow-get': mistralclient.commands.v2.workflows.Get,
-            'workflow-create': mistralclient.commands.v2.workflows.Create,
-            'workflow-delete': mistralclient.commands.v2.workflows.Delete,
-            'workflow-update': mistralclient.commands.v2.workflows.Update,
-            'workflow-get-definition':
-            mistralclient.commands.v2.workflows.GetDefinition
+            'cron-trigger-list': mistralclient.commands.v2.cron_triggers.List,
+            'cron-trigger-get': mistralclient.commands.v2.cron_triggers.Get,
+            'cron-trigger-create':
+            mistralclient.commands.v2.cron_triggers.Create,
+            'cron-trigger-delete':
+            mistralclient.commands.v2.cron_triggers.Delete
         }
 
 
