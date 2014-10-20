@@ -151,7 +151,7 @@ class Update(show.ShowOne):
         )
         parser.add_argument(
             'state',
-            choices=['RUNNING', 'SUSPENDED', 'STOPPED', 'SUCCESS', 'ERROR'],
+            choices=['RUNNING', 'PAUSED', 'SUCCESS', 'ERROR'],
             help='Execution state'
         )
 

@@ -49,7 +49,7 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            ('my_trigger', '* * * * *', 'flow1', {}, '1', '1', '1'),
+            ('my_trigger', '* * * * *', 'flow1', '1', '1', '1'),
             result[1]
         )
 
@@ -60,7 +60,7 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
         result = self.call(cron_triggers_cmd.List)
 
         self.assertEqual(
-            [('my_trigger', '* * * * *', 'flow1', {}, '1', '1', '1')],
+            [('my_trigger', '* * * * *', 'flow1', '1', '1', '1')],
             result[1]
         )
 
@@ -71,7 +71,7 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
         result = self.call(cron_triggers_cmd.Get, app_args=['name'])
 
         self.assertEqual(
-            ('my_trigger', '* * * * *', 'flow1', {}, '1', '1', '1'),
+            ('my_trigger', '* * * * *', 'flow1', '1', '1', '1'),
             result[1]
         )
 

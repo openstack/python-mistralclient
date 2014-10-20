@@ -253,13 +253,13 @@ class ExecutionCLITests(ClientTestBase):
         self.assertEqual('RUNNING', status)
 
         execution = self.mistral_command(
-            'execution-update', params='{0} "STOPPED"'.format(exec_id))
+            'execution-update', params='{0} "PAUSED"'.format(exec_id))
 
         updated_exec_id = self.get_value_of_field(execution, 'ID')
         status = self.get_value_of_field(execution, 'State')
 
         self.assertEqual(exec_id, updated_exec_id)
-        self.assertEqual('STOPPED', status)
+        self.assertEqual('PAUSED', status)
 
     def test_execution_get(self):
         execution = self.mistral_command(
