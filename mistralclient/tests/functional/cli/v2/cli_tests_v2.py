@@ -14,7 +14,7 @@
 
 import os
 
-from tempest import exceptions
+from tempest_lib import exceptions
 
 from mistralclient.tests.functional.cli import base
 
@@ -65,6 +65,14 @@ class SimpleMistralCLITests(base.MistralCLIAuth):
                                 'Next execution time',
                                 'Created at', 'Updated at'])
 
+    def test_actions_list(self):
+        actions = self.parser.listing(
+            self.mistral('action-list'))
+        self.assertTableStruct(actions,
+                               ['Name', 'Is system', 'Input',
+                                'Description', 'Tags', 'Created at',
+                                'Updated at'])
+
 
 class ClientTestBase(base.MistralCLIAuth):
 
@@ -83,6 +91,14 @@ class ClientTestBase(base.MistralCLIAuth):
         cls.wf_def = os.path.relpath(
             'functionaltests/resources/v2/wf_v2.yaml', os.getcwd())
 
+        cls.act_def = os.path.relpath(
+            'functionaltests/resources/v2/action_v2.yaml', os.getcwd())
+
+    def setUp(self):
+        super(ClientTestBase, self).setUp()
+
+        self.actions = []
+
     def tearDown(self):
         super(ClientTestBase, self).tearDown()
 
@@ -96,9 +112,16 @@ class ClientTestBase(base.MistralCLIAuth):
                 if id != "<none>":
                     self.mistral('{0}-delete'.format(object), params=id)
 
+        for act in self.actions:
+            self.mistral('action-delete', params=act)
+        del self.actions
+
     def get_value_of_field(self, obj, field):
         return [o['Value'] for o in obj
                 if o['Field'] == "{0}".format(field)][0]
+
+    def get_item_info(self, get_from, get_by, value):
+        return [i for i in get_from if i[get_by] == value][0]
 
     def mistral_command(self, cmd, params=""):
         return self.parser.listing(self.mistral('{0}'.format(cmd),
@@ -376,6 +399,82 @@ class TriggerCLITests(ClientTestBase):
         self.mistral('cron-trigger-delete', params='{0}'.format(tr_name))
 
 
+class ActionCLITests(ClientTestBase):
+    """Test suite checks commands to work with actions."""
+
+    @classmethod
+    def setUpClass(cls):
+        super(ActionCLITests, cls).setUpClass()
+
+    def test_action_create_delete(self):
+        acts = self.mistral_command(
+            'action-create', params='{0}'.format(self.act_def))
+        self.assertTableStruct(acts, ['Name', 'Is system', 'Input',
+                                      'Description', 'Tags',
+                                      'Created at', 'Updated at'])
+
+        self.assertIn('greeting', [action['Name'] for action in acts])
+        self.assertIn('farewell', [action['Name'] for action in acts])
+
+        action_1 = self.get_item_info(
+            get_from=acts, get_by='Name', value='greeting')
+        action_2 = self.get_item_info(
+            get_from=acts, get_by='Name', value='farewell')
+
+        self.assertEqual(action_1['Tags'], 'hello')
+        self.assertEqual(action_2['Tags'], '<none>')
+
+        self.assertEqual(action_1['Is system'], 'False')
+        self.assertEqual(action_2['Is system'], 'False')
+
+        self.assertEqual(action_1['Input'], 'name')
+        self.assertEqual(action_2['Input'], '')
+
+        acts = self.mistral_command('action-list')
+        self.assertIn(action_1['Name'], [action['Name'] for action in acts])
+        self.assertIn(action_2['Name'], [action['Name'] for action in acts])
+
+        self.mistral_command(
+            'action-delete', params='{0}'.format(action_1['Name']))
+        self.mistral_command(
+            'action-delete', params='{0}'.format(action_2['Name']))
+
+        acts = self.mistral_command('action-list')
+        self.assertNotIn(action_1['Name'], [action['Name'] for action in acts])
+        self.assertNotIn(action_2['Name'], [action['Name'] for action in acts])
+
+    def test_action_update(self):
+        acts = self.mistral_command(
+            'action-create', params='{0}'.format(self.act_def))
+
+        self.actions.extend([action['Name'] for action in acts])
+
+        created_action = self.get_item_info(
+            get_from=acts, get_by='Name', value='greeting')
+
+        acts = self.mistral_command(
+            'action-update', params='{0}'.format(self.act_def))
+
+        updated_action = self.get_item_info(
+            get_from=acts, get_by='Name', value='greeting')
+
+        self.assertEqual(created_action['Created at'].split(".")[0],
+                         updated_action['Created at'])
+        self.assertEqual(created_action['Name'], updated_action['Name'])
+        self.assertNotEqual(created_action['Updated at'],
+                            updated_action['Updated at'])
+
+    def test_action_get_definition(self):
+        acts = self.mistral_command(
+            'action-create', params='{0}'.format(self.act_def))
+
+        self.actions.extend([action['Name'] for action in acts])
+
+        definition = self.mistral_command(
+            'action-get-definition', params='greeting')
+        self.assertNotIn('404 Not Found', definition)
+
+
 class NegativeCLITests(ClientTestBase):
     """This class contains negative tests."""
 
@@ -507,3 +606,41 @@ class NegativeCLITests(ClientTestBase):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral,
                           'cron-trigger-get', params='tr')
+
+    def test_action_get_nonexistent(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral,
+                          'action-get', params='nonexist')
+
+    def test_action_double_creation(self):
+        acts = self.mistral_command(
+            'action-create', params='{0}'.format(self.act_def))
+        self.actions.extend([action['Name'] for action in acts])
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'action-create',
+                          params='{0}'.format(self.act_def))
+
+    def test_action_create_without_def(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'action-create',
+                          params='')
+
+    def test_action_create_invalid_def(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'action-create',
+                          params='{0}'.format(self.wb_def))
+
+    def test_action_delete_nonexistent_act(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'action-delete',
+                          params='nonexist')
+
+    def test_action_delete_standard_action(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'action-delete',
+                          params='heat.events_get')
+
+    def test_action_get_definition_nonexistent_action(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'action-get-definition',
+                          params='nonexist')

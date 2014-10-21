@@ -14,22 +14,36 @@
 
 import os
 
-from tempest import cli
+from tempest_lib.cli import base
+
+from tempest import config
+from tempest import test
+
+CONF = config.CONF
 
 
-class MistralCLIAuth(cli.ClientTestBase):
+class MistralCLIAuth(base.ClientTestBase, test.BaseTestCase):
 
     _mistral_url = None
 
-    def mistral(self, action, flags='', params='', admin=True, fail_ok=False,
-                keystone_version=3):
+    def _get_clients(self):
+        clients = base.CLIClient(
+            CONF.identity.admin_username,
+            CONF.identity.admin_password,
+            CONF.identity.admin_tenant_name,
+            CONF.identity.uri,
+            CONF.cli.cli_dir)
+        return clients
+
+    def mistral(self, action, flags='', params='', fail_ok=False):
         """Executes Mistral command."""
         mistral_url_op = "--os-mistral-url %s" % self._mistral_url
 
         if 'WITHOUT_AUTH' in os.environ:
-            return cli.execute(
-                'mistral %s' % mistral_url_op, action, flags, params)
+            return base.execute(
+                'mistral %s' % mistral_url_op, action, flags, params,
+                fail_ok, merge_stderr=False, cli_dir='')
         else:
-            return self.cmd_with_auth(
-                'mistral %s' % mistral_url_op, action, flags, params, admin,
-                fail_ok, keystone_version)
+            return self.clients.cmd_with_auth(
+                'mistral %s' % mistral_url_op, action, flags, params,
+                fail_ok)
