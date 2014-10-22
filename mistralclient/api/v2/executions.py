@@ -13,6 +13,7 @@
 #    limitations under the License.
 
 import json
+import six
 
 from mistralclient.api import base
 
@@ -30,7 +31,10 @@ class ExecutionManager(base.ResourceManager):
         data = {'workflow_name': workflow_name}
 
         if workflow_input:
-            data.update({'input': json.dumps(workflow_input)})
+            if isinstance(workflow_input, six.string_types):
+                data.update({'input': workflow_input})
+            else:
+                data.update({'input': json.dumps(workflow_input)})
 
         if params:
             data.update({'params': json.dumps(params)})
