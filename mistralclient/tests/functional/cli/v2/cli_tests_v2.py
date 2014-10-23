@@ -40,7 +40,8 @@ class SimpleMistralCLITests(base.MistralCLIAuth):
         workflows = self.parser.listing(
             self.mistral('workflow-list'))
         self.assertTableStruct(workflows,
-                               ['Name', 'Tags', 'Created at', 'Updated at'])
+                               ['Name', 'Tags', 'Input',
+                                'Created at', 'Updated at'])
 
     def test_executions_list(self):
         executions = self.parser.listing(
@@ -55,6 +56,14 @@ class SimpleMistralCLITests(base.MistralCLIAuth):
         self.assertTableStruct(tasks,
                                ['ID', 'Name', 'Workflow name', 'Execution ID',
                                 'State'])
+
+    def test_cron_trigger_list(self):
+        triggers = self.parser.listing(
+            self.mistral('cron-trigger-list'))
+        self.assertTableStruct(triggers,
+                               ['Name', 'Pattern', 'Workflow',
+                                'Next execution time',
+                                'Created at', 'Updated at'])
 
 
 class ClientTestBase(base.MistralCLIAuth):
@@ -77,7 +86,7 @@ class ClientTestBase(base.MistralCLIAuth):
     def tearDown(self):
         super(ClientTestBase, self).tearDown()
 
-        for object in ['execution', 'workflow', 'workbook']:
+        for object in ['execution', 'workflow', 'workbook', 'cron-trigger']:
             objects = self.mistral_command('{0}-list'.format(object))
             if object == 'execution':
                 identifiers = [obj['ID'] for obj in objects]
@@ -294,6 +303,83 @@ class ExecutionCLITests(ClientTestBase):
         self.assertEqual([], ex_output)
 
 
+class TriggerCLITests(ClientTestBase):
+    """Test suite checks commands to work with triggers."""
+
+    def setUp(self):
+        super(TriggerCLITests, self).setUp()
+
+        self.mistral(
+            'workbook-create', params='{0}'.format(self.wb_def))
+
+    def tearDown(self):
+        super(TriggerCLITests, self).tearDown()
+
+    def test_trigger_create_delete(self):
+        trigger = self.mistral_command(
+            'cron-trigger-create', params='trigger "5 * * * *" wb.wf1 {}')
+
+        self.assertTableStruct(trigger, ['Field', 'Value'])
+
+        tr_name = self.get_value_of_field(trigger, 'Name')
+        wf_name = self.get_value_of_field(trigger, 'Workflow')
+        wf_input = self.get_value_of_field(trigger, 'Workflow input')
+        created_at = self.get_value_of_field(trigger, 'Created at')
+
+        self.assertEqual('trigger', tr_name)
+        self.assertEqual('wb.wf1', wf_name)
+        self.assertEqual('None', wf_input)
+        self.assertIsNotNone(created_at)
+
+        trgs = self.mistral_command('cron-trigger-list')
+        self.assertIn(tr_name, [tr['Name'] for tr in trgs])
+        self.assertIn(wf_name, [tr['Workflow'] for tr in trgs])
+
+        self.mistral('cron-trigger-delete', params='{0}'.format(tr_name))
+
+        trgs = self.mistral_command('cron-trigger-list')
+        self.assertNotIn(tr_name, [tr['Name'] for tr in trgs])
+
+    def test_two_triggers_for_one_wf(self):
+        self.mistral(
+            'cron-trigger-create', params='trigger1 "5 * * * *" wb.wf1 {}')
+
+        self.mistral(
+            'cron-trigger-create', params='trigger2 "15 * * * *" wb.wf1 {}')
+
+        trgs = self.mistral_command('cron-trigger-list')
+        self.assertIn("trigger1", [tr['Name'] for tr in trgs])
+        self.assertIn("trigger2", [tr['Name'] for tr in trgs])
+
+        self.mistral('cron-trigger-delete', params='trigger1')
+        self.mistral('cron-trigger-delete', params='trigger2')
+
+    def test_trigger_get(self):
+        trigger = self.mistral_command(
+            'cron-trigger-create', params='trigger "5 * * * *" wb.wf1 {}')
+
+        self.assertTableStruct(trigger, ['Field', 'Value'])
+
+        tr_name = self.get_value_of_field(trigger, 'Name')
+
+        fetched_tr = self.mistral_command(
+            'cron-trigger-get', params='trigger')
+
+        self.assertTableStruct(trigger, ['Field', 'Value'])
+
+        tr_name = self.get_value_of_field(fetched_tr, 'Name')
+        wf_name = self.get_value_of_field(fetched_tr, 'Workflow')
+        wf_input = self.get_value_of_field(fetched_tr, 'Workflow input')
+        created_at = self.get_value_of_field(fetched_tr, 'Created at')
+
+        self.assertEqual('trigger', tr_name)
+        self.assertEqual('wb.wf1', wf_name)
+        self.assertEqual('None', wf_input)
+        self.assertIsNotNone(created_at)
+
+        self.mistral('cron-trigger-delete', params='{0}'.format(tr_name))
+
+
 class NegativeCLITests(ClientTestBase):
     """This class contains negative tests."""
 
@@ -392,3 +478,36 @@ class NegativeCLITests(ClientTestBase):
         self.mistral('workbook-create', params='{0}'.format(self.wb_def))
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral, 'execution-get', params='wb.wf1 id')
+
+    def test_tr_create_without_pattern(self):
+        self.mistral('workbook-create', params='{0}'.format(self.wb_def))
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral,
+                          'cron-trigger-create', params='tr "" wb.wf1 {}')
+
+    def test_tr_create_invalid_pattern(self):
+        self.mistral('workbook-create', params='{0}'.format(self.wb_def))
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral,
+                          'cron-trigger-create', params='tr "q" wb.wf1 {}')
+
+    def test_tr_create_invalid_pattern_value_out_of_range(self):
+        self.mistral('workbook-create', params='{0}'.format(self.wb_def))
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'cron-trigger-create',
+                          params='tr "88 * * * *" wb.wf1 {}')
+
+    def test_tr_create_nonexistent_wf(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'cron-trigger-create',
+                          params='tr "* * * * *" wb.wf1 {}')
+
+    def test_tr_delete_nonexistant_wf(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral,
+                          'cron-trigger-delete', params='tr')
+
+    def test_tr_get_nonexistant_wf(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral,
+                          'cron-trigger-get', params='tr')
