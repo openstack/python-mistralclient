@@ -323,12 +323,10 @@ class TriggerCLITests(ClientTestBase):
 
         tr_name = self.get_value_of_field(trigger, 'Name')
         wf_name = self.get_value_of_field(trigger, 'Workflow')
-        wf_input = self.get_value_of_field(trigger, 'Workflow input')
         created_at = self.get_value_of_field(trigger, 'Created at')
 
         self.assertEqual('trigger', tr_name)
         self.assertEqual('wb.wf1', wf_name)
-        self.assertEqual('None', wf_input)
         self.assertIsNotNone(created_at)
 
         trgs = self.mistral_command('cron-trigger-list')
@@ -369,12 +367,10 @@ class TriggerCLITests(ClientTestBase):
 
         tr_name = self.get_value_of_field(fetched_tr, 'Name')
         wf_name = self.get_value_of_field(fetched_tr, 'Workflow')
-        wf_input = self.get_value_of_field(fetched_tr, 'Workflow input')
         created_at = self.get_value_of_field(fetched_tr, 'Created at')
 
         self.assertEqual('trigger', tr_name)
         self.assertEqual('wb.wf1', wf_name)
-        self.assertEqual('None', wf_input)
         self.assertIsNotNone(created_at)
 
         self.mistral('cron-trigger-delete', params='{0}'.format(tr_name))
