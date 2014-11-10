@@ -98,23 +98,19 @@ class ClientTestBase(base.MistralCLIAuth):
         super(ClientTestBase, self).setUp()
 
         self.actions = []
+        self.executions = []
+        self.workflows = []
+        self.workbooks = []
+        self.cron_triggers = []
 
     def tearDown(self):
         super(ClientTestBase, self).tearDown()
 
-        for object in ['execution', 'workflow', 'workbook', 'cron-trigger']:
-            objects = self.mistral_command('{0}-list'.format(object))
-            if object == 'execution':
-                identifiers = [obj['ID'] for obj in objects]
-            else:
-                identifiers = [obj['Name'] for obj in objects]
-            for id in identifiers:
-                if id != "<none>":
-                    self.mistral('{0}-delete'.format(object), params=id)
-
-        for act in self.actions:
-            self.mistral('action-delete', params=act)
         del self.actions
+        del self.executions
+        del self.workflows
+        del self.workbooks
+        del self.cron_triggers
 
     def get_value_of_field(self, obj, field):
         return [o['Value'] for o in obj
@@ -135,28 +131,36 @@ class WorkbookCLITests(ClientTestBase):
     def setUpClass(cls):
         super(WorkbookCLITests, cls).setUpClass()
 
+    def tearDown(self):
+        for wb in self.workbooks:
+            self.mistral('workbook-delete', params=wb)
+
+        super(WorkbookCLITests, self).tearDown()
+
     def test_workbook_create_delete(self):
         wb = self.mistral_command(
             'workbook-create', params='{0}'.format(self.wb_def))
+        wb_name = self.get_value_of_field(wb, "Name")
+        self.workbooks.append(wb_name)
         self.assertTableStruct(wb, ['Field', 'Value'])
 
-        wfs = self.mistral_command('workflow-list')
-        self.assertIn('wb.wf1', [wf['Name'] for wf in wfs])
-
-        name = self.get_value_of_field(wb, "Name")
-        self.assertEqual('wb', name)
+        wbs = self.mistral_command('workbook-list')
+        self.assertIn(wb_name, [workbook['Name'] for workbook in wbs])
 
         wbs = self.mistral_command('workbook-list')
-        self.assertIn('wb', [workbook['Name'] for workbook in wbs])
+        self.assertIn(wb_name, [workbook['Name'] for workbook in wbs])
 
-        self.mistral_command('workbook-delete', params='wb')
+        self.mistral_command('workbook-delete', params=wb_name)
 
         wbs = self.mistral_command('workbook-list')
-        self.assertNotIn('wb', [workbook['Name'] for workbook in wbs])
+        self.assertNotIn(wb_name, [workbook['Name'] for workbook in wbs])
+        self.workbooks.remove(wb_name)
 
     def test_workbook_update(self):
         wb = self.mistral_command(
             'workbook-create', params='{0}'.format(self.wb_def))
+        wb_name = self.get_value_of_field(wb, "Name")
+        self.workbooks.append(wb_name)
 
         tags = self.get_value_of_field(wb, 'Tags')
         self.assertNotIn('tag', tags)
@@ -168,13 +172,16 @@ class WorkbookCLITests(ClientTestBase):
         name = self.get_value_of_field(wb, 'Name')
         tags = self.get_value_of_field(wb, 'Tags')
 
-        self.assertEqual('wb', name)
+        self.assertEqual(wb_name, name)
         self.assertIn('tag', tags)
 
     def test_workbook_get(self):
         created = self.mistral_command(
             'workbook-create', params='{0}'.format(self.wb_with_tags_def))
-        fetched = self.mistral_command('workbook-get', params='wb')
+        wb_name = self.get_value_of_field(created, "Name")
+        self.workbooks.append(wb_name)
+
+        fetched = self.mistral_command('workbook-get', params=wb_name)
 
         created_wb_name = self.get_value_of_field(created, 'Name')
         fetched_wb_name = self.get_value_of_field(fetched, 'Name')
@@ -187,10 +194,13 @@ class WorkbookCLITests(ClientTestBase):
         self.assertEqual(created_wb_tag, fetched_wb_tag)
 
     def test_workbook_get_definition(self):
-        self.mistral('workbook-create', params='{0}'.format(self.wb_def))
+        wb = self.mistral_command(
+            'workbook-create', params='{0}'.format(self.wb_def))
+        wb_name = self.get_value_of_field(wb, "Name")
+        self.workbooks.append(wb_name)
 
-        definition = self.mistral_command('workbook-get-definition',
-                                          params='wb')
+        definition = self.mistral_command(
+            'workbook-get-definition', params=wb_name)
         self.assertNotIn('404 Not Found', definition)
 
 
@@ -201,72 +211,97 @@ class WorkflowCLITests(ClientTestBase):
     def setUpClass(cls):
         super(WorkflowCLITests, cls).setUpClass()
 
+    def tearDown(self):
+        for wf in self.workflows:
+            self.mistral('workflow-delete', params=wf)
+
+        super(WorkflowCLITests, self).tearDown()
+
     def test_workflow_create_delete(self):
-        wf = self.mistral_command(
+        init_wf = self.mistral_command(
             'workflow-create', params='{0}'.format(self.wf_def))
-        self.assertTableStruct(wf, ['Name', 'Created at', 'Updated at'])
-
-        self.assertEqual('wf', wf[0]['Name'])
+        wf_name = init_wf[0]['Name']
+        self.workflows.extend([workflow['Name'] for workflow in init_wf])
+        self.assertTableStruct(init_wf, ['Name', 'Created at', 'Updated at'])
 
         wfs = self.mistral_command('workflow-list')
-        self.assertIn('wf', [workflow['Name'] for workflow in wfs])
+        self.assertIn(wf_name, [workflow['Name'] for workflow in wfs])
 
-        self.mistral_command('workflow-delete', params='wf')
+        self.mistral_command('workflow-delete', params=wf_name)
+
         wfs = self.mistral_command('workflow-list')
-        self.assertNotIn('wf', [workflow['Name'] for workflow in wfs])
+        self.assertNotIn(wf_name, [workflow['Name'] for workflow in wfs])
+        for w in [workflow['Name'] for workflow in init_wf]:
+            self.workflows.remove(w)
 
     def test_workflow_update(self):
-        self.mistral(
-            'workflow-create', params='{0}'.format(self.wf_def))
-
         wf = self.mistral_command(
-            'workflow-update', params='{0}'.format(self.wf_def))
-        self.assertTableStruct(wf, ['Name', 'Created at', 'Updated at'])
+            'workflow-create', params='{0}'.format(self.wf_def))
+        wf_name = wf[0]['Name']
+        self.workflows.extend([workflow['Name'] for workflow in wf])
 
-        self.assertEqual('wf', wf[0]['Name'])
+        upd_wf = self.mistral_command(
+            'workflow-update', params='{0}'.format(self.wf_def))
+        self.assertTableStruct(upd_wf, ['Name', 'Created at', 'Updated at'])
+
+        self.assertEqual(wf_name, upd_wf[0]['Name'])
 
     def test_workflow_get(self):
         created = self.mistral_command(
             'workflow-create', params='{0}'.format(self.wf_def))
+        wf_name = created[0]['Name']
+        self.workflows.extend([workflow['Name'] for workflow in created])
 
-        fetched = self.mistral_command('workflow-get', params='wf')
-        created_wf_name = created[0]['Name']
+        fetched = self.mistral_command('workflow-get', params=wf_name)
         fetched_wf_name = self.get_value_of_field(fetched, 'Name')
-
-        self.assertEqual(created_wf_name, fetched_wf_name)
+        self.assertEqual(wf_name, fetched_wf_name)
 
     def test_workflow_get_definition(self):
-        self.mistral(
+        wf = self.mistral_command(
             'workflow-create', params='{0}'.format(self.wf_def))
+        wf_name = wf[0]['Name']
+        self.workflows.extend([workflow['Name'] for workflow in wf])
 
         definition = self.mistral_command(
-            'workflow-get-definition', params='wf')
+            'workflow-get-definition', params=wf_name)
         self.assertNotIn('404 Not Found', definition)
 
 
 class ExecutionCLITests(ClientTestBase):
     """Test suite checks commands to work with executions."""
 
+    @classmethod
+    def setUpClass(cls):
+        super(ExecutionCLITests, cls).setUpClass()
+
     def setUp(self):
         super(ExecutionCLITests, self).setUp()
 
-        self.mistral(
-            'workbook-create', params='{0}'.format(self.wb_def))
+        wf = self.mistral_command(
+            'workflow-create', params='{0}'.format(self.wf_def))
+        self.wf_name = wf[0]['Name']
+        self.workflows.extend([workflow['Name'] for workflow in wf])
 
     def tearDown(self):
+        for ex in self.executions:
+            self.mistral('execution-delete', params=ex)
+
+        self.mistral('workflow-delete', params=self.wf_name)
+
         super(ExecutionCLITests, self).tearDown()
 
     def test_execution_create_delete(self):
         execution = self.mistral_command(
-            'execution-create', params='wb.wf1')
-
-        self.assertTableStruct(execution, ['Field', 'Value'])
+            'execution-create', params=self.wf_name)
 
         exec_id = self.get_value_of_field(execution, 'ID')
+        self.executions.append(exec_id)
+        self.assertTableStruct(execution, ['Field', 'Value'])
+
         wf = self.get_value_of_field(execution, 'Workflow')
         created_at = self.get_value_of_field(execution, 'Created at')
 
-        self.assertEqual('wb.wf1', wf)
+        self.assertEqual(self.wf_name, wf)
         self.assertIsNotNone(created_at)
 
         execs = self.mistral_command('execution-list')
@@ -274,12 +309,15 @@ class ExecutionCLITests(ClientTestBase):
         self.assertIn(wf, [ex['Workflow'] for ex in execs])
         self.assertIn('SUCCESS', [ex['State'] for ex in execs])
 
-        self.mistral_command('execution-delete', params='{0}'.format(exec_id))
+        self.mistral_command('execution-delete', params=exec_id)
+        self.executions.remove(exec_id)
 
     def test_execution_update(self):
-        execution = self.mistral_command('execution-create', params='wb.wf1')
-
+        execution = self.mistral_command(
+            'execution-create', params=self.wf_name)
         exec_id = self.get_value_of_field(execution, 'ID')
+        self.executions.append(exec_id)
+
         status = self.get_value_of_field(execution, 'State')
 
         self.assertEqual('RUNNING', status)
@@ -295,9 +333,10 @@ class ExecutionCLITests(ClientTestBase):
 
     def test_execution_get(self):
         execution = self.mistral_command(
-            'execution-create', params='wb.wf1')
+            'execution-create', params=self.wf_name)
 
         exec_id = self.get_value_of_field(execution, 'ID')
+        self.executions.append(exec_id)
 
         execution = self.mistral_command(
             'execution-get', params='{0}'.format(exec_id))
@@ -306,42 +345,59 @@ class ExecutionCLITests(ClientTestBase):
         wf = self.get_value_of_field(execution, 'Workflow')
 
         self.assertEqual(exec_id, gotten_id)
-        self.assertEqual('wb.wf1', wf)
+        self.assertEqual(self.wf_name, wf)
 
     def test_execution_get_input(self):
         execution = self.mistral_command(
-            'execution-create', params='wb.wf1')
+            'execution-create', params=self.wf_name)
 
         exec_id = self.get_value_of_field(execution, 'ID')
+        self.executions.append(exec_id)
+
         ex_input = self.mistral_command('execution-get-input', params=exec_id)
         self.assertEqual([], ex_input)
 
     def test_execution_get_output(self):
         execution = self.mistral_command(
-            'execution-create', params='wb.wf1')
+            'execution-create', params=self.wf_name)
 
         exec_id = self.get_value_of_field(execution, 'ID')
+        self.executions.append(exec_id)
+
         ex_output = self.mistral_command(
             'execution-get-output', params=exec_id)
         self.assertEqual([], ex_output)
 
 
-class TriggerCLITests(ClientTestBase):
-    """Test suite checks commands to work with triggers."""
+class CronTriggerCLITests(ClientTestBase):
+    """Test suite checks commands to work with cron-triggers."""
+
+    @classmethod
+    def setUpClass(cls):
+        super(CronTriggerCLITests, cls).setUpClass()
 
     def setUp(self):
-        super(TriggerCLITests, self).setUp()
+        super(CronTriggerCLITests, self).setUp()
 
-        self.mistral(
-            'workbook-create', params='{0}'.format(self.wb_def))
+        wf = self.mistral_command(
+            'workflow-create', params='{0}'.format(self.wf_def))
+        self.wf_name = wf[0]['Name']
+        self.workflows.append(self.wf_name)
 
     def tearDown(self):
-        super(TriggerCLITests, self).tearDown()
+        for tr in self.cron_triggers:
+            self.mistral('cron-trigger-delete', params=tr)
 
-    def test_trigger_create_delete(self):
+        self.mistral('workflow-delete', params=self.wf_name)
+
+        super(CronTriggerCLITests, self).tearDown()
+
+    def test_cron_trigger_create_delete(self):
         trigger = self.mistral_command(
-            'cron-trigger-create', params='trigger "5 * * * *" wb.wf1 {}')
-
+            'cron-trigger-create',
+            params='trigger "5 * * * *" %s {}' % self.wf_name)
+        cron_tr_name = 'trigger'
+        self.cron_triggers.append(cron_tr_name)
         self.assertTableStruct(trigger, ['Field', 'Value'])
 
         tr_name = self.get_value_of_field(trigger, 'Name')
@@ -349,7 +405,7 @@ class TriggerCLITests(ClientTestBase):
         created_at = self.get_value_of_field(trigger, 'Created at')
 
         self.assertEqual('trigger', tr_name)
-        self.assertEqual('wb.wf1', wf_name)
+        self.assertEqual(self.wf_name, wf_name)
         self.assertIsNotNone(created_at)
 
         trgs = self.mistral_command('cron-trigger-list')
@@ -360,13 +416,17 @@ class TriggerCLITests(ClientTestBase):
 
         trgs = self.mistral_command('cron-trigger-list')
         self.assertNotIn(tr_name, [tr['Name'] for tr in trgs])
+        self.cron_triggers.remove(cron_tr_name)
 
-    def test_two_triggers_for_one_wf(self):
+    def test_two_cron_triggers_for_one_wf(self):
         self.mistral(
-            'cron-trigger-create', params='trigger1 "5 * * * *" wb.wf1 {}')
-
+            'cron-trigger-create',
+            params='trigger1 "5 * * * *" %s {}' % self.wf_name)
+        self.cron_triggers.append('trigger1')
         self.mistral(
-            'cron-trigger-create', params='trigger2 "15 * * * *" wb.wf1 {}')
+            'cron-trigger-create',
+            params='trigger2 "15 * * * *" %s {}' % self.wf_name)
+        self.cron_triggers.append('trigger2')
 
         trgs = self.mistral_command('cron-trigger-list')
         self.assertIn("trigger1", [tr['Name'] for tr in trgs])
@@ -375,10 +435,14 @@ class TriggerCLITests(ClientTestBase):
         self.mistral('cron-trigger-delete', params='trigger1')
         self.mistral('cron-trigger-delete', params='trigger2')
 
-    def test_trigger_get(self):
-        trigger = self.mistral_command(
-            'cron-trigger-create', params='trigger "5 * * * *" wb.wf1 {}')
+        self.cron_triggers.remove('trigger1')
+        self.cron_triggers.remove('trigger2')
 
+    def test_cron_trigger_get(self):
+        trigger = self.mistral_command(
+            'cron-trigger-create',
+            params='trigger "5 * * * *" %s {}' % self.wf_name)
+        self.cron_triggers.append('trigger')
         self.assertTableStruct(trigger, ['Field', 'Value'])
 
         tr_name = self.get_value_of_field(trigger, 'Name')
@@ -393,10 +457,11 @@ class TriggerCLITests(ClientTestBase):
         created_at = self.get_value_of_field(fetched_tr, 'Created at')
 
         self.assertEqual('trigger', tr_name)
-        self.assertEqual('wb.wf1', wf_name)
+        self.assertEqual(self.wf_name, wf_name)
         self.assertIsNotNone(created_at)
 
         self.mistral('cron-trigger-delete', params='{0}'.format(tr_name))
+        self.cron_triggers.remove('trigger')
 
 
 class ActionCLITests(ClientTestBase):
@@ -406,20 +471,27 @@ class ActionCLITests(ClientTestBase):
     def setUpClass(cls):
         super(ActionCLITests, cls).setUpClass()
 
-    def test_action_create_delete(self):
-        acts = self.mistral_command(
-            'action-create', params='{0}'.format(self.act_def))
-        self.assertTableStruct(acts, ['Name', 'Is system', 'Input',
-                                      'Description', 'Tags',
-                                      'Created at', 'Updated at'])
+    def tearDown(self):
+        for act in self.actions:
+            self.mistral('action-delete', params=act)
 
-        self.assertIn('greeting', [action['Name'] for action in acts])
-        self.assertIn('farewell', [action['Name'] for action in acts])
+        super(ActionCLITests, self).tearDown()
+
+    def test_action_create_delete(self):
+        init_acts = self.mistral_command(
+            'action-create', params='{0}'.format(self.act_def))
+        self.actions.extend([action['Name'] for action in init_acts])
+        self.assertTableStruct(init_acts, ['Name', 'Is system', 'Input',
+                                           'Description', 'Tags',
+                                           'Created at', 'Updated at'])
+
+        self.assertIn('greeting', [action['Name'] for action in init_acts])
+        self.assertIn('farewell', [action['Name'] for action in init_acts])
 
         action_1 = self.get_item_info(
-            get_from=acts, get_by='Name', value='greeting')
+            get_from=init_acts, get_by='Name', value='greeting')
         action_2 = self.get_item_info(
-            get_from=acts, get_by='Name', value='farewell')
+            get_from=init_acts, get_by='Name', value='farewell')
 
         self.assertEqual(action_1['Tags'], 'hello')
         self.assertEqual(action_2['Tags'], '<none>')
@@ -442,6 +514,8 @@ class ActionCLITests(ClientTestBase):
         acts = self.mistral_command('action-list')
         self.assertNotIn(action_1['Name'], [action['Name'] for action in acts])
         self.assertNotIn(action_2['Name'], [action['Name'] for action in acts])
+        for a in [action['Name'] for action in init_acts]:
+            self.actions.remove(a)
 
     def test_action_update(self):
         acts = self.mistral_command(
@@ -478,6 +552,21 @@ class ActionCLITests(ClientTestBase):
 class NegativeCLITests(ClientTestBase):
     """This class contains negative tests."""
 
+    def tearDown(self):
+        for wb in self.workbooks:
+            self.mistral('workbook-delete', params=wb)
+
+        for cron_tr in self.cron_triggers:
+            self.mistral('cron-trigger-delete', params=cron_tr)
+
+        for wf in self.workflows:
+            self.mistral('workflow-delete', params=wf)
+
+        for act in self.actions:
+            self.mistral('action-delete', params=act)
+
+        super(NegativeCLITests, self).tearDown()
+
     def test_wb_list_extra_param(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral, 'workbook-list', params='param')
@@ -491,7 +580,11 @@ class NegativeCLITests(ClientTestBase):
                           self.mistral, 'workbook-get')
 
     def test_wb_create_same_name(self):
-        self.mistral('workbook-create', params='{0}'.format(self.wb_def))
+        wb = self.mistral_command(
+            'workbook-create', params='{0}'.format(self.wb_def))
+        wb_name = self.get_value_of_field(wb, "Name")
+        self.workbooks.append(wb_name)
+        self.workflows.append('wb.wf1')
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral, 'workbook-create',
                           params='{0}'.format(self.wb_def))
@@ -558,51 +651,64 @@ class NegativeCLITests(ClientTestBase):
                           self.mistral, 'execution-create', params='wf')
 
     def test_ex_create_unexist_task(self):
-        self.mistral('workbook-create', params='{0}'.format(self.wb_def))
+        wf = self.mistral_command(
+            'workflow-create', params='{0}'.format(self.wf_def))
+        self.workflows.append(wf[0]['Name'])
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral,
-                          'execution-create', params='wb param {}')
+                          self.mistral, 'execution-create',
+                          params='%s param {}' % wf[0]['Name'])
 
     def test_ex_create_with_invalid_input(self):
-        self.mistral('workbook-create', params='{0}'.format(self.wb_def))
+        wf = self.mistral_command(
+            'workflow-create', params='{0}'.format(self.wf_def))
+        self.workflows.append(wf[0]['Name'])
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral,
-                          'execution-create', params="wb.wf1 input")
+                          self.mistral, 'execution-create',
+                          params="%s input" % wf[0]['Name'])
 
     def test_ex_get_nonexist_execution(self):
-        self.mistral('workbook-create', params='{0}'.format(self.wb_def))
+        wf = self.mistral_command(
+            'workflow-create', params='{0}'.format(self.wf_def))
+        self.workflows.append(wf[0]['Name'])
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral, 'execution-get', params='wb.wf1 id')
+                          self.mistral, 'execution-get',
+                          params='%s id' % wf[0]['Name'])
 
     def test_tr_create_without_pattern(self):
-        self.mistral('workbook-create', params='{0}'.format(self.wb_def))
-        self.assertRaises(exceptions.CommandFailed,
-                          self.mistral,
-                          'cron-trigger-create', params='tr "" wb.wf1 {}')
-
-    def test_tr_create_invalid_pattern(self):
-        self.mistral('workbook-create', params='{0}'.format(self.wb_def))
-        self.assertRaises(exceptions.CommandFailed,
-                          self.mistral,
-                          'cron-trigger-create', params='tr "q" wb.wf1 {}')
-
-    def test_tr_create_invalid_pattern_value_out_of_range(self):
-        self.mistral('workbook-create', params='{0}'.format(self.wb_def))
+        wf = self.mistral_command(
+            'workflow-create', params='{0}'.format(self.wf_def))
+        self.workflows.append(wf[0]['Name'])
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral, 'cron-trigger-create',
-                          params='tr "88 * * * *" wb.wf1 {}')
+                          params='tr "" %s {}' % wf[0]['Name'])
+
+    def test_tr_create_invalid_pattern(self):
+        wf = self.mistral_command(
+            'workflow-create', params='{0}'.format(self.wf_def))
+        self.workflows.append(wf[0]['Name'])
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'cron-trigger-create',
+                          params='tr "q" %s {}' % wf[0]['Name'])
+
+    def test_tr_create_invalid_pattern_value_out_of_range(self):
+        wf = self.mistral_command(
+            'workflow-create', params='{0}'.format(self.wf_def))
+        self.workflows.append(wf[0]['Name'])
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral, 'cron-trigger-create',
+                          params='tr "88 * * * *" %s {}' % wf[0]['Name'])
 
     def test_tr_create_nonexistent_wf(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral, 'cron-trigger-create',
                           params='tr "* * * * *" wb.wf1 {}')
 
-    def test_tr_delete_nonexistant_wf(self):
+    def test_tr_delete_nonexistant_tr(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral,
                           'cron-trigger-delete', params='tr')
 
-    def test_tr_get_nonexistant_wf(self):
+    def test_tr_get_nonexistant_tr(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral,
                           'cron-trigger-get', params='tr')
