@@ -15,24 +15,27 @@
 import os
 
 from tempest import config
-from tempest import test
 from tempest_lib.cli import base
 
 CONF = config.CONF
 
 
-class MistralCLIAuth(base.ClientTestBase, test.BaseTestCase):
+class MistralCLIAuth(base.ClientTestBase):
 
     _mistral_url = None
 
-    def _get_clients(self):
+    def _get_admin_clients(self):
         clients = base.CLIClient(
             CONF.identity.admin_username,
             CONF.identity.admin_password,
             CONF.identity.admin_tenant_name,
             CONF.identity.uri,
             CONF.cli.cli_dir)
+
         return clients
+
+    def _get_clients(self):
+        return self._get_admin_clients()
 
     def mistral(self, action, flags='', params='', fail_ok=False):
         """Executes Mistral command."""
@@ -46,3 +49,28 @@ class MistralCLIAuth(base.ClientTestBase, test.BaseTestCase):
             return self.clients.cmd_with_auth(
                 'mistral %s' % mistral_url_op, action, flags, params,
                 fail_ok)
+
+
+class MistralCLIAltAuth(base.ClientTestBase):
+
+    _mistral_url = None
+
+    def _get_alt_clients(self):
+        clients = base.CLIClient(
+            CONF.identity.alt_username,
+            CONF.identity.alt_password,
+            CONF.identity.alt_tenant_name,
+            CONF.identity.uri,
+            CONF.cli.cli_dir)
+
+        return clients
+
+    def _get_clients(self):
+        return self._get_alt_clients()
+
+    def mistral_alt(self, action, flags='', params='', mode='alt_user'):
+        """Executes Mistral command for alt_user from alt_tenant."""
+        mistral_url_op = "--os-mistral-url %s" % self._mistral_url
+
+        return self.clients.cmd_with_auth(
+            'mistral %s' % mistral_url_op, action, flags, params)
