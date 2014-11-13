@@ -12,9 +12,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import unittest2
-import mock
 import json
+
+import mock
+import unittest2
 
 
 class FakeResponse(object):
@@ -35,8 +36,8 @@ class BaseClientTest(unittest2.TestCase):
         if isinstance(content, dict):
             content = json.dumps(content)
 
-        self._client.http_client.get = \
-            mock.MagicMock(return_value=FakeResponse(status_code, content))
+        self._client.http_client.get = mock.MagicMock(
+            return_value=FakeResponse(status_code, content))
 
         return self._client.http_client.get
 
@@ -44,8 +45,8 @@ class BaseClientTest(unittest2.TestCase):
         if isinstance(content, dict):
             content = json.dumps(content)
 
-        self._client.http_client.post = \
-            mock.MagicMock(return_value=FakeResponse(status_code, content))
+        self._client.http_client.post = mock.MagicMock(
+            return_value=FakeResponse(status_code, content))
 
         return self._client.http_client.post
 
@@ -53,14 +54,14 @@ class BaseClientTest(unittest2.TestCase):
         if isinstance(content, dict):
             content = json.dumps(content)
 
-        self._client.http_client.put = \
-            mock.MagicMock(return_value=FakeResponse(status_code, content))
+        self._client.http_client.put = mock.MagicMock(
+            return_value=FakeResponse(status_code, content))
 
         return self._client.http_client.put
 
     def mock_http_delete(self, status_code=204):
-        self._client.http_client.delete = \
-            mock.MagicMock(return_value=FakeResponse(status_code))
+        self._client.http_client.delete = mock.MagicMock(
+            return_value=FakeResponse(status_code))
 
         return self._client.http_client.delete
 

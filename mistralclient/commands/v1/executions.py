@@ -17,11 +17,11 @@
 import json
 import logging
 
-from cliff.command import Command as BaseCommand
-from cliff.lister import Lister as ListCommand
-from cliff.show import ShowOne as ShowCommand
+from cliff import command
+from cliff import lister
+from cliff import show
 
-from mistralclient.api.v1.executions import ExecutionManager
+from mistralclient.api.v1 import executions as e
 
 LOG = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ def format(execution=None):
     return (columns, data)
 
 
-class List(ListCommand):
+class List(lister.Lister):
     "List all executions"
 
     def get_parser(self, prog_name):
@@ -60,7 +60,7 @@ class List(ListCommand):
 
     def take_action(self, parsed_args):
         data = [format(execution)[1] for execution
-                in ExecutionManager(self.app.client)
+                in e.ExecutionManager(self.app.client)
                 .list(parsed_args.workbook)]
 
         if data:
@@ -69,7 +69,7 @@ class List(ListCommand):
             return format()
 
 
-class Get(ShowCommand):
+class Get(show.ShowOne):
     "Show specific execution"
 
     def get_parser(self, prog_name):
@@ -84,13 +84,14 @@ class Get(ShowCommand):
         return parser
 
     def take_action(self, parsed_args):
-        execution = ExecutionManager(self.app.client)\
-            .get(parsed_args.workbook, parsed_args.id)
+        execution = e.ExecutionManager(self.app.client).get(
+            parsed_args.workbook,
+            parsed_args.id)
 
         return format(execution)
 
 
-class Create(ShowCommand):
+class Create(show.ShowOne):
     "Create new execution"
 
     def get_parser(self, prog_name):
@@ -113,15 +114,15 @@ class Create(ShowCommand):
         except:
             ctx = open(parsed_args.context).read()
 
-        execution = ExecutionManager(self.app.client)\
-            .create(parsed_args.workbook,
-                    parsed_args.task,
-                    ctx)
+        execution = e.ExecutionManager(self.app.client).create(
+            parsed_args.workbook,
+            parsed_args.task,
+            ctx)
 
         return format(execution)
 
 
-class Delete(BaseCommand):
+class Delete(command.Command):
     "Delete execution"
 
     def get_parser(self, prog_name):
@@ -136,11 +137,11 @@ class Delete(BaseCommand):
         return parser
 
     def take_action(self, parsed_args):
-        ExecutionManager(self.app.client)\
-            .delete(parsed_args.workbook, parsed_args.id)
+        e.ExecutionManager(self.app.client).delete(
+            parsed_args.workbook, parsed_args.id)
 
 
-class Update(ShowCommand):
+class Update(show.ShowOne):
     "Update execution"
 
     def get_parser(self, prog_name):
@@ -159,9 +160,9 @@ class Update(ShowCommand):
         return parser
 
     def take_action(self, parsed_args):
-        execution = ExecutionManager(self.app.client)\
-            .update(parsed_args.workbook,
-                    parsed_args.id,
-                    parsed_args.state)
+        execution = e.ExecutionManager(self.app.client).update(
+            parsed_args.workbook,
+            parsed_args.id,
+            parsed_args.state)
 
         return format(execution)

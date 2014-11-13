@@ -17,11 +17,11 @@
 import argparse
 import logging
 
-from cliff.command import Command as BaseCommand
-from cliff.lister import Lister as ListCommand
-from cliff.show import ShowOne as ShowCommand
+from cliff import command
+from cliff import lister
+from cliff import show
 
-from mistralclient.api.v1.workbooks import WorkbookManager
+from mistralclient.api.v1 import workbooks as w
 
 LOG = logging.getLogger(__name__)
 
@@ -45,12 +45,12 @@ def format(workbook=None):
     return (columns, data)
 
 
-class List(ListCommand):
+class List(lister.Lister):
     "List all workbooks"
 
     def take_action(self, parsed_args):
         data = [format(workbook)[1] for workbook
-                in WorkbookManager(self.app.client).list()]
+                in w.WorkbookManager(self.app.client).list()]
 
         if data:
             return (format()[0], data)
@@ -58,7 +58,7 @@ class List(ListCommand):
             return format()
 
 
-class Get(ShowCommand):
+class Get(show.ShowOne):
     "Show specific workbook"
 
     def get_parser(self, prog_name):
@@ -69,12 +69,12 @@ class Get(ShowCommand):
         return parser
 
     def take_action(self, parsed_args):
-        workbook = WorkbookManager(self.app.client).get(parsed_args.name)
+        workbook = w.WorkbookManager(self.app.client).get(parsed_args.name)
 
         return format(workbook)
 
 
-class Create(ShowCommand):
+class Create(show.ShowOne):
     "Create new workbook"
 
     def get_parser(self, prog_name):
@@ -100,20 +100,20 @@ class Create(ShowCommand):
         return parser
 
     def take_action(self, parsed_args):
-        workbook = WorkbookManager(self.app.client)\
-            .create(parsed_args.name,
-                    parsed_args.description,
-                    str(parsed_args.tags).split(','))
+        workbook = w.WorkbookManager(self.app.client).create(
+            parsed_args.name,
+            parsed_args.description,
+            str(parsed_args.tags).split(','))
 
         if parsed_args.definition:
-            WorkbookManager(self.app.client)\
-                .upload_definition(parsed_args.name,
-                                   parsed_args.definition.read())
+            w.WorkbookManager(self.app.client).upload_definition(
+                parsed_args.name,
+                parsed_args.definition.read())
 
         return format(workbook)
 
 
-class Delete(BaseCommand):
+class Delete(command.Command):
     "Delete workbook"
 
     def get_parser(self, prog_name):
@@ -125,10 +125,10 @@ class Delete(BaseCommand):
         return parser
 
     def take_action(self, parsed_args):
-        WorkbookManager(self.app.client).delete(parsed_args.name)
+        w.WorkbookManager(self.app.client).delete(parsed_args.name)
 
 
-class Update(ShowCommand):
+class Update(show.ShowOne):
     "Update workbook"
 
     def get_parser(self, prog_name):
@@ -148,15 +148,15 @@ class Update(ShowCommand):
         return parser
 
     def take_action(self, parsed_args):
-        workbook = WorkbookManager(self.app.client)\
-            .update(parsed_args.name,
-                    parsed_args.description,
-                    parsed_args.tags)
+        workbook = w.WorkbookManager(self.app.client).update(
+            parsed_args.name,
+            parsed_args.description,
+            parsed_args.tags)
 
         return format(workbook)
 
 
-class UploadDefinition(BaseCommand):
+class UploadDefinition(command.Command):
     "Upload workbook definition"
 
     def get_parser(self, prog_name):
@@ -172,12 +172,12 @@ class UploadDefinition(BaseCommand):
         return parser
 
     def take_action(self, parsed_args):
-        WorkbookManager(self.app.client)\
-            .upload_definition(parsed_args.name,
-                               parsed_args.path.read())
+        w.WorkbookManager(self.app.client).upload_definition(
+            parsed_args.name,
+            parsed_args.path.read())
 
 
-class GetDefinition(BaseCommand):
+class GetDefinition(command.Command):
     "Show workbook definition"
 
     def get_parser(self, prog_name):
@@ -189,7 +189,7 @@ class GetDefinition(BaseCommand):
         return parser
 
     def take_action(self, parsed_args):
-        definition = WorkbookManager(self.app.client)\
-            .get_definition(parsed_args.name)
+        definition = w.WorkbookManager(
+            self.app.client).get_definition(parsed_args.name)
 
         self.app.stdout.write(definition)

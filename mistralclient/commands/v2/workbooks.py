@@ -97,8 +97,8 @@ class Create(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        workbook = workbooks.WorkbookManager(self.app.client)\
-            .create(parsed_args.definition.read())
+        workbook = workbooks.WorkbookManager(self.app.client).create(
+            parsed_args.definition.read())
 
         return format(workbook)
 
@@ -132,8 +132,8 @@ class Update(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        workbook = workbooks.WorkbookManager(self.app.client)\
-            .update(parsed_args.definition.read())
+        workbook = workbooks.WorkbookManager(self.app.client).update(
+            parsed_args.definition.read())
 
         return format(workbook)
 
@@ -149,7 +149,7 @@ class GetDefinition(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        definition = workbooks.WorkbookManager(self.app.client)\
-            .get(parsed_args.name).definition
+        definition = workbooks.WorkbookManager(self.app.client).get(
+            parsed_args.name).definition
 
         self.app.stdout.write(definition or "\n")

@@ -14,15 +14,14 @@
 #    under the License.
 #
 
+import mock
 import pkg_resources as pkg
 
-import mock
-
-from mistralclient.tests.unit import base
+from mistralclient.api.v1 import executions as e
 from mistralclient.commands.v1 import executions
-from mistralclient.api.v1.executions import Execution
+from mistralclient.tests.unit import base
 
-EXECUTION = Execution(mock, {
+EXECUTION = e.Execution(mock, {
     'id': '123',
     'workbook_name': 'some',
     'task': 'else',

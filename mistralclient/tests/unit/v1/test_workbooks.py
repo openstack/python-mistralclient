@@ -14,10 +14,10 @@
 
 import json
 
+from mistralclient.api.v1 import workbooks as w
 from mistralclient.tests.unit.v1 import base
-from mistralclient.api.v1.workbooks import Workbook
 
-# TODO: later we need additional tests verifying all the errors etc.
+# TODO(everyone): later we need additional tests verifying all the errors etc.
 
 WORKBOOKS = [
     {
@@ -66,7 +66,7 @@ class TestWorkbooks(base.BaseClientV1Test):
                                    WORKBOOKS[0]['tags'])
 
         self.assertIsNotNone(wb)
-        self.assertEqual(Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
+        self.assertEqual(w.Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
                          wb.__dict__)
         mock.assert_called_once_with(URL_TEMPLATE, json.dumps(WORKBOOKS[0]))
 
@@ -78,7 +78,7 @@ class TestWorkbooks(base.BaseClientV1Test):
                                    WORKBOOKS[0]['tags'])
 
         self.assertIsNotNone(wb)
-        self.assertEqual(Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
+        self.assertEqual(w.Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
                          wb.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE_NAME % WORKBOOKS[0]['name'],
@@ -92,7 +92,7 @@ class TestWorkbooks(base.BaseClientV1Test):
         self.assertEqual(1, len(workbooks))
         wb = workbooks[0]
 
-        self.assertEqual(Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
+        self.assertEqual(w.Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
                          wb.__dict__)
         mock.assert_called_once_with(URL_TEMPLATE)
 
@@ -102,7 +102,7 @@ class TestWorkbooks(base.BaseClientV1Test):
         wb = self.workbooks.get(WORKBOOKS[0]['name'])
 
         self.assertIsNotNone(wb)
-        self.assertEqual(Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
+        self.assertEqual(w.Workbook(self.workbooks, WORKBOOKS[0]).__dict__,
                          wb.__dict__)
         mock.assert_called_once_with(URL_TEMPLATE_NAME % WORKBOOKS[0]['name'])
 

@@ -35,23 +35,24 @@ def format(trigger=None, lister=False):
         'Name',
         'Pattern',
         'Workflow',
-        # TODO (rakhmerov): Uncomment when passwords are handled properly.
-        # 'Workflow input',
+        # TODO(rakhmerov): Uncomment when passwords are handled properly.
+        # TODO(rakhmerov): Add 'Workflow input' column.
         'Next execution time',
         'Created at',
         'Updated at'
     )
 
     if trigger:
-        # wf_input = trigger.workflow_input if not lister \
-        #     else base.cut(trigger.workflow_input)
+        # TODO(rakhmerov): Add following here:
+        # TODO(rakhmerov): wf_input = trigger.workflow_input if not lister
+        # TODO(rakhmerov:):    else base.cut(trigger.workflow_input)
 
         data = (
             trigger.name,
             trigger.pattern,
             trigger.workflow_name,
-            # TODO (rakhmerov): Uncomment when passwords are handled properly.
-            # wf_input,
+            # TODO(rakhmerov): Uncomment when passwords are handled properly.
+            # TODo(rakhmerov): Add 'wf_input' here.
             trigger.next_execution_time,
             trigger.created_at,
         )

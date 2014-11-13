@@ -15,12 +15,12 @@
 #
 
 import json
+
 import mock
 
-from mistralclient.tests.unit import base
-
-from mistralclient.commands.v2 import tasks as task_cmd
 from mistralclient.api.v2 import tasks
+from mistralclient.commands.v2 import tasks as task_cmd
+from mistralclient.tests.unit import base
 
 TASK_DICT = {
     'id': '123',

@@ -71,8 +71,8 @@ class Get(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        execution = executions.ExecutionManager(self.app.client)\
-            .get(parsed_args.id)
+        execution = executions.ExecutionManager(self.app.client).get(
+            parsed_args.id)
 
         return format(execution)
 
@@ -117,10 +117,10 @@ class Create(show.ShowOne):
         else:
             params = {}
 
-        execution = executions.ExecutionManager(self.app.client)\
-            .create(parsed_args.workflow_name,
-                    wf_input,
-                    **params)
+        execution = executions.ExecutionManager(self.app.client).create(
+            parsed_args.workflow_name,
+            wf_input,
+            **params)
 
         return format(execution)
 
@@ -158,9 +158,9 @@ class Update(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        execution = executions.ExecutionManager(self.app.client)\
-            .update(parsed_args.id,
-                    parsed_args.state)
+        execution = executions.ExecutionManager(self.app.client).update(
+            parsed_args.id,
+            parsed_args.state)
 
         return format(execution)
 
@@ -176,8 +176,8 @@ class GetInput(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        ex_input = executions.ExecutionManager(self.app.client)\
-            .get(parsed_args.id).input
+        ex_input = executions.ExecutionManager(self.app.client).get(
+            parsed_args.id).input
 
         try:
             ex_input = json.loads(ex_input)
@@ -199,8 +199,8 @@ class GetOutput(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        output = executions.ExecutionManager(self.app.client)\
-            .get(parsed_args.id).output
+        output = executions.ExecutionManager(self.app.client).get(
+            parsed_args.id).output
 
         try:
             output = json.loads(output)

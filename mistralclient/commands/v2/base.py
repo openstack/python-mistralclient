@@ -15,9 +15,9 @@
 #
 
 import abc
-import six
 
 from cliff import lister
+import six
 
 
 @six.add_metaclass(abc.ABCMeta)

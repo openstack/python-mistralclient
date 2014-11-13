@@ -14,10 +14,9 @@
 
 import os
 
-from tempest_lib.cli import base
-
 from tempest import config
 from tempest import test
+from tempest_lib.cli import base
 
 CONF = config.CONF
 

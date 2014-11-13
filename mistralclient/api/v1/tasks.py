@@ -31,8 +31,8 @@ class TaskManager(base.ResourceManager):
 
         if execution_id:
             if workbook_name:
-                uri = '/workbooks/%s/executions/%s/tasks/%s' % \
-                      (workbook_name, execution_id, id)
+                uri = ('/workbooks/%s/executions/%s/tasks/%s' %
+                       (workbook_name, execution_id, id))
             else:
                 uri = '/executions/%s/tasks/%s' % (execution_id, id)
         else:
@@ -43,8 +43,8 @@ class TaskManager(base.ResourceManager):
     def list(self, workbook_name, execution_id):
         if execution_id:
             if workbook_name:
-                uri = '/workbooks/%s/executions/%s/tasks' % \
-                      (workbook_name, execution_id)
+                uri = ('/workbooks/%s/executions/%s/tasks' %
+                       (workbook_name, execution_id))
             else:
                 uri = '/executions/%s/tasks' % execution_id
         else:
@@ -57,8 +57,8 @@ class TaskManager(base.ResourceManager):
 
         if execution_id:
             if workbook_name:
-                uri = '/workbooks/%s/executions/%s/tasks/%s' % \
-                      (workbook_name, execution_id, id)
+                uri = ('/workbooks/%s/executions/%s/tasks/%s' %
+                       (workbook_name, execution_id, id))
             else:
                 uri = '/executions/%s/tasks/%s' % (execution_id, id)
         else:
