@@ -91,6 +91,9 @@ class ClientTestBase(base.MistralCLIAuth):
         cls.wf_def = os.path.relpath(
             'functionaltests/resources/v2/wf_v2.yaml', os.getcwd())
 
+        cls.wf_with_delay_def = os.path.relpath(
+            'functionaltests/resources/v2/wf_delay_v2.yaml', os.getcwd())
+
         cls.act_def = os.path.relpath(
             'functionaltests/resources/v2/action_v2.yaml', os.getcwd())
 
@@ -282,11 +285,17 @@ class ExecutionCLITests(ClientTestBase):
         self.wf_name = wf[0]['Name']
         self.workflows.extend([workflow['Name'] for workflow in wf])
 
+        wf = self.mistral_command(
+            'workflow-create', params='{0}'.format(self.wf_with_delay_def))
+        self.wf_with_delay_name = wf[0]['Name']
+        self.workflows += [self.wf_with_delay_name]
+
     def tearDown(self):
         for ex in self.executions:
             self.mistral('execution-delete', params=ex)
 
         self.mistral('workflow-delete', params=self.wf_name)
+        self.mistral('workflow-delete', params=self.wf_with_delay_name)
 
         super(ExecutionCLITests, self).tearDown()
 
@@ -314,7 +323,7 @@ class ExecutionCLITests(ClientTestBase):
 
     def test_execution_update(self):
         execution = self.mistral_command(
-            'execution-create', params=self.wf_name)
+            'execution-create', params=self.wf_with_delay_name)
         exec_id = self.get_value_of_field(execution, 'ID')
         self.executions.append(exec_id)
 
