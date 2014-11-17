@@ -115,8 +115,8 @@ class Create(base.MistralLister):
         return format
 
     def _get_resources(self, parsed_args):
-        return actions.ActionManager(self.app.client)\
-            .create(parsed_args.definition.read())
+        return actions.ActionManager(self.app.client).create(
+            parsed_args.definition.read())
 
 
 class Delete(command.Command):
@@ -151,8 +151,8 @@ class Update(base.MistralLister):
         return format
 
     def _get_resources(self, parsed_args):
-        return actions.ActionManager(self.app.client).\
-            update(parsed_args.definition.read())
+        return actions.ActionManager(self.app.client).update(
+            parsed_args.definition.read())
 
 
 class GetDefinition(command.Command):
@@ -166,7 +166,7 @@ class GetDefinition(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        definition = actions.ActionManager(self.app.client)\
-            .get(parsed_args.name).definition
+        definition = actions.ActionManager(self.app.client).get(
+            parsed_args.name).definition
 
         self.app.stdout.write(definition or "\n")

@@ -14,10 +14,10 @@
 
 import json
 
+from mistralclient.api.v1 import listeners as l
 from mistralclient.tests.unit.v1 import base
-from mistralclient.api.v1.listeners import Listener
 
-# TODO: later we need additional tests verifying all the errors etc.
+# TODO(everyone): later we need additional tests verifying all the errors etc.
 
 LISTENERS = [
     {
@@ -47,7 +47,7 @@ class TestListeners(base.BaseClientV1Test):
                                      LISTENERS[0]['description'])
 
         self.assertIsNotNone(lsnr)
-        self.assertEqual(Listener(self.listeners, LISTENERS[0]).__dict__,
+        self.assertEqual(l.Listener(self.listeners, LISTENERS[0]).__dict__,
                          lsnr.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE % (LISTENERS[0]['workbook_name']),
@@ -69,7 +69,7 @@ class TestListeners(base.BaseClientV1Test):
                                      LISTENERS[0]['description'])
 
         self.assertIsNotNone(lsnr)
-        self.assertEqual(Listener(self.listeners, LISTENERS[0]).__dict__,
+        self.assertEqual(l.Listener(self.listeners, LISTENERS[0]).__dict__,
                          lsnr.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % (LISTENERS[0]['workbook_name'],
@@ -84,7 +84,7 @@ class TestListeners(base.BaseClientV1Test):
         self.assertEqual(1, len(listeners))
         lsnr = listeners[0]
 
-        self.assertEqual(Listener(self.listeners, LISTENERS[0]).__dict__,
+        self.assertEqual(l.Listener(self.listeners, LISTENERS[0]).__dict__,
                          lsnr.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE % (LISTENERS[0]['workbook_name']))
@@ -95,7 +95,7 @@ class TestListeners(base.BaseClientV1Test):
         lsnr = self.listeners.get(LISTENERS[0]['workbook_name'],
                                   LISTENERS[0]['id'])
 
-        self.assertEqual(Listener(self.listeners, LISTENERS[0]).__dict__,
+        self.assertEqual(l.Listener(self.listeners, LISTENERS[0]).__dict__,
                          lsnr.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % (LISTENERS[0]['workbook_name'],

@@ -108,8 +108,8 @@ class Create(base.MistralLister):
                                "definition file.")
 
     def _get_resources(self, parsed_args):
-        return workflows.WorkflowManager(self.app.client).\
-            create(parsed_args.definition.read())
+        return workflows.WorkflowManager(self.app.client).create(
+            parsed_args.definition.read())
 
 
 class Delete(command.Command):
@@ -160,7 +160,7 @@ class GetDefinition(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        definition = workflows.WorkflowManager(self.app.client)\
-            .get(parsed_args.name).definition
+        definition = workflows.WorkflowManager(self.app.client).get(
+            parsed_args.name).definition
 
         self.app.stdout.write(definition or "\n")

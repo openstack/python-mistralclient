@@ -14,10 +14,10 @@
 
 import json
 
-from mistralclient.tests.unit.v2 import base
 from mistralclient.api.v2 import tasks
+from mistralclient.tests.unit.v2 import base
 
-# TODO: later we need additional tests verifying all the errors etc.
+# TODO(everyone): later we need additional tests verifying all the errors etc.
 
 TASK = {
     'id': "1",

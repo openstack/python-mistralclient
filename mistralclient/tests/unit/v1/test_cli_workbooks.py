@@ -16,12 +16,11 @@
 
 import mock
 
+from mistralclient.api.v1 import workbooks as w
+from mistralclient.commands.v1 import workbooks
 from mistralclient.tests.unit import base
 
-from mistralclient.commands.v1 import workbooks
-from mistralclient.api.v1.workbooks import Workbook
-
-WORKBOOK = Workbook(mock, {
+WORKBOOK = w.Workbook(mock, {
     'name': 'a',
     'description': 'some',
     'tags': ['a', 'b']

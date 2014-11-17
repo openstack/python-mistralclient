@@ -14,10 +14,10 @@
 
 import json
 
+from mistralclient.api.v1 import tasks as t
 from mistralclient.tests.unit.v1 import base
-from mistralclient.api.v1.tasks import Task
 
-# TODO: later we need additional tests verifying all the errors etc.
+# TODO(everyone): later we need additional tests verifying all the errors etc.
 
 TASKS = [
     {
@@ -49,7 +49,7 @@ class TestTasks(base.BaseClientV1Test):
                                  TASKS[0]['state'])
 
         self.assertIsNotNone(task)
-        self.assertEqual(Task(self.tasks, TASKS[0]).__dict__, task.__dict__)
+        self.assertEqual(t.Task(self.tasks, TASKS[0]).__dict__, task.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % (TASKS[0]['workbook_name'],
                                TASKS[0]['execution_id'],
@@ -65,7 +65,7 @@ class TestTasks(base.BaseClientV1Test):
         self.assertEqual(1, len(tasks))
         task = tasks[0]
 
-        self.assertEqual(Task(self.tasks, TASKS[0]).__dict__, task.__dict__)
+        self.assertEqual(t.Task(self.tasks, TASKS[0]).__dict__, task.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE % (TASKS[0]['workbook_name'],
                             TASKS[0]['execution_id']))
@@ -77,7 +77,7 @@ class TestTasks(base.BaseClientV1Test):
                               TASKS[0]['execution_id'],
                               TASKS[0]['id'])
 
-        self.assertEqual(Task(self.tasks, TASKS[0]).__dict__, task.__dict__)
+        self.assertEqual(t.Task(self.tasks, TASKS[0]).__dict__, task.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % (TASKS[0]['workbook_name'],
                                TASKS[0]['execution_id'],

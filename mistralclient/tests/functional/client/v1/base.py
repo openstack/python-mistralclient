@@ -1,8 +1,22 @@
+# Copyright (c) 2014 Mirantis, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+
 import os
-import testtools
 
 from tempest import clients
 from tempest.common import rest_client
+import testtools
 
 from mistralclient.api import base
 from mistralclient.api.v1 import client as mclient
@@ -71,8 +85,8 @@ class MistralBase(testtools.TestCase):
     def assert_item_in_list(self, items, **props):
         def _matches(item, **props):
             for prop_name, prop_val in props.iteritems():
-                v = item[prop_name] if isinstance(item, dict) \
-                    else getattr(item, prop_name)
+                v = item[prop_name] if isinstance(item, dict) else getattr(
+                    item, prop_name)
 
                 if v != prop_val:
                     return False

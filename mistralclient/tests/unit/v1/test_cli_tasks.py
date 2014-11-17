@@ -16,12 +16,11 @@
 
 import mock
 
+from mistralclient.api.v1 import tasks as t
+from mistralclient.commands.v1 import tasks
 from mistralclient.tests.unit import base
 
-from mistralclient.commands.v1 import tasks
-from mistralclient.api.v1.tasks import Task
-
-TASK = Task(mock, {
+TASK = t.Task(mock, {
     'id': '123',
     'workbook_name': 'some',
     'execution_id': 'thing',

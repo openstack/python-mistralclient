@@ -12,13 +12,14 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import unittest2
 import json
 
-from mistralclient.tests.unit.v2 import base
-from mistralclient.api.v2 import executions
+import unittest2
 
-# TODO: Later we need additional tests verifying all the errors etc.
+from mistralclient.api.v2 import executions
+from mistralclient.tests.unit.v2 import base
+
+# TODO(everyone): Later we need additional tests verifying all the errors etc.
 
 EXEC = {
     'id': "123",

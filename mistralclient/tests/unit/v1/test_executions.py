@@ -12,13 +12,14 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import unittest2
 import json
 
-from mistralclient.tests.unit.v1 import base
-from mistralclient.api.v1.executions import Execution
+import unittest2
 
-# TODO: Later we need additional tests verifying all the errors etc.
+from mistralclient.api.v1 import executions as e
+from mistralclient.tests.unit.v1 import base
+
+# TODO(everyone): Later we need additional tests verifying all the errors etc.
 
 EXECS = [
     {
@@ -55,7 +56,7 @@ class TestExecutions(base.BaseClientV1Test):
                                     EXECS[0]['context'])
 
         self.assertIsNotNone(ex)
-        self.assertDictEqual(Execution(self.executions, EXECS[0]).__dict__,
+        self.assertDictEqual(e.Execution(self.executions, EXECS[0]).__dict__,
                              ex.__dict__)
 
         arg_body = mock.call_args[0][1]
@@ -105,7 +106,7 @@ class TestExecutions(base.BaseClientV1Test):
                                     EXECS[0]['state'])
 
         self.assertIsNotNone(ex)
-        self.assertEqual(Execution(self.executions, EXECS[0]).__dict__,
+        self.assertEqual(e.Execution(self.executions, EXECS[0]).__dict__,
                          ex.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % (EXECS[0]['workbook_name'], EXECS[0]['id']),
@@ -119,7 +120,7 @@ class TestExecutions(base.BaseClientV1Test):
         self.assertEqual(1, len(executions))
         ex = executions[0]
 
-        self.assertEqual(Execution(self.executions, EXECS[0]).__dict__,
+        self.assertEqual(e.Execution(self.executions, EXECS[0]).__dict__,
                          ex.__dict__)
         mock.assert_called_once_with(URL_TEMPLATE % EXECS[0]['workbook_name'])
 
@@ -128,7 +129,7 @@ class TestExecutions(base.BaseClientV1Test):
 
         ex = self.executions.get(EXECS[0]['workbook_name'], EXECS[0]['id'])
 
-        self.assertEqual(Execution(self.executions, EXECS[0]).__dict__,
+        self.assertEqual(e.Execution(self.executions, EXECS[0]).__dict__,
                          ex.__dict__)
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % (EXECS[0]['workbook_name'], EXECS[0]['id']))

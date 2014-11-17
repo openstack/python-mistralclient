@@ -16,10 +16,9 @@
 
 import mock
 
-from mistralclient.tests.unit import base
-
-from mistralclient.commands.v2 import workflows as workflow_cmd
 from mistralclient.api.v2 import workflows
+from mistralclient.commands.v2 import workflows as workflow_cmd
+from mistralclient.tests.unit import base
 
 
 WORKFLOW_DICT = {

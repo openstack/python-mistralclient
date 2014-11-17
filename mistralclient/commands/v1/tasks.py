@@ -16,10 +16,10 @@
 
 import logging
 
-from cliff.lister import Lister as ListCommand
-from cliff.show import ShowOne as ShowCommand
+from cliff import lister
+from cliff import show
 
-from mistralclient.api.v1.tasks import TaskManager
+from mistralclient.api.v1 import tasks as t
 
 LOG = logging.getLogger(__name__)
 
@@ -51,7 +51,7 @@ def format(task=None):
     return (columns, data)
 
 
-class List(ListCommand):
+class List(lister.Lister):
     "List all tasks"
 
     def get_parser(self, prog_name):
@@ -67,7 +67,7 @@ class List(ListCommand):
 
     def take_action(self, parsed_args):
         data = [format(task)[1] for task
-                in TaskManager(self.app.client)
+                in t.TaskManager(self.app.client)
                 .list(parsed_args.workbook,
                       parsed_args.execution)]
 
@@ -77,7 +77,7 @@ class List(ListCommand):
             return format()
 
 
-class Get(ShowCommand):
+class Get(show.ShowOne):
     "Show specific task"
 
     def get_parser(self, prog_name):
@@ -94,15 +94,15 @@ class Get(ShowCommand):
         return parser
 
     def take_action(self, parsed_args):
-        execution = TaskManager(self.app.client)\
-            .get(parsed_args.workbook,
-                 parsed_args.execution,
-                 parsed_args.id)
+        execution = t.TaskManager(self.app.client).get(
+            parsed_args.workbook,
+            parsed_args.execution,
+            parsed_args.id)
 
         return format(execution)
 
 
-class Update(ShowCommand):
+class Update(show.ShowOne):
     "Update task"
 
     def get_parser(self, prog_name):
@@ -124,9 +124,10 @@ class Update(ShowCommand):
         return parser
 
     def take_action(self, parsed_args):
-        execution = TaskManager(self.app.client).update(parsed_args.workbook,
-                                                        parsed_args.execution,
-                                                        parsed_args.id,
-                                                        parsed_args.state)
+        execution = t.TaskManager(self.app.client).update(
+            parsed_args.workbook,
+            parsed_args.execution,
+            parsed_args.id,
+            parsed_args.state)
 
         return format(execution)

@@ -16,10 +16,9 @@
 
 import mock
 
-from mistralclient.tests.unit import base
-
-from mistralclient.commands.v2 import workbooks as workbook_cmd
 from mistralclient.api.v2 import workbooks
+from mistralclient.commands.v2 import workbooks as workbook_cmd
+from mistralclient.tests.unit import base
 
 
 WORKBOOK_DICT = {

@@ -71,8 +71,8 @@ class Get(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        execution = tasks.TaskManager(self.app.client)\
-            .get(parsed_args.id)
+        execution = tasks.TaskManager(self.app.client).get(
+            parsed_args.id)
 
         return format(execution)
 
@@ -113,8 +113,8 @@ class GetOutput(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        output = tasks.TaskManager(self.app.client)\
-            .get(parsed_args.id).output
+        output = tasks.TaskManager(self.app.client).get(
+            parsed_args.id).output
 
         try:
             output = json.loads(output)
@@ -137,8 +137,8 @@ class GetResult(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        result = tasks.TaskManager(self.app.client)\
-            .get(parsed_args.id).result
+        result = tasks.TaskManager(self.app.client).get(
+            parsed_args.id).result
 
         try:
             result = json.loads(result)
@@ -162,8 +162,8 @@ class GetInput(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        result = tasks.TaskManager(self.app.client)\
-            .get(parsed_args.id).input
+        result = tasks.TaskManager(self.app.client).get(
+            parsed_args.id).input
 
         try:
             result = json.loads(result)

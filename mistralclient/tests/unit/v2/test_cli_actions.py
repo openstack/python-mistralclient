@@ -16,10 +16,9 @@
 
 import mock
 
-from mistralclient.tests.unit import base
-
-from mistralclient.commands.v2 import actions as action_cmd
 from mistralclient.api.v2 import actions
+from mistralclient.commands.v2 import actions as action_cmd
+from mistralclient.tests.unit import base
 
 
 ACTION_DICT = {

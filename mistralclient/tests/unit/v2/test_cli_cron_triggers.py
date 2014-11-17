@@ -16,10 +16,9 @@
 
 import mock
 
-from mistralclient.tests.unit import base
-
-from mistralclient.commands.v2 import cron_triggers as cron_triggers_cmd
 from mistralclient.api.v2 import cron_triggers
+from mistralclient.commands.v2 import cron_triggers as cron_triggers_cmd
+from mistralclient.tests.unit import base
 
 
 TRIGGER_DICT = {

@@ -13,7 +13,6 @@
 #    limitations under the License.
 
 import json
-
 import logging
 
 LOG = logging.getLogger(__name__)
@@ -139,9 +138,10 @@ class ResourceManager(object):
 
 
 def get_json(response):
-    """This method provided backward compatibility with old versions
-    of requests library.
+    """Gets JSON representation of response.
 
+    This method provided backward compatibility with old versions
+    of requests library.
     """
     json_field_or_function = getattr(response, 'json', None)
 

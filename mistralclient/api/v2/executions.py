@@ -13,6 +13,7 @@
 #    limitations under the License.
 
 import json
+
 import six
 
 from mistralclient.api import base

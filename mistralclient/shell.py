@@ -21,23 +21,21 @@ Command-line interface to the Mistral APIs
 import logging
 import sys
 
-from mistralclient.openstack.common.cliutils import env
-
 from mistralclient.api import client
-
-import mistralclient.commands.v1.workbooks
 import mistralclient.commands.v1.executions
 import mistralclient.commands.v1.tasks
+import mistralclient.commands.v1.workbooks
 import mistralclient.commands.v2.actions
 import mistralclient.commands.v2.cron_triggers
 import mistralclient.commands.v2.executions
 import mistralclient.commands.v2.tasks
 import mistralclient.commands.v2.workbooks
 import mistralclient.commands.v2.workflows
+from mistralclient.openstack.common import cliutils as c
 
 from cliff import app
-from cliff import help
 from cliff import commandmanager
+from cliff import help
 
 import argparse
 
@@ -126,49 +124,50 @@ class MistralShell(app.App):
             '--os-mistral-url',
             action='store',
             dest='mistral_url',
-            default=env('OS_MISTRAL_URL', default='http://localhost:8989/v2'),
+            default=c.env('OS_MISTRAL_URL',
+                          default='http://localhost:8989/v2'),
             help='Mistral API host (Env: OS_MISTRAL_URL)'
         )
         parser.add_argument(
             '--os-username',
             action='store',
             dest='username',
-            default=env('OS_USERNAME', default='admin'),
+            default=c.env('OS_USERNAME', default='admin'),
             help='Authentication username (Env: OS_USERNAME)'
         )
         parser.add_argument(
             '--os-password',
             action='store',
             dest='password',
-            default=env('OS_PASSWORD', default='openstack'),
+            default=c.env('OS_PASSWORD', default='openstack'),
             help='Authentication password (Env: OS_PASSWORD)'
         )
         parser.add_argument(
             '--os-tenant-id',
             action='store',
             dest='tenant_id',
-            default=env('OS_TENANT_ID'),
+            default=c.env('OS_TENANT_ID'),
             help='Authentication tenant identifier (Env: OS_TENANT_ID)'
         )
         parser.add_argument(
             '--os-tenant-name',
             action='store',
             dest='tenant_name',
-            default=env('OS_TENANT_NAME', 'Default'),
+            default=c.env('OS_TENANT_NAME', 'Default'),
             help='Authentication tenant name (Env: OS_TENANT_NAME)'
         )
         parser.add_argument(
             '--os-auth-token',
             action='store',
             dest='token',
-            default=env('OS_AUTH_TOKEN'),
+            default=c.env('OS_AUTH_TOKEN'),
             help='Authentication token (Env: OS_AUTH_TOKEN)'
         )
         parser.add_argument(
             '--os-auth-url',
             action='store',
             dest='auth_url',
-            default=env('OS_AUTH_URL'),
+            default=c.env('OS_AUTH_URL'),
             help='Authentication URL (Env: OS_AUTH_URL)'
         )
         return parser

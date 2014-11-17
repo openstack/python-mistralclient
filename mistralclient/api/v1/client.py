@@ -15,10 +15,10 @@
 import six
 
 from mistralclient.api import httpclient
-from mistralclient.api.v1 import workbooks
 from mistralclient.api.v1 import executions
-from mistralclient.api.v1 import tasks
 from mistralclient.api.v1 import listeners
+from mistralclient.api.v1 import tasks
+from mistralclient.api.v1 import workbooks
 
 
 class Client(object):
@@ -31,11 +31,11 @@ class Client(object):
             raise RuntimeError('Mistral url should be string')
 
         if auth_url:
-            (mistral_url, auth_token, project_id, user_id) = \
+            (mistral_url, auth_token, project_id, user_id) = (
                 self.authenticate(mistral_url, username, api_key,
                                   project_name, auth_url, project_id,
                                   endpoint_type, service_type, auth_token,
-                                  user_id)
+                                  user_id))
 
         if not mistral_url:
             mistral_url = "http://localhost:8989/v1"
