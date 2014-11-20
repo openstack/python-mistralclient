@@ -12,8 +12,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import json
-
 from mistralclient.api import base
 
 
@@ -29,7 +27,8 @@ class ActionManager(base.ResourceManager):
 
         resp = self.client.http_client.post(
             '/actions',
-            json.dumps({'definition': definition})
+            definition,
+            headers={'content-type': 'text/plain'}
         )
 
         if resp.status_code != 201:
@@ -43,7 +42,8 @@ class ActionManager(base.ResourceManager):
 
         resp = self.client.http_client.put(
             '/actions',
-            json.dumps({'definition': definition})
+            definition,
+            headers={'content-type': 'text/plain'}
         )
 
         if resp.status_code != 200:
