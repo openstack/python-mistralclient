@@ -25,12 +25,30 @@ class WorkbookManager(base.ResourceManager):
     def create(self, definition):
         self._ensure_not_empty(definition=definition)
 
-        return self._create('/workbooks', {'definition': definition})
+        resp = self.client.http_client.post(
+            '/workbooks',
+            definition,
+            headers={'content-type': 'text/plain'}
+        )
+
+        if resp.status_code != 201:
+            self._raise_api_exception(resp)
+
+        return self.resource_class(self, base.extract_json(resp, None))
 
     def update(self, definition):
         self._ensure_not_empty(definition=definition)
 
-        return self._update('/workbooks', {'definition': definition})
+        resp = self.client.http_client.put(
+            '/workbooks',
+            definition,
+            headers={'content-type': 'text/plain'}
+        )
+
+        if resp.status_code != 200:
+            self._raise_api_exception(resp)
+
+        return self.resource_class(self, base.extract_json(resp, None))
 
     def list(self):
         return self._list('/workbooks', response_key='workbooks')

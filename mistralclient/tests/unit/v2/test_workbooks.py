@@ -12,8 +12,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import json
-
 from mistralclient.api.v2 import workbooks
 from mistralclient.tests.unit.v2 import base
 
@@ -54,28 +52,30 @@ class TestWorkbooksV2(base.BaseClientV2Test):
     def test_create(self):
         mock = self.mock_http_post(content=WORKBOOK)
 
-        wb = self.workbooks.create(WORKBOOK['definition'])
+        wb = self.workbooks.create(WB_DEF)
 
         self.assertIsNotNone(wb)
-        self.assertEqual(
-            workbooks.Workbook(self.workbooks, WORKBOOK).__dict__,
-            wb.__dict__
-        )
+        self.assertEqual(WB_DEF, wb.definition)
 
-        mock.assert_called_once_with(URL_TEMPLATE, json.dumps(WORKBOOK))
+        mock.assert_called_once_with(
+            URL_TEMPLATE,
+            WB_DEF,
+            headers={'content-type': 'text/plain'}
+        )
 
     def test_update(self):
         mock = self.mock_http_put(content=WORKBOOK)
 
-        wb = self.workbooks.update(WORKBOOK['definition'])
+        wb = self.workbooks.update(WB_DEF)
 
         self.assertIsNotNone(wb)
-        self.assertEqual(
-            workbooks.Workbook(self.workbooks, WORKBOOK).__dict__,
-            wb.__dict__
-        )
+        self.assertEqual(WB_DEF, wb.definition)
 
-        mock.assert_called_once_with(URL_TEMPLATE, json.dumps(WORKBOOK))
+        mock.assert_called_once_with(
+            URL_TEMPLATE,
+            WB_DEF,
+            headers={'content-type': 'text/plain'}
+        )
 
     def test_list(self):
         mock = self.mock_http_get(content={'workbooks': [WORKBOOK]})
