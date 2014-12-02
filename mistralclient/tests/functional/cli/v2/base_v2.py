@@ -108,10 +108,16 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
 
         return trigger
 
-    def execution_create(self, wf_name, admin=True):
-        ex = self.mistral_cli(admin, 'execution-create', params=wf_name)
+    def execution_create(self, params, admin=True):
+        ex = self.mistral_cli(admin, 'execution-create', params=params)
         exec_id = self.get_value_of_field(ex, 'ID')
         self.addCleanup(self.mistral_cli, admin,
                         'execution-delete', params=exec_id)
 
         return ex
+
+    def create_file(self, file_name, file_body=""):
+        f = open(file_name, 'w')
+        f.write(file_body)
+        f.close()
+        self.addCleanup(os.remove, file_name)
