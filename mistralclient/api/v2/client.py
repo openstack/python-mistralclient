@@ -1,4 +1,5 @@
 # Copyright 2014 - Mirantis, Inc.
+# Copyright 2015 - StackStorm, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -17,6 +18,7 @@ import six
 from mistralclient.api import httpclient
 from mistralclient.api.v2 import actions
 from mistralclient.api.v2 import cron_triggers
+from mistralclient.api.v2 import environments
 from mistralclient.api.v2 import executions
 from mistralclient.api.v2 import tasks
 from mistralclient.api.v2 import workbooks
@@ -53,6 +55,7 @@ class Client(object):
         self.actions = actions.ActionManager(self)
         self.workflows = workflows.WorkflowManager(self)
         self.cron_triggers = cron_triggers.CronTriggerManager(self)
+        self.environments = environments.EnvironmentManager(self)
 
     def authenticate(self, mistral_url=None, username=None, api_key=None,
                      project_name=None, auth_url=None, project_id=None,

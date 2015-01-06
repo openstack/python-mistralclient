@@ -1,4 +1,4 @@
-# Copyright 2014 StackStorm, Inc.
+# Copyright 2015 StackStorm, Inc.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -27,6 +27,7 @@ import mistralclient.commands.v1.tasks
 import mistralclient.commands.v1.workbooks
 import mistralclient.commands.v2.actions
 import mistralclient.commands.v2.cron_triggers
+import mistralclient.commands.v2.environments
 import mistralclient.commands.v2.executions
 import mistralclient.commands.v2.tasks
 import mistralclient.commands.v2.workbooks
@@ -244,6 +245,14 @@ class MistralShell(app.App):
             'workflow-update': mistralclient.commands.v2.workflows.Update,
             'workflow-get-definition':
             mistralclient.commands.v2.workflows.GetDefinition,
+            'environment-create':
+            mistralclient.commands.v2.environments.Create,
+            'environment-delete':
+            mistralclient.commands.v2.environments.Delete,
+            'environment-update':
+            mistralclient.commands.v2.environments.Update,
+            'environment-list': mistralclient.commands.v2.environments.List,
+            'environment-get': mistralclient.commands.v2.environments.Get,
             'execution-create': mistralclient.commands.v2.executions.Create,
             'execution-delete': mistralclient.commands.v2.executions.Delete,
             'execution-update': mistralclient.commands.v2.executions.Update,

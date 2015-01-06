@@ -1,4 +1,5 @@
 # Copyright 2014 - Mirantis, Inc.
+# Copyright 2015 - StackStorm, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -26,3 +27,4 @@ class BaseClientV2Test(base.BaseClientTest):
         self.executions = self._client.executions
         self.tasks = self._client.tasks
         self.workflows = self._client.workflows
+        self.environments = self._client.environments
