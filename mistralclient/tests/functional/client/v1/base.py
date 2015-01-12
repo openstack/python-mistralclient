@@ -16,15 +16,21 @@ import os
 
 from tempest import clients
 from tempest.common import rest_client
+from tempest import config
 import testtools
 
 from mistralclient.api import base
 from mistralclient.api.v1 import client as mclient
 
+CONF = config.CONF
+
 
 class ClientAuth(rest_client.RestClient):
     def __init__(self, auth_provider, url):
-        super(ClientAuth, self).__init__(auth_provider)
+        super(ClientAuth, self).__init__(
+            auth_provider=auth_provider,
+            service='workflow',
+            region=CONF.identity.region)
 
         self.mistral_client = mclient.Client(
             auth_token=self.auth_provider.get_token(),
