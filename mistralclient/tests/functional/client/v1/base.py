@@ -15,8 +15,8 @@
 import os
 
 from tempest import clients
-from tempest.common import rest_client
 from tempest import config
+from tempest_lib.common import rest_client
 import testtools
 
 from mistralclient.api import base
