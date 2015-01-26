@@ -43,6 +43,9 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
         cls.act_def = os.path.relpath(
             'functionaltests/resources/v2/action_v2.yaml', os.getcwd())
 
+        cls.act_tag_def = os.path.relpath(
+            'functionaltests/resources/v2/action_v2_tags.yaml', os.getcwd())
+
     def setUp(self):
         super(MistralClientTestBase, self).setUp()
 

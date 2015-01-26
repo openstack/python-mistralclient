@@ -108,18 +108,31 @@ class WorkbookCLITests(base_v2.MistralClientTestBase):
         wb = self.workbook_create(self.wb_def)
         wb_name = self.get_value_of_field(wb, "Name")
 
+        init_update_at = self.get_value_of_field(wb, "Updated at")
         tags = self.get_value_of_field(wb, 'Tags')
         self.assertNotIn('tag', tags)
+
+        wb = self.mistral_admin(
+            'workbook-update', params=self.wb_def)
+        update_at = self.get_value_of_field(wb, "Updated at")
+        name = self.get_value_of_field(wb, 'Name')
+        tags = self.get_value_of_field(wb, 'Tags')
+
+        self.assertEqual(wb_name, name)
+        self.assertNotIn('tag', tags)
+        self.assertEqual(init_update_at, update_at)
 
         wb = self.mistral_admin(
             'workbook-update', params=self.wb_with_tags_def)
         self.assertTableStruct(wb, ['Field', 'Value'])
 
+        update_at = self.get_value_of_field(wb, "Updated at")
         name = self.get_value_of_field(wb, 'Name')
         tags = self.get_value_of_field(wb, 'Tags')
 
         self.assertEqual(wb_name, name)
         self.assertIn('tag', tags)
+        self.assertNotEqual(init_update_at, update_at)
 
     def test_workbook_get(self):
         created = self.workbook_create(self.wb_with_tags_def)
@@ -189,6 +202,20 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
 
         upd_wf = self.mistral_admin(
             'workflow-update', params='{0}'.format(self.wf_def))
+        self.assertTableStruct(upd_wf, ['Name', 'Created at', 'Updated at'])
+
+        updated_wf_info = self.get_item_info(
+            get_from=upd_wf, get_by='Name', value=wf_name)
+
+        self.assertEqual(wf_name, upd_wf[0]['Name'])
+
+        self.assertEqual(created_wf_info['Created at'].split(".")[0],
+                         updated_wf_info['Created at'])
+        self.assertEqual(created_wf_info['Updated at'],
+                         updated_wf_info['Updated at'])
+
+        upd_wf = self.mistral_admin(
+            'workflow-update', params='{0}'.format(self.wf_with_delay_def))
         self.assertTableStruct(upd_wf, ['Name', 'Created at', 'Updated at'])
 
         updated_wf_info = self.get_item_info(
@@ -428,7 +455,7 @@ class ActionCLITests(base_v2.MistralClientTestBase):
         action_2 = self.get_item_info(
             get_from=init_acts, get_by='Name', value='farewell')
 
-        self.assertEqual(action_1['Tags'], 'hello')
+        self.assertEqual(action_1['Tags'], '<none>')
         self.assertEqual(action_2['Tags'], '<none>')
 
         self.assertEqual(action_1['Is system'], 'False')
@@ -461,6 +488,18 @@ class ActionCLITests(base_v2.MistralClientTestBase):
         updated_action = self.get_item_info(
             get_from=acts, get_by='Name', value='greeting')
 
+        self.assertEqual(created_action['Created at'].split(".")[0],
+                         updated_action['Created at'])
+        self.assertEqual(created_action['Name'], updated_action['Name'])
+        self.assertEqual(created_action['Updated at'],
+                         updated_action['Updated at'])
+
+        acts = self.mistral_admin('action-update', params=self.act_tag_def)
+
+        updated_action = self.get_item_info(
+            get_from=acts, get_by='Name', value='greeting')
+
+        self.assertEqual(updated_action['Tags'], 'tag, tag1')
         self.assertEqual(created_action['Created at'].split(".")[0],
                          updated_action['Created at'])
         self.assertEqual(created_action['Name'], updated_action['Name'])

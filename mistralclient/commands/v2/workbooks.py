@@ -42,7 +42,7 @@ def format(workbook=None):
         )
 
         if hasattr(workbook, 'updated_at'):
-            data += (workbook.updated_at or '<none>',)
+            data += (workbook.updated_at,)
         else:
             data += (None,)
 

@@ -1,14 +1,15 @@
 ---
 version: '2.0'
 
-wf_delay:
+wf:
   type: direct
+  tags: [tag]
 
   tasks:
     hello:
       action: std.echo output="Hello"
       publish:
-        result: $
+        result: $.hello
       policies:
         wait-after: 1
       on-success:
@@ -17,4 +18,4 @@ wf_delay:
     task2:
       action: std.echo output="Task 2"
       publish:
-        task2: $
+        task2: $.task2
