@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from tempest import test
 from tempest_lib import exceptions
 
 from mistralclient.tests.functional.cli import base
@@ -32,45 +33,60 @@ class SimpleMistralCLITests(base.MistralCLIAuth):
 
     def test_workbooks_list(self):
         workbooks = self.parser.listing(self.mistral('workbook-list'))
-        self.assertTableStruct(workbooks,
-                               ['Name', 'Tags', 'Created at', 'Updated at'])
+        self.assertTableStruct(
+            workbooks,
+            ['Name', 'Tags', 'Created at', 'Updated at']
+        )
 
     def test_workflow_list(self):
         workflows = self.parser.listing(
             self.mistral('workflow-list'))
-        self.assertTableStruct(workflows,
-                               ['Name', 'Tags', 'Input',
-                                'Created at', 'Updated at'])
+        self.assertTableStruct(
+            workflows,
+            ['Name', 'Tags', 'Input', 'Created at', 'Updated at']
+        )
 
     def test_executions_list(self):
         executions = self.parser.listing(
             self.mistral('execution-list'))
-        self.assertTableStruct(executions,
-                               ['ID', 'Workflow', 'State',
-                                'Created at', 'Updated at'])
+        self.assertTableStruct(
+            executions,
+            ['ID', 'Workflow', 'State', 'Created at', 'Updated at']
+        )
 
     def test_tasks_list(self):
         tasks = self.parser.listing(
             self.mistral('task-list'))
-        self.assertTableStruct(tasks,
-                               ['ID', 'Name', 'Workflow name', 'Execution ID',
-                                'State'])
+        self.assertTableStruct(
+            tasks,
+            ['ID', 'Name', 'Workflow name', 'Execution ID', 'State']
+        )
 
     def test_cron_trigger_list(self):
         triggers = self.parser.listing(
             self.mistral('cron-trigger-list'))
-        self.assertTableStruct(triggers,
-                               ['Name', 'Pattern', 'Workflow',
-                                'Next execution time',
-                                'Created at', 'Updated at'])
+        self.assertTableStruct(
+            triggers,
+            ['Name', 'Pattern', 'Workflow', 'Next execution time',
+             'Created at', 'Updated at']
+        )
 
     def test_actions_list(self):
         actions = self.parser.listing(
             self.mistral('action-list'))
-        self.assertTableStruct(actions,
-                               ['Name', 'Is system', 'Input',
-                                'Description', 'Tags', 'Created at',
-                                'Updated at'])
+        self.assertTableStruct(
+            actions,
+            ['Name', 'Is system', 'Input', 'Description',
+             'Tags', 'Created at', 'Updated at']
+        )
+
+    def test_environments_list(self):
+        envs = self.parser.listing(
+            self.mistral('environment-list'))
+        self.assertTableStruct(
+            envs,
+            ['Name', 'Description', 'Scope', 'Created at', 'Updated at']
+        )
 
 
 class WorkbookCLITests(base_v2.MistralClientTestBase):
@@ -514,22 +530,114 @@ class ActionCLITests(base_v2.MistralClientTestBase):
         self.assertNotIn('404 Not Found', definition)
 
 
+class EnvironmentCLITests(base_v2.MistralClientTestBase):
+    """Test suite checks commands to work with environments."""
+
+    def setUp(self):
+        super(EnvironmentCLITests, self).setUp()
+
+        self.create_file('env.yaml',
+                         'name: env\n'
+                         'description: Test env\n'
+                         'variables:\n'
+                         '  var: "value"')
+
+    def test_environment_create(self):
+        env = self.mistral_admin('environment-create', params='env.yaml')
+        env_name = self.get_value_of_field(env, 'Name')
+        env_desc = self.get_value_of_field(env, 'Description')
+
+        self.assertTableStruct(env, ['Field', 'Value'])
+
+        envs = self.mistral_admin('environment-list')
+        self.assertIn(env_name, [en['Name'] for en in envs])
+        self.assertIn(env_desc, [en['Description'] for en in envs])
+
+        self.mistral_admin('environment-delete', params=env_name)
+
+        envs = self.mistral_admin('environment-list')
+        self.assertNotIn(env_name, [en['Name'] for en in envs])
+
+    def test_environment_update(self):
+        env = self.environment_create('env.yaml')
+        env_name = self.get_value_of_field(env, 'Name')
+        env_desc = self.get_value_of_field(env, 'Description')
+        env_created_at = self.get_value_of_field(env, 'Created at')
+        env_updated_at = self.get_value_of_field(env, 'Updated at')
+
+        self.assertIsNotNone(env_created_at)
+        self.assertEqual(env_updated_at, 'None')
+
+        self.create_file('env_upd.yaml',
+                         'name: env\n'
+                         'description: Updated env\n'
+                         'variables:\n'
+                         '  var: "value"')
+
+        env = self.mistral_admin('environment-update', params='env_upd.yaml')
+        self.assertTableStruct(env, ['Field', 'Value'])
+
+        updated_env_name = self.get_value_of_field(env, 'Name')
+        updated_env_desc = self.get_value_of_field(env, 'Description')
+        updated_env_created_at = self.get_value_of_field(env, 'Created at')
+        updated_env_updated_at = self.get_value_of_field(env, 'Updated at')
+
+        self.assertEqual(env_name, updated_env_name)
+        self.assertNotEqual(env_desc, updated_env_desc)
+        self.assertEqual(updated_env_desc, 'Updated env')
+        self.assertEqual(env_created_at.split('.')[0], updated_env_created_at)
+        self.assertIsNotNone(updated_env_updated_at)
+
+    @test.skip_because(bug="1418545")
+    def test_environment_update_work_as_create(self):
+        env = self.mistral_admin('environment-update', params='env.yaml')
+        env_name = self.get_value_of_field(env, 'Name')
+        env_desc = self.get_value_of_field(env, 'Description')
+
+        self.assertTableStruct(env, ['Field', 'Value'])
+
+        envs = self.mistral_admin('environment-list')
+        self.assertIn(env_name, [en['Name'] for en in envs])
+        self.assertIn(env_desc, [en['Description'] for en in envs])
+
+        self.mistral_admin('environment-delete', params=env_name)
+
+        envs = self.mistral_admin('environment-list')
+        self.assertNotIn(env_name, [en['Name'] for en in envs])
+
+    def test_environment_get(self):
+        env = self.environment_create('env.yaml')
+        env_name = self.get_value_of_field(env, 'Name')
+        env_desc = self.get_value_of_field(env, 'Description')
+
+        env = self.mistral_admin('environment-get', params=env_name)
+        fetched_env_name = self.get_value_of_field(env, 'Name')
+        fetched_env_desc = self.get_value_of_field(env, 'Description')
+
+        self.assertTableStruct(env, ['Field', 'Value'])
+        self.assertEqual(env_name, fetched_env_name)
+        self.assertEqual(env_desc, fetched_env_desc)
+
+
 class NegativeCLITests(base_v2.MistralClientTestBase):
     """This class contains negative tests."""
 
     def test_wb_list_extra_param(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workbook-list', params='param')
+                          'workbook-list',
+                          params='param')
 
     def test_wb_get_unexist_wb(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workbook-get', params='wb')
+                          'workbook-get',
+                          params='wb')
 
     def test_wb_get_without_param(self):
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'workbook-get')
+                          self.mistral_admin,
+                          'workbook-get')
 
     def test_wb_create_same_name(self):
         self.workbook_create(self.wb_def)
@@ -540,17 +648,20 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
     def test_wb_create_with_wrong_path_to_definition(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workbook_create', 'wb')
+                          'workbook_create',
+                          'wb')
 
     def test_wb_delete_unexist_wb(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workbook-delete', params='wb')
+                          'workbook-delete',
+                          params='wb')
 
     def test_wb_update_wrong_path_to_def(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workbook-update', params='wb')
+                          'workbook-update',
+                          params='wb')
 
     def test_wb_update_nonexistant_wb(self):
         self.assertRaises(exceptions.CommandFailed,
@@ -562,28 +673,33 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
         self.create_file('empty')
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workbook-create', params='empty')
+                          'workbook-create',
+                          params='empty')
 
     def test_wb_update_empty_def(self):
         self.create_file('empty')
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workbook-update', params='empty')
+                          'workbook-update',
+                          params='empty')
 
     def test_wb_get_definition_unexist_wb(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workbook-get-definition', params='wb')
+                          'workbook-get-definition',
+                          params='wb')
 
     def test_wb_create_invalid_def(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workbook-create', params=self.wf_def)
+                          'workbook-create',
+                          params=self.wf_def)
 
     def test_wb_update_invalid_def(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workbook-update', params=self.wf_def)
+                          'workbook-update',
+                          params=self.wf_def)
 
     def test_wb_update_without_def(self):
         self.assertRaises(exceptions.CommandFailed,
@@ -593,41 +709,49 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
     def test_wf_list_extra_param(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workflow-list', params='param')
+                          'workflow-list',
+                          params='param')
 
     def test_wf_get_unexist_wf(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workflow-get', params='wb')
+                          'workflow-get',
+                          params='wf')
 
     def test_wf_get_without_param(self):
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'workflow-get')
+                          self.mistral_admin,
+                          'workflow-get')
 
     def test_wf_create_without_definition(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workflow-create', params='')
+                          'workflow-create',
+                          params='')
 
     def test_wf_create_with_wrong_path_to_definition(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workflow-create', params='wf')
+                          'workflow-create',
+                          params='wf')
 
     def test_wf_delete_unexist_wf(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workflow-delete', params='wf')
+                          'workflow-delete',
+                          params='wf')
 
     def test_wf_update_unexist_wf(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workflow-update', params='wf')
+                          'workflow-update',
+                          params='wf')
 
     def test_wf_get_definition_unexist_wf(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workflow-get-definition', params='wf')
+                          'workflow-get-definition',
+                          params='wf')
 
     def test_wf_get_definition_missed_param(self):
         self.assertRaises(exceptions.CommandFailed,
@@ -650,40 +774,47 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
         self.create_file('empty')
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workflow-create', params='empty')
+                          'workflow-create',
+                          params='empty')
 
     def test_wf_update_empty_def(self):
         self.create_file('empty')
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'workflow-update', params='empty')
+                          'workflow-update',
+                          params='empty')
 
     def test_ex_list_extra_param(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'execution-list', params='param')
+                          'execution-list',
+                          params='param')
 
     def test_ex_create_unexist_wf(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'execution-create', params='wf')
+                          'execution-create',
+                          params='wf')
 
     def test_ex_create_unexist_task(self):
         wf = self.workflow_create(self.wf_def)
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'execution-create',
+                          self.mistral_admin,
+                          'execution-create',
                           params='%s param {}' % wf[0]['Name'])
 
     def test_ex_create_with_invalid_input(self):
         wf = self.workflow_create(self.wf_def)
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'execution-create',
+                          self.mistral_admin,
+                          'execution-create',
                           params="%s input" % wf[0]['Name'])
 
     def test_ex_get_nonexist_execution(self):
         wf = self.workflow_create(self.wf_def)
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'execution-get',
+                          self.mistral_admin,
+                          'execution-get',
                           params='%s id' % wf[0]['Name'])
 
     def test_ex_create_without_wf_name(self):
@@ -696,21 +827,24 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
         self.create_file('input', '{\n    "farewell": "Bye"\n}\n')
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'execution-create ', params=wf[1]['Name'])
+                          'execution-create ',
+                          params=wf[1]['Name'])
 
     def test_ex_create_missed_input(self):
         self.create_file('empty')
         wf = self.workflow_create(self.wf_def)
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'execution-create empty', params=wf[1]['Name'])
+                          'execution-create empty',
+                          params=wf[1]['Name'])
 
     def test_ex_invalid_status_changing(self):
         wf = self.workflow_create(self.wf_def)
         execution = self.execution_create(params=wf[0]['Name'])
         exec_id = self.get_value_of_field(execution, 'ID')
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'execution-update',
+                          self.mistral_admin,
+                          'execution-update',
                           params='%s ERROR' % exec_id)
 
     def test_ex_delete_nonexistent_execution(self):
@@ -721,73 +855,138 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
     def test_tr_create_without_pattern(self):
         wf = self.workflow_create(self.wf_def)
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'cron-trigger-create',
+                          self.mistral_admin,
+                          'cron-trigger-create',
                           params='tr "" %s {}' % wf[0]['Name'])
 
     def test_tr_create_invalid_pattern(self):
         wf = self.workflow_create(self.wf_def)
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'cron-trigger-create',
+                          self.mistral_admin,
+                          'cron-trigger-create',
                           params='tr "q" %s {}' % wf[0]['Name'])
 
     def test_tr_create_invalid_pattern_value_out_of_range(self):
         wf = self.workflow_create(self.wf_def)
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'cron-trigger-create',
+                          self.mistral_admin,
+                          'cron-trigger-create',
                           params='tr "88 * * * *" %s {}' % wf[0]['Name'])
 
     def test_tr_create_nonexistent_wf(self):
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'cron-trigger-create',
+                          self.mistral_admin,
+                          'cron-trigger-create',
                           params='tr "* * * * *" wb.wf1 {}')
 
     def test_tr_delete_nonexistant_tr(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'cron-trigger-delete', params='tr')
+                          'cron-trigger-delete',
+                          params='tr')
 
     def test_tr_get_nonexistant_tr(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
-                          'cron-trigger-get', params='tr')
+                          'cron-trigger-get',
+                          params='tr')
 
     def test_action_get_nonexistent(self):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral,
-                          'action-get', params='nonexist')
+                          'action-get',
+                          params='nonexist')
 
     def test_action_double_creation(self):
         self.action_create(self.act_def)
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'action-create',
+                          self.mistral_admin,
+                          'action-create',
                           params='{0}'.format(self.act_def))
 
     def test_action_create_without_def(self):
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'action-create',
+                          self.mistral_admin,
+                          'action-create',
                           params='')
 
     def test_action_create_invalid_def(self):
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'action-create',
+                          self.mistral_admin,
+                          'action-create',
                           params='{0}'.format(self.wb_def))
 
     def test_action_delete_nonexistent_act(self):
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'action-delete',
+                          self.mistral_admin,
+                          'action-delete',
                           params='nonexist')
 
     def test_action_delete_standard_action(self):
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'action-delete',
+                          self.mistral_admin,
+                          'action-delete',
                           params='heat.events_get')
 
     def test_action_get_definition_nonexistent_action(self):
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'action-get-definition',
+                          self.mistral_admin,
+                          'action-get-definition',
                           params='nonexist')
 
     def test_task_get_nonexistent_task(self):
         self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin, 'task-get',
+                          self.mistral_admin,
+                          'task-get',
                           params='nonexist')
+
+    def test_env_get_without_param(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral_admin,
+                          'environment-get')
+
+    def test_env_create_same_name(self):
+        self.create_file('env.yaml',
+                         'name: env\n'
+                         'description: Test env\n'
+                         'variables:\n'
+                         '  var: "value"')
+
+        self.environment_create('env.yaml')
+        self.assertRaises(exceptions.CommandFailed,
+                          self.environment_create,
+                          'env.yaml')
+
+    def test_env_create_with_wrong_path_to_definition(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral_admin,
+                          'execution_create',
+                          'env')
+
+    def test_env_delete_unexist_env(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral_admin,
+                          'environment-delete',
+                          params='env')
+
+    def test_env_update_wrong_path_to_def(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral_admin,
+                          'environment-update',
+                          params='env')
+
+    def test_env_create_without_name(self):
+        self.create_file('env.yaml',
+                         'variables:\n  var: "value"')
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral_admin,
+                          'environment-create',
+                          params='env.yaml')
+
+    def test_env_create_without_variables(self):
+        self.create_file('env.yaml',
+                         'name: env')
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral_admin,
+                          'environment-create',
+                          params='env.yaml')

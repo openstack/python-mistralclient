@@ -74,50 +74,79 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
 
     def workbook_create(self, wb_def, admin=True):
         wb = self.mistral_cli(
-            admin, 'workbook-create', params='{0}'.format(wb_def))
+            admin,
+            'workbook-create',
+            params='{0}'.format(wb_def))
         wb_name = self.get_value_of_field(wb, "Name")
         self.addCleanup(self.mistral_cli,
-                        admin, 'workbook-delete', params=wb_name)
+                        admin,
+                        'workbook-delete',
+                        params=wb_name)
         self.addCleanup(self.mistral_cli,
-                        admin, 'workflow-delete', params='wb.wf1')
+                        admin,
+                        'workflow-delete',
+                        params='wb.wf1')
 
         return wb
 
     def workflow_create(self, wf_def, admin=True):
         wf = self.mistral_cli(
-            admin, 'workflow-create', params='{0}'.format(wf_def))
+            admin,
+            'workflow-create',
+            params='{0}'.format(wf_def))
         for workflow in wf:
-            self.addCleanup(self.mistral_cli, admin,
-                            'workflow-delete', params=workflow['Name'])
+            self.addCleanup(self.mistral_cli,
+                            admin,
+                            'workflow-delete',
+                            params=workflow['Name'])
 
         return wf
 
     def action_create(self, act_def, admin=True):
         acts = self.mistral_cli(
-            admin, 'action-create', params='{0}'.format(act_def))
+            admin,
+            'action-create',
+            params='{0}'.format(act_def))
         for action in acts:
-            self.addCleanup(self.mistral_cli, admin,
-                            'action-delete', params=action['Name'])
+            self.addCleanup(self.mistral_cli,
+                            admin,
+                            'action-delete',
+                            params=action['Name'])
 
         return acts
 
     def cron_trigger_create(self, name, pattern,
                             wf_name, wf_input, admin=True):
         trigger = self.mistral_cli(
-            admin, 'cron-trigger-create',
+            admin,
+            'cron-trigger-create',
             params='%s "%s" %s %s' % (name, pattern, wf_name, wf_input))
-        self.addCleanup(self.mistral_cli, admin,
-                        'cron-trigger-delete', params=name)
+        self.addCleanup(self.mistral_cli,
+                        admin,
+                        'cron-trigger-delete',
+                        params=name)
 
         return trigger
 
     def execution_create(self, params, admin=True):
         ex = self.mistral_cli(admin, 'execution-create', params=params)
         exec_id = self.get_value_of_field(ex, 'ID')
-        self.addCleanup(self.mistral_cli, admin,
-                        'execution-delete', params=exec_id)
+        self.addCleanup(self.mistral_cli,
+                        admin,
+                        'execution-delete',
+                        params=exec_id)
 
         return ex
+
+    def environment_create(self, params, admin=True):
+        env = self.mistral_cli(admin, 'environment-create', params=params)
+        env_name = self.get_value_of_field(env, 'Name')
+        self.addCleanup(self.mistral_cli,
+                        admin,
+                        'environment-delete',
+                        params=env_name)
+
+        return env
 
     def create_file(self, file_name, file_body=""):
         f = open(file_name, 'w')
