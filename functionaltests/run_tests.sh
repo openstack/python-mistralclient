@@ -15,7 +15,7 @@
 # How many seconds to wait for the API to be responding before giving up
 API_RESPONDING_TIMEOUT=20
 
-if ! timeout ${API_RESPONDING_TIMEOUT} sh -c "while ! curl -s http://127.0.0.1:8989/v1/ 2>/dev/null | grep -q 'Authentication required' ; do sleep 1; done"; then
+if ! timeout ${API_RESPONDING_TIMEOUT} sh -c "while ! curl -s http://127.0.0.1:8989/v2/ 2>/dev/null | grep -q 'Authentication required' ; do sleep 1; done"; then
     echo "Mistral API failed to respond within ${API_RESPONDING_TIMEOUT} seconds"
     exit 1
 fi
@@ -27,5 +27,8 @@ TEMPEST_DIR=${TEMPEST_DIR:-/opt/stack/new/tempest}
 
 # Add tempest source tree to PYTHONPATH
 export PYTHONPATH=$PYTHONPATH:$TEMPEST_DIR
+
+#installing requirements for tempest
+pip install -r $TEMPEST_DIR/requirements.txt
 
 nosetests -sv mistralclient/tests/functional/
