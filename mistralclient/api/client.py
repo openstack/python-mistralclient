@@ -21,7 +21,7 @@ from mistralclient.api.v2 import client as client_v2
 def client(mistral_url=None, username=None, api_key=None,
            project_name=None, auth_url=None, project_id=None,
            endpoint_type='publicURL', service_type='workflow',
-           auth_token=None, user_id=None):
+           auth_token=None, user_id=None, cacert=None):
 
         if mistral_url and not isinstance(mistral_url, six.string_types):
             raise RuntimeError('Mistral url should be string')
@@ -41,7 +41,7 @@ def client(mistral_url=None, username=None, api_key=None,
                           auth_url=auth_url, project_id=project_id,
                           endpoint_type=endpoint_type,
                           service_type=service_type, auth_token=auth_token,
-                          user_id=user_id)
+                          user_id=user_id, cacert=cacert)
 
 
 def determine_client_version(mistral_url):
