@@ -171,6 +171,13 @@ class MistralShell(app.App):
             default=c.env('OS_AUTH_URL'),
             help='Authentication URL (Env: OS_AUTH_URL)'
         )
+        parser.add_argument(
+            '--os-cacert',
+            action='store',
+            dest='cacert',
+            default=c.env('OS_CACERT'),
+            help='Authentication CA Certificate (Env: OS_CACERT)'
+        )
         return parser
 
     def initialize_app(self, argv):
@@ -186,7 +193,8 @@ class MistralShell(app.App):
                                     project_id=self.options.tenant_id,
                                     endpoint_type='publicURL',
                                     service_type='workflow',
-                                    auth_token=self.options.token)
+                                    auth_token=self.options.token,
+                                    cacert=self.options.cacert)
 
     def _set_shell_commands(self, cmds_dict):
         for k, v in cmds_dict.items():

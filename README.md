@@ -32,6 +32,10 @@ If Mistral authentication is enabled, provide the information about OpenStack au
     export OS_PASSWORD=secret
     export OS_MISTRAL_URL=http://<Mistral host>:8989/v2  (optional, by default URL=http://localhost:8989/v2)
 
+and in the case that you are authenticating against keystone over https:
+
+    export OS_CACERT=<path_to_ca_cert>
+
 >***Note:** In client, we can use both Keystone auth versions - v2.0 and v3. But server supports only v3.*
 
 To make sure Mistral client works, type:

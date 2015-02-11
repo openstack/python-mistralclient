@@ -29,7 +29,7 @@ class Client(object):
     def __init__(self, mistral_url=None, username=None, api_key=None,
                  project_name=None, auth_url=None, project_id=None,
                  endpoint_type='publicURL', service_type='workflow',
-                 auth_token=None, user_id=None):
+                 auth_token=None, user_id=None, cacert=None):
 
         if mistral_url and not isinstance(mistral_url, six.string_types):
             raise RuntimeError('Mistral url should be string')
@@ -39,7 +39,7 @@ class Client(object):
                 self.authenticate(mistral_url, username, api_key,
                                   project_name, auth_url, project_id,
                                   endpoint_type, service_type, auth_token,
-                                  user_id))
+                                  user_id, cacert))
 
         if not mistral_url:
             mistral_url = "http://localhost:8989/v2"
@@ -60,7 +60,7 @@ class Client(object):
     def authenticate(self, mistral_url=None, username=None, api_key=None,
                      project_name=None, auth_url=None, project_id=None,
                      endpoint_type='publicURL', service_type='workflow',
-                     auth_token=None, user_id=None):
+                     auth_token=None, user_id=None, cacert=None):
 
         if (not (project_name or project_id) or
             not (isinstance(project_name, six.string_types) or
@@ -90,7 +90,8 @@ class Client(object):
             tenant_id=project_id,
             tenant_name=project_name,
             auth_url=auth_url,
-            endpoint=auth_url)
+            endpoint=auth_url,
+            cacert=cacert)
 
         keystone.authenticate()
         token = keystone.auth_token
