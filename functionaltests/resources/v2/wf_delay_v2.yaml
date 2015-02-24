@@ -9,7 +9,7 @@ wf:
     hello:
       action: std.echo output="Hello"
       publish:
-        result: $.hello
+        result: <% $.hello %>
       policies:
         wait-after: 1
       on-success:
@@ -18,4 +18,4 @@ wf:
     task2:
       action: std.echo output="Task 2"
       publish:
-        task2: $.task2
+        task2: <% $.task2 %>

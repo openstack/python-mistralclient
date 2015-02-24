@@ -37,8 +37,8 @@ version: '2.0'
 
 base: std.echo
 base-parameters:
-    output: "{$.str1}{$.str2}"
-output: "{$}{$}"
+    output: "<% $.str1 %><% $.str2 %>"
+output: "<% $ %><% $ %>"
 """
 
 ACTION_WITH_DEF_DICT = ACTION_DICT.copy()

@@ -9,7 +9,7 @@ wf:
       policies:
         wait-before: 5
       publish:
-        result: $
+        result: <% $.hello %>
 
 wf1:
   type: reverse
@@ -20,7 +20,7 @@ wf1:
     addressee:
       action: std.echo output="John"
       publish:
-        name: $
+        name: <% $.addressee %>
     goodbye:
-      action: std.echo output="{$.farewell}, {$.name}"
+      action: std.echo output="<% $.farewell %>, <% $.name %>"
       requires: [addressee]

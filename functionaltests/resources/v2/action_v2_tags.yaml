@@ -6,8 +6,8 @@ greeting:
   tags: [tag, tag1]
   base: std.echo
   base-input:
-    output: 'Hello,  {$.name}'
+    output: 'Hello,  <% $.name %>'
   input:
     - name
   output:
-    string: $.output
+    string: <% $.output %>
