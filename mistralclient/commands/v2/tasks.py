@@ -101,30 +101,6 @@ class Update(show.ShowOne):
         return format(execution)
 
 
-class GetOutput(command.Command):
-    """Show task output data."""
-
-    def get_parser(self, prog_name):
-        parser = super(GetOutput, self).get_parser(prog_name)
-        parser.add_argument(
-            'id',
-            help='Task ID')
-
-        return parser
-
-    def take_action(self, parsed_args):
-        output = tasks.TaskManager(self.app.client).get(
-            parsed_args.id).output
-
-        try:
-            output = json.loads(output)
-            output = json.dumps(output, indent=4) + "\n"
-        except:
-            LOG.debug("Task output is not JSON.")
-
-        self.app.stdout.write(output or "\n")
-
-
 class GetResult(command.Command):
     """Show task output data."""
 

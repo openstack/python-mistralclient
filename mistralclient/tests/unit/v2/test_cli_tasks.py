@@ -35,14 +35,11 @@ TASK_INPUT = {"param1": "val1", "param2": 2}
 
 TASK_WITH_RESULT_DICT = TASK_DICT.copy()
 TASK_WITH_RESULT_DICT.update({'result': json.dumps(TASK_RESULT)})
-TASK_WITH_OUTPUT_DICT = TASK_DICT.copy()
-TASK_WITH_OUTPUT_DICT.update({'output': json.dumps(TASK_RESULT)})
 TASK_WITH_INPUT_DICT = TASK_DICT.copy()
 TASK_WITH_INPUT_DICT.update({'input': json.dumps(TASK_INPUT)})
 
 TASK = tasks.Task(mock, TASK_DICT)
 TASK_WITH_RESULT = tasks.Task(mock, TASK_WITH_RESULT_DICT)
-TASK_WITH_OUTPUT = tasks.Task(mock, TASK_WITH_OUTPUT_DICT)
 TASK_WITH_INPUT = tasks.Task(mock, TASK_WITH_INPUT_DICT)
 
 
@@ -80,15 +77,6 @@ class TestCLIT1asksV2(base.BaseCommandTest):
         mock.return_value = TASK_WITH_RESULT
 
         self.call(task_cmd.GetResult, app_args=['id'])
-
-        self.app.stdout.write.assert_called_with(
-            json.dumps(TASK_RESULT, indent=4) + "\n")
-
-    @mock.patch('mistralclient.api.v2.tasks.TaskManager.get')
-    def test_get_output(self, mock):
-        mock.return_value = TASK_WITH_OUTPUT
-
-        self.call(task_cmd.GetOutput, app_args=['id'])
 
         self.app.stdout.write.assert_called_with(
             json.dumps(TASK_RESULT, indent=4) + "\n")
