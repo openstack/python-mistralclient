@@ -39,7 +39,7 @@ def format(task=None):
         data = (
             task.id,
             task.name,
-            task.wf_name,
+            task.workflow_name,
             task.execution_id,
             task.state,
         )

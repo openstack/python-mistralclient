@@ -25,7 +25,7 @@ from mistralclient.tests.unit import base
 TASK_DICT = {
     'id': '123',
     'name': 'some',
-    'wf_name': 'thing',
+    'workflow_name': 'thing',
     'execution_id': '321',
     'state': 'RUNNING',
 }
