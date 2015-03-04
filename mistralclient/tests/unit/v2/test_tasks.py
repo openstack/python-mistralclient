@@ -23,7 +23,7 @@ TASK = {
     'id': "1",
     'execution_id': '123',
     'name': 'my_task',
-    'wf_name': 'my_wf',
+    'workflow_name': 'my_wf',
     'state': 'RUNNING',
     'tags': ['deployment', 'demo']
 }
