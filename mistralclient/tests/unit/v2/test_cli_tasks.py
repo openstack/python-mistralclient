@@ -26,7 +26,7 @@ TASK_DICT = {
     'id': '123',
     'name': 'some',
     'workflow_name': 'thing',
-    'execution_id': '321',
+    'workflow_execution_id': '321',
     'state': 'RUNNING',
 }
 

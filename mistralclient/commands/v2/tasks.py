@@ -40,7 +40,7 @@ def format(task=None):
             task.id,
             task.name,
             task.workflow_name,
-            task.execution_id,
+            task.workflow_execution_id,
             task.state,
         )
     else:

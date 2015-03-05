@@ -21,7 +21,7 @@ from mistralclient.tests.unit.v2 import base
 
 TASK = {
     'id': "1",
-    'execution_id': '123',
+    'workflow_execution_id': '123',
     'name': 'my_task',
     'workflow_name': 'my_wf',
     'state': 'RUNNING',

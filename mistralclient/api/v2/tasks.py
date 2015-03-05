@@ -31,11 +31,11 @@ class TaskManager(base.ResourceManager):
 
         return self._update('/tasks/%s' % id, data)
 
-    def list(self, execution_id=None):
+    def list(self, workflow_execution_id=None):
         url = '/tasks'
 
-        if execution_id:
-            url = '/executions/%s/tasks' % execution_id
+        if workflow_execution_id:
+            url = '/executions/%s/tasks' % workflow_execution_id
 
         return self._list(url, response_key='tasks')
 
