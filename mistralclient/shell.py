@@ -25,6 +25,7 @@ from mistralclient.api import client
 import mistralclient.commands.v1.executions
 import mistralclient.commands.v1.tasks
 import mistralclient.commands.v1.workbooks
+import mistralclient.commands.v2.action_executions
 import mistralclient.commands.v2.actions
 import mistralclient.commands.v2.cron_triggers
 import mistralclient.commands.v2.environments
@@ -261,6 +262,16 @@ class MistralShell(app.App):
             mistralclient.commands.v2.environments.Update,
             'environment-list': mistralclient.commands.v2.environments.List,
             'environment-get': mistralclient.commands.v2.environments.Get,
+            'action-execution-list':
+            mistralclient.commands.v2.action_executions.List,
+            'action-execution-get':
+            mistralclient.commands.v2.action_executions.Get,
+            'action-execution-get-input':
+            mistralclient.commands.v2.action_executions.GetInput,
+            'action-execution-get-output':
+            mistralclient.commands.v2.action_executions.GetOutput,
+            'action-execution-update':
+            mistralclient.commands.v2.action_executions.Update,
             'execution-create': mistralclient.commands.v2.executions.Create,
             'execution-delete': mistralclient.commands.v2.executions.Delete,
             'execution-update': mistralclient.commands.v2.executions.Update,

@@ -43,7 +43,7 @@ TASK_WITH_RESULT = tasks.Task(mock, TASK_WITH_RESULT_DICT)
 TASK_WITH_INPUT = tasks.Task(mock, TASK_WITH_INPUT_DICT)
 
 
-class TestCLIT1asksV2(base.BaseCommandTest):
+class TestCLITasksV2(base.BaseCommandTest):
     @mock.patch('mistralclient.api.v2.tasks.TaskManager.update')
     def test_update(self, mock):
         mock.return_value = TASK

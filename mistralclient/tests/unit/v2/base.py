@@ -28,3 +28,4 @@ class BaseClientV2Test(base.BaseClientTest):
         self.tasks = self._client.tasks
         self.workflows = self._client.workflows
         self.environments = self._client.environments
+        self.action_executions = self._client.action_executions
