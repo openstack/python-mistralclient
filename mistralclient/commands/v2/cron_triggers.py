@@ -33,11 +33,12 @@ def format_list(trigger=None):
 def format(trigger=None, lister=False):
     columns = (
         'Name',
-        'Pattern',
         'Workflow',
+        'Pattern',
         # TODO(rakhmerov): Uncomment when passwords are handled properly.
         # TODO(rakhmerov): Add 'Workflow input' column.
         'Next execution time',
+        'Remaining executions',
         'Created at',
         'Updated at'
     )
@@ -49,11 +50,12 @@ def format(trigger=None, lister=False):
 
         data = (
             trigger.name,
-            trigger.pattern,
             trigger.workflow_name,
+            trigger.pattern,
             # TODO(rakhmerov): Uncomment when passwords are handled properly.
             # TODo(rakhmerov): Add 'wf_input' here.
             trigger.next_execution_time,
+            trigger.remaining_executions,
             trigger.created_at,
         )
 
@@ -100,13 +102,31 @@ class Create(show.ShowOne):
         parser = super(Create, self).get_parser(prog_name)
 
         parser.add_argument('name', help='Cron trigger name')
-        parser.add_argument('pattern', help='Cron trigger pattern')
         parser.add_argument('workflow_name', help='Workflow name')
 
         parser.add_argument(
             'workflow_input',
             nargs='?',
             help='Workflow input'
+        )
+
+        parser.add_argument(
+            '--pattern',
+            type=str,
+            help='Cron trigger pattern',
+            metavar='<* * * * *>'
+        )
+        parser.add_argument(
+            '--first-time',
+            type=str,
+            help="Date and time of the first execution",
+            metavar='<YYYY-MM-DD HH:MM>'
+        )
+        parser.add_argument(
+            '--count',
+            type=int,
+            help="Number of wanted executions",
+            metavar='<integer>'
         )
 
         return parser
@@ -124,9 +144,11 @@ class Create(show.ShowOne):
 
         trigger = mgr.create(
             parsed_args.name,
-            parsed_args.pattern,
             parsed_args.workflow_name,
-            wf_input
+            wf_input,
+            parsed_args.pattern,
+            parsed_args.first_time,
+            parsed_args.count
         )
 
         return format(trigger)

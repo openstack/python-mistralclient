@@ -23,10 +23,11 @@ from mistralclient.tests.unit import base
 
 TRIGGER_DICT = {
     'name': 'my_trigger',
-    'pattern': '* * * * *',
     'workflow_name': 'flow1',
     'workflow_input': {},
-    'next_execution_time': '1',
+    'pattern': '* * * * *',
+    'next_execution_time': '4242-12-20 13:37',
+    'remaining_executions': 5,
     'created_at': '1',
     'updated_at': '1'
 }
@@ -44,11 +45,13 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
 
         result = self.call(
             cron_triggers_cmd.Create,
-            app_args=['my_trigger', '* * * * *', 'flow1']
+            app_args=['my_trigger', 'flow1', '--pattern', '* * * * *',
+                      '--count', '5', '--first-time', '4242-12-20 13:37']
         )
 
         self.assertEqual(
-            ('my_trigger', '* * * * *', 'flow1', '1', '1', '1'),
+            ('my_trigger', 'flow1', '* * * * *', '4242-12-20 13:37', 5, '1',
+             '1'),
             result[1]
         )
 
@@ -59,7 +62,8 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
         result = self.call(cron_triggers_cmd.List)
 
         self.assertEqual(
-            [('my_trigger', '* * * * *', 'flow1', '1', '1', '1')],
+            [('my_trigger', 'flow1', '* * * * *', '4242-12-20 13:37', 5, '1',
+             '1')],
             result[1]
         )
 
@@ -70,7 +74,8 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
         result = self.call(cron_triggers_cmd.Get, app_args=['name'])
 
         self.assertEqual(
-            ('my_trigger', '* * * * *', 'flow1', '1', '1', '1'),
+            ('my_trigger', 'flow1', '* * * * *', '4242-12-20 13:37', 5, '1',
+             '1'),
             result[1]
         )
 

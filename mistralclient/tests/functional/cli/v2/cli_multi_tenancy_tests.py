@@ -224,7 +224,7 @@ class CronTriggerIsolationCLITests(base_v2.MistralClientTestBase):
     def test_cron_trigger_name_uniqueness(self):
         wf = self.workflow_create(self.wf_def)
         self.cron_trigger_create(
-            "trigger", "5 * * * *", wf[0]["Name"], "{}")
+            "trigger", wf[0]["Name"], "{}", "5 * * * *")
 
         self.assertRaises(
             exceptions.CommandFailed,
@@ -236,23 +236,20 @@ class CronTriggerIsolationCLITests(base_v2.MistralClientTestBase):
         )
 
         wf = self.workflow_create(self.wf_def, admin=False)
-        self.cron_trigger_create(
-            "trigger", "5 * * * *", wf[0]["Name"], "{}", admin=False)
+        self.cron_trigger_create("trigger", wf[0]["Name"], "{}", "5 * * * *",
+                                 None, None, admin=False)
 
         self.assertRaises(
             exceptions.CommandFailed,
             self.cron_trigger_create,
-            "trigger",
-            "5 * * * *",
-            wf[0]["Name"],
-            "{}",
-            admin=False
+            "trigger", wf[0]["Name"], "{}", "5 * * * *",
+            None, None, admin=False
         )
 
     def test_cron_trigger_isolation(self):
         wf = self.workflow_create(self.wf_def)
         self.cron_trigger_create(
-            "trigger", "5 * * * *", wf[0]["Name"], "{}")
+            "trigger", wf[0]["Name"], "{}", "5 * * * *")
 
         alt_trs = self.mistral_alt_user("cron-trigger-list")
 

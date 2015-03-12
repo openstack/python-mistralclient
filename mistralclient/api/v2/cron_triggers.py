@@ -24,17 +24,19 @@ class CronTrigger(base.Resource):
 class CronTriggerManager(base.ResourceManager):
     resource_class = CronTrigger
 
-    def create(self, name, pattern, workflow_name, workflow_input=None):
+    def create(self, name, workflow_name, workflow_input=None, pattern=None,
+               first_time=None, count=None):
         self._ensure_not_empty(
             name=name,
-            pattern=pattern,
             workflow_name=workflow_name
         )
 
         data = {
             'name': name,
-            'pattern': pattern,
             'workflow_name': workflow_name,
+            'pattern': pattern,
+            'first_execution_time': first_time,
+            'remaining_executions': count
         }
 
         if workflow_input:
