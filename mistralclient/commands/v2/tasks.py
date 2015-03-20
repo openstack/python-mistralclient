@@ -52,11 +52,22 @@ def format(task=None):
 class List(base.MistralLister):
     """List all tasks."""
 
+    def get_parser(self, prog_name):
+        parser = super(List, self).get_parser(prog_name)
+
+        parser.add_argument(
+            'workflow_execution',
+            nargs='?',
+            help='Workflow execution ID associated with list of Tasks.')
+        return parser
+
     def _get_format_function(self):
         return format
 
     def _get_resources(self, parsed_args):
-        return tasks.TaskManager(self.app.client).list()
+        return tasks.TaskManager(self.app.client).list(
+            parsed_args.workflow_execution
+        )
 
 
 class Get(show.ShowOne):
@@ -73,30 +84,6 @@ class Get(show.ShowOne):
     def take_action(self, parsed_args):
         execution = tasks.TaskManager(self.app.client).get(
             parsed_args.id)
-
-        return format(execution)
-
-
-class Update(show.ShowOne):
-    """Update task."""
-
-    def get_parser(self, prog_name):
-        parser = super(Update, self).get_parser(prog_name)
-
-        parser.add_argument(
-            'id',
-            help='Task identifier')
-        parser.add_argument(
-            'state',
-            choices=['IDLE', 'RUNNING', 'SUCCESS', 'ERROR'],
-            help='Task state')
-
-        return parser
-
-    def take_action(self, parsed_args):
-        execution = tasks.TaskManager(self.app.client).update(
-            parsed_args.id,
-            parsed_args.state)
 
         return format(execution)
 

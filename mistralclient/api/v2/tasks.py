@@ -22,15 +22,6 @@ class Task(base.Resource):
 class TaskManager(base.ResourceManager):
     resource_class = Task
 
-    def update(self, id, state):
-        self._ensure_not_empty(id=id, state=state)
-
-        data = {
-            'state': state
-        }
-
-        return self._update('/tasks/%s' % id, data)
-
     def list(self, workflow_execution_id=None):
         url = '/tasks'
 
