@@ -301,10 +301,8 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
             "%s input task_name" % self.reverse_wf['Name'])
         exec_id = self.get_value_of_field(execution, 'ID')
 
-        execution = self.mistral_admin(
-            'execution-get', params=exec_id)
-        exec_state = self.get_value_of_field(execution, 'State')
-        self.assertEqual('SUCCESS', exec_state)
+        result = self.wait_execution_success(exec_id)
+        self.assertTrue(result)
 
     def test_execution_update(self):
         execution = self.execution_create(self.direct_wf['Name'])
