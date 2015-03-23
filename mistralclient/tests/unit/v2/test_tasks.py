@@ -12,8 +12,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import json
-
 from mistralclient.api.v2 import tasks
 from mistralclient.tests.unit.v2 import base
 
@@ -25,7 +23,8 @@ TASK = {
     'name': 'my_task',
     'workflow_name': 'my_wf',
     'state': 'RUNNING',
-    'tags': ['deployment', 'demo']
+    'tags': ['deployment', 'demo'],
+    'result': {'some': 'result'}
 }
 
 
@@ -34,20 +33,6 @@ URL_TEMPLATE_ID = '/tasks/%s'
 
 
 class TestTasksV2(base.BaseClientV2Test):
-    def test_update(self):
-        mock = self.mock_http_put(content=TASK)
-        body = {
-            'state': TASK['state']
-        }
-
-        task = self.tasks.update(TASK['id'],
-                                 TASK['state'])
-
-        self.assertIsNotNone(task)
-        self.assertEqual(tasks.Task(self.tasks, TASK).__dict__, task.__dict__)
-        mock.assert_called_once_with(
-            URL_TEMPLATE_ID % TASK['id'], json.dumps(body))
-
     def test_list(self):
         mock = self.mock_http_get(content={'tasks': [TASK]})
 

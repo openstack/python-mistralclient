@@ -44,21 +44,20 @@ TASK_WITH_INPUT = tasks.Task(mock, TASK_WITH_INPUT_DICT)
 
 
 class TestCLITasksV2(base.BaseCommandTest):
-    @mock.patch('mistralclient.api.v2.tasks.TaskManager.update')
-    def test_update(self, mock):
-        mock.return_value = TASK
-
-        result = self.call(task_cmd.Update,
-                           app_args=['id', 'ERROR'])
-
-        self.assertEqual(('123', 'some', 'thing', '321', 'RUNNING'),
-                         result[1])
-
     @mock.patch('mistralclient.api.v2.tasks.TaskManager.list')
     def test_list(self, mock):
         mock.return_value = (TASK,)
 
         result = self.call(task_cmd.List)
+
+        self.assertEqual([('123', 'some', 'thing', '321', 'RUNNING')],
+                         result[1])
+
+    @mock.patch('mistralclient.api.v2.tasks.TaskManager.list')
+    def test_list_with_workflow_execution(self, mock):
+        mock.return_value = (TASK,)
+
+        result = self.call(task_cmd.List, app_args=['workflow_execution'])
 
         self.assertEqual([('123', 'some', 'thing', '321', 'RUNNING')],
                          result[1])
