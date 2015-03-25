@@ -9,3 +9,4 @@ mock>=1.0
 nose
 testtools>=0.9.34
 lockfile>=0.8
+tempest-lib
