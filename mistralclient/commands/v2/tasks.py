@@ -112,21 +112,20 @@ class GetResult(command.Command):
         self.app.stdout.write(result or "\n")
 
 
-class GetInput(command.Command):
-    """Show task input."""
+class GetPublished(command.Command):
+    """Show task published variables."""
 
     def get_parser(self, prog_name):
-        parser = super(GetInput, self).get_parser(prog_name)
+        parser = super(GetPublished, self).get_parser(prog_name)
         parser.add_argument(
             'id',
-            help='Task ID'
-        )
+            help='Task ID')
 
         return parser
 
     def take_action(self, parsed_args):
         result = tasks.TaskManager(self.app.client).get(
-            parsed_args.id).input
+            parsed_args.id).published
 
         try:
             result = json.loads(result)
