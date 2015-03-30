@@ -88,6 +88,15 @@ class SimpleMistralCLITests(base.MistralCLIAuth):
             ['Name', 'Description', 'Scope', 'Created at', 'Updated at']
         )
 
+    def test_action_execution_list(self):
+        act_execs = self.parser.listing(
+            self.mistral('action-execution-list'))
+        self.assertTableStruct(
+            act_execs,
+            ['ID', 'Name', 'Workflow name', 'State',
+             'State info', 'Is accepted']
+        )
+
 
 class WorkbookCLITests(base_v2.MistralClientTestBase):
     """Test suite checks commands to work with workbooks."""
@@ -622,6 +631,31 @@ class EnvironmentCLITests(base_v2.MistralClientTestBase):
         self.assertEqual(env_desc, fetched_env_desc)
 
 
+class ActionExecutionCLITests(base_v2.MistralClientTestBase):
+    """Test suite checks commands to work with action executions."""
+
+    def setUp(self):
+        super(ActionExecutionCLITests, self).setUp()
+
+        wfs = self.workflow_create(self.wf_def)
+        self.direct_wf = wfs[0]
+
+        direct_wf_exec = self.execution_create(self.direct_wf['Name'])
+        self.direct_ex_id = self.get_value_of_field(direct_wf_exec, 'ID')
+
+    def test_act_execution_get(self):
+        self.wait_execution_success(self.direct_ex_id)
+
+        act_ex = self.mistral_admin(
+            'action-execution-get', params=self.direct_ex_id)
+
+        wf_name = self.get_value_of_field(act_ex, 'Workflow name')
+        status = self.get_value_of_field(act_ex, 'State')
+
+        self.assertEqual(wf_name, self.direct_wf['Name'])
+        self.assertEqual(status, 'SUCCESS')
+
+
 class NegativeCLITests(base_v2.MistralClientTestBase):
     """This class contains negative tests."""
 
@@ -1029,3 +1063,24 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
                           self.mistral_admin,
                           'environment-create',
                           params='env.yaml')
+
+    def test_action_execution_get_without_params(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral_admin,
+                          'action-execution-get')
+
+    def test_action_execution_get_unexistent_obj(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral_admin,
+                          'action-execution-get',
+                          params='123456')
+
+    def test_action_execution_update(self):
+        wfs = self.workflow_create(self.wf_def)
+        direct_wf_exec = self.execution_create(wfs[0]['Name'])
+        direct_ex_id = self.get_value_of_field(direct_wf_exec, 'ID')
+
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral_admin,
+                          'action-execution-update',
+                          params='%s ERROR' % direct_ex_id)

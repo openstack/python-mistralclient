@@ -345,3 +345,30 @@ class EnvironmentIsolationCLITests(base_v2.MistralClientTestBase):
             "environment-delete",
             params=env_name
         )
+
+
+class ActionExecutionIsolationCLITests(base_v2.MistralClientTestBase):
+
+    def test_action_execution_isolation(self):
+        wf = self.workflow_create(self.wf_def)
+        self.execution_create(wf[0]["Name"])
+
+        act_execs = self.mistral_admin("action-execution-list")
+        self.assertIn(wf[0]["Name"],
+                      [act["Workflow name"] for act in act_execs])
+
+        alt_act_execs = self.mistral_alt_user("action-execution-list")
+        self.assertNotIn(wf[0]["Name"],
+                         [act["Workflow name"] for act in alt_act_execs])
+
+    def test_get_action_execution_from_another_tenant(self):
+        wf = self.workflow_create(self.wf_def)
+        ex = self.execution_create(wf[0]["Name"])
+        exec_id = self.get_value_of_field(ex, "ID")
+
+        self.assertRaises(
+            exceptions.CommandFailed,
+            self.mistral_alt_user,
+            "action-execution-get",
+            params=exec_id
+        )
