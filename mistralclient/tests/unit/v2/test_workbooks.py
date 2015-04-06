@@ -1,4 +1,5 @@
 # Copyright 2014 - Mirantis, Inc.
+# Copyright 2015 - StackStorm, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -12,6 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from mistralclient.api import base as api_base
 from mistralclient.api.v2 import workbooks
 from mistralclient.tests.unit.v2 import base
 
@@ -41,11 +43,25 @@ workflows:
         action: std.http url="http://some_url" server_id=1
 """
 
-WORKBOOK = {'definition': WB_DEF}
+INVALID_WB_DEF = """
+version: 2.0
 
+name: wb
+
+workflows:
+  wf1:
+    type: direct
+    tasks:
+      task1:
+        action: std.http url="localhost:8989"
+        workflow: wf2
+"""
+
+WORKBOOK = {'definition': WB_DEF}
 
 URL_TEMPLATE = '/workbooks'
 URL_TEMPLATE_NAME = '/workbooks/%s'
+URL_TEMPLATE_VALIDATE = '/workbooks/validate'
 
 
 class TestWorkbooksV2(base.BaseClientV2Test):
@@ -112,3 +128,56 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         self.workbooks.delete('wb')
 
         mock.assert_called_once_with(URL_TEMPLATE_NAME % 'wb')
+
+    def test_validate(self):
+        mock = self.mock_http_post(status_code=200,
+                                   content={'valid': True})
+
+        result = self.workbooks.validate(WB_DEF)
+
+        self.assertIsNotNone(result)
+        self.assertIn('valid', result)
+        self.assertTrue(result['valid'])
+
+        mock.assert_called_once_with(
+            URL_TEMPLATE_VALIDATE,
+            WB_DEF,
+            headers={'content-type': 'text/plain'}
+        )
+
+    def test_validate_failed(self):
+        mock_result = {
+            "valid": False,
+            "error": "Task properties 'action' and 'workflow' "
+                     "can't be specified both"
+        }
+
+        mock = self.mock_http_post(status_code=200, content=mock_result)
+
+        result = self.workbooks.validate(INVALID_WB_DEF)
+
+        self.assertIsNotNone(result)
+        self.assertIn('valid', result)
+        self.assertFalse(result['valid'])
+        self.assertIn('error', result)
+        self.assertIn("Task properties 'action' and 'workflow' "
+                      "can't be specified both", result['error'])
+
+        mock.assert_called_once_with(
+            URL_TEMPLATE_VALIDATE,
+            INVALID_WB_DEF,
+            headers={'content-type': 'text/plain'}
+        )
+
+    def test_validate_api_failed(self):
+        mock = self.mock_http_post(status_code=500, content={})
+
+        self.assertRaises(api_base.APIException,
+                          self.workbooks.validate,
+                          WB_DEF)
+
+        mock.assert_called_once_with(
+            URL_TEMPLATE_VALIDATE,
+            WB_DEF,
+            headers={'content-type': 'text/plain'}
+        )

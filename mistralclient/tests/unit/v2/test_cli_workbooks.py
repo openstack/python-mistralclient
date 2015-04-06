@@ -1,23 +1,23 @@
-# Copyright 2014 Mirantis, Inc.
-# All Rights Reserved
+# Copyright 2014 - Mirantis, Inc.
+# Copyright 2015 - StackStorm, Inc.
 #
-#    Licensed under the Apache License, Version 2.0 (the "License"); you may
-#    not use this file except in compliance with the License. You may obtain
-#    a copy of the License at
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
 #
-#         http://www.apache.org/licenses/LICENSE-2.0
+#        http://www.apache.org/licenses/LICENSE-2.0
 #
 #    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#    License for the specific language governing permissions and limitations
-#    under the License.
-#
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
 
 import mock
 
 from mistralclient.api.v2 import workbooks
 from mistralclient.commands.v2 import workbooks as workbook_cmd
+from mistralclient import exceptions as exc
 from mistralclient.tests.unit import base
 
 
@@ -96,3 +96,25 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
         self.call(workbook_cmd.GetDefinition, app_args=['name'])
 
         self.app.stdout.write.assert_called_with(WB_DEF)
+
+    @mock.patch('argparse.open', create=True)
+    @mock.patch('mistralclient.api.v2.workbooks.WorkbookManager.validate')
+    def test_validate(self, mock, mock_open):
+        mock.return_value = {'valid': True}
+        mock_open.return_value = mock.MagicMock(spec=file)
+
+        result = self.call(workbook_cmd.Validate, app_args=['wb.yaml'])
+
+        self.assertEqual(result[0], tuple())
+        self.assertEqual(result[1], tuple())
+
+    @mock.patch('argparse.open', create=True)
+    @mock.patch('mistralclient.api.v2.workbooks.WorkbookManager.validate')
+    def test_validate_failed(self, mock, mock_open):
+        mock.return_value = {'valid': False, 'error': 'Invalid DSL...'}
+        mock_open.return_value = mock.MagicMock(spec=file)
+
+        self.assertRaises(exc.MistralClientException,
+                          self.call,
+                          workbook_cmd.Validate,
+                          app_args=['wb.yaml'])

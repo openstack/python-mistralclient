@@ -1,18 +1,16 @@
-# Copyright 2015 StackStorm, Inc.
-# All Rights Reserved
+# Copyright 2015 - StackStorm, Inc.
 #
-#    Licensed under the Apache License, Version 2.0 (the "License"); you may
-#    not use this file except in compliance with the License. You may obtain
-#    a copy of the License at
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
 #
-#         http://www.apache.org/licenses/LICENSE-2.0
+#        http://www.apache.org/licenses/LICENSE-2.0
 #
 #    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#    License for the specific language governing permissions and limitations
-#    under the License.
-#
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
 
 """
 Command-line interface to the Mistral APIs
@@ -247,6 +245,7 @@ class MistralShell(app.App):
             'workbook-update': mistralclient.commands.v2.workbooks.Update,
             'workbook-get-definition':
             mistralclient.commands.v2.workbooks.GetDefinition,
+            'workbook-validate': mistralclient.commands.v2.workbooks.Validate,
             'workflow-list': mistralclient.commands.v2.workflows.List,
             'workflow-get': mistralclient.commands.v2.workflows.Get,
             'workflow-create': mistralclient.commands.v2.workflows.Create,
@@ -254,6 +253,7 @@ class MistralShell(app.App):
             'workflow-update': mistralclient.commands.v2.workflows.Update,
             'workflow-get-definition':
             mistralclient.commands.v2.workflows.GetDefinition,
+            'workflow-validate': mistralclient.commands.v2.workflows.Validate,
             'environment-create':
             mistralclient.commands.v2.environments.Create,
             'environment-delete':

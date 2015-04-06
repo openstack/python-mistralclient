@@ -1,4 +1,5 @@
 # Copyright 2014 - Mirantis, Inc.
+# Copyright 2015 - StackStorm, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -64,3 +65,17 @@ class WorkflowManager(base.ResourceManager):
         self._ensure_not_empty(name=name)
 
         self._delete('/workflows/%s' % name)
+
+    def validate(self, definition):
+        self._ensure_not_empty(definition=definition)
+
+        resp = self.client.http_client.post(
+            '/workflows/validate',
+            definition,
+            headers={'content-type': 'text/plain'}
+        )
+
+        if resp.status_code != 200:
+            self._raise_api_exception(resp)
+
+        return base.extract_json(resp, None)
