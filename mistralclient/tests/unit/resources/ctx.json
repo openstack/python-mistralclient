@@ -1,5 +1,7 @@
-{"context": {
-    "server": {
-        "name": "name"
+{
+    "context": {
+        "server": {
+            "name": "name"
+        }
     }
-}}
+}
