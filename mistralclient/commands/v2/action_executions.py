@@ -64,6 +64,7 @@ class List(base.MistralLister):
             'task_execution_id',
             nargs='?',
             help='Task execution ID.')
+
         return parser
 
     def _get_resources(self, parsed_args):
