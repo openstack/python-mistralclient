@@ -85,7 +85,7 @@ class Create(show.ShowOne):
 
         parser.add_argument(
             'workflow_name',
-            help='Execution workflow'
+            help='Workflow name'
         )
         parser.add_argument(
             'workflow_input',
