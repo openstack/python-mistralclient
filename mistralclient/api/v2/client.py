@@ -29,7 +29,7 @@ from mistralclient.api.v2 import workflows
 class Client(object):
     def __init__(self, mistral_url=None, username=None, api_key=None,
                  project_name=None, auth_url=None, project_id=None,
-                 endpoint_type='publicURL', service_type='workflow',
+                 endpoint_type='publicURL', service_type='workflowv2',
                  auth_token=None, user_id=None, cacert=None):
 
         if mistral_url and not isinstance(mistral_url, six.string_types):
@@ -61,23 +61,13 @@ class Client(object):
 
     def authenticate(self, mistral_url=None, username=None, api_key=None,
                      project_name=None, auth_url=None, project_id=None,
-                     endpoint_type='publicURL', service_type='workflow',
+                     endpoint_type='publicURL', service_type='workflowv2',
                      auth_token=None, user_id=None, cacert=None):
 
-        if (not (project_name or project_id) or
-            not (isinstance(project_name, six.string_types) or
-                 isinstance(project_id, six.string_types))):
-            raise RuntimeError('Either project name or project id should'
-                               ' be non-empty string')
         if project_name and project_id:
             raise RuntimeError('Only project name or '
                                'project id should be set')
 
-        if (not (username or user_id) or
-            not (isinstance(username, six.string_types) or
-                 isinstance(user_id, six.string_types))):
-            raise RuntimeError('Either user name or user id should'
-                               ' be non-empty string')
         if username and user_id:
             raise RuntimeError('Only user name or user id'
                                ' should be set')
