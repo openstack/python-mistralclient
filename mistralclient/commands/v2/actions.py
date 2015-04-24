@@ -22,6 +22,7 @@ from cliff import show
 
 from mistralclient.api.v2 import actions
 from mistralclient.commands.v2 import base
+from mistralclient import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -125,12 +126,18 @@ class Delete(command.Command):
     def get_parser(self, prog_name):
         parser = super(Delete, self).get_parser(prog_name)
 
-        parser.add_argument('name', help='Action name')
+        parser.add_argument('name', nargs='+', help='Name of action(s).')
 
         return parser
 
     def take_action(self, parsed_args):
-        actions.ActionManager(self.app.client).delete(parsed_args.name)
+        action_mgr = actions.ActionManager(self.app.client)
+        utils.do_action_on_many(
+            lambda s: action_mgr.delete(s),
+            parsed_args.name,
+            "Request to delete action %s has been accepted.",
+            "Unable to delete the specified action(s)."
+        )
 
 
 class Update(base.MistralLister):

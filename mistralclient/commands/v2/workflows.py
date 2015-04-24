@@ -22,6 +22,7 @@ from cliff import show
 from mistralclient.api.v2 import workflows
 from mistralclient.commands.v2 import base
 from mistralclient import exceptions as exc
+from mistralclient import utils
 
 
 LOG = logging.getLogger(__name__)
@@ -119,12 +120,18 @@ class Delete(command.Command):
     def get_parser(self, prog_name):
         parser = super(Delete, self).get_parser(prog_name)
 
-        parser.add_argument('name', help='Workflow name')
+        parser.add_argument('name', nargs='+', help='Name of workflow(s).')
 
         return parser
 
     def take_action(self, parsed_args):
-        workflows.WorkflowManager(self.app.client).delete(parsed_args.name)
+        wf_mgr = workflows.WorkflowManager(self.app.client)
+        utils.do_action_on_many(
+            lambda s: wf_mgr.delete(s),
+            parsed_args.name,
+            "Request to delete workflow %s has been accepted.",
+            "Unable to delete the specified workflow(s)."
+        )
 
 
 class Update(base.MistralLister):
