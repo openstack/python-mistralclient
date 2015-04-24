@@ -95,8 +95,20 @@ class TestCLIActionsV2(base.BaseCommandTest):
         )
 
     @mock.patch('mistralclient.api.v2.actions.ActionManager.delete')
-    def test_delete(self, mock):
-        self.assertIsNone(self.call(action_cmd.Delete, app_args=['name']))
+    def test_delete(self, del_mock):
+        self.call(action_cmd.Delete, app_args=['name'])
+
+        del_mock.assert_called_once_with('name')
+
+    @mock.patch('mistralclient.api.v2.actions.ActionManager.delete')
+    def test_delete_with_multi_names(self, del_mock):
+        self.call(action_cmd.Delete, app_args=['name1', 'name2'])
+
+        self.assertEqual(2, del_mock.call_count)
+        self.assertEqual(
+            [mock.call('name1'), mock.call('name2')],
+            del_mock.call_args_list
+        )
 
     @mock.patch('mistralclient.api.v2.actions.'
                 'ActionManager.get')

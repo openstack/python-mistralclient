@@ -82,7 +82,17 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
                           '1', '1'), result[1])
 
     @mock.patch('mistralclient.api.v2.executions.ExecutionManager.delete')
-    def test_delete(self, mock):
-        result = self.call(execution_cmd.Delete, app_args=['id'])
+    def test_delete(self, del_mock):
+        self.call(execution_cmd.Delete, app_args=['id'])
 
-        self.assertIsNone(result)
+        del_mock.assert_called_once_with('id')
+
+    @mock.patch('mistralclient.api.v2.executions.ExecutionManager.delete')
+    def test_delete_with_multi_names(self, del_mock):
+        self.call(execution_cmd.Delete, app_args=['id1', 'id2'])
+
+        self.assertEqual(2, del_mock.call_count)
+        self.assertEqual(
+            [mock.call('id1'), mock.call('id2')],
+            del_mock.call_args_list
+        )
