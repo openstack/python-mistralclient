@@ -26,7 +26,11 @@ from mistralclient.commands.v2 import base
 LOG = logging.getLogger(__name__)
 
 
-def format(action_ex=None):
+def format_list(action_ex=None):
+    return format(action_ex, lister=True)
+
+
+def format(action_ex=None, lister=False):
     columns = (
         'ID',
         'Name',
@@ -37,12 +41,15 @@ def format(action_ex=None):
     )
 
     if action_ex:
+        state_info = (action_ex.state_info if not lister
+                      else base.cut(action_ex.state_info))
+
         data = (
             action_ex.id,
             action_ex.name,
             action_ex.workflow_name,
             action_ex.state,
-            action_ex.state_info,
+            state_info,
             action_ex.accepted,
         )
     else:
@@ -55,7 +62,7 @@ class List(base.MistralLister):
     """List all Action executions."""
 
     def _get_format_function(self):
-        return format
+        return format_list
 
     def get_parser(self, prog_name):
         parser = super(List, self).get_parser(prog_name)
