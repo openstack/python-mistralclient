@@ -5,6 +5,11 @@ _mistral()
     declare -A SUBCOMMANDS
     declare -A OPTS
 
+    OPTS["action-execution-get"]="-h --help -f --format -c --column --max-width --prefix"
+    OPTS["action-execution-get-input"]="-h --help"
+    OPTS["action-execution-get-output"]="-h --help"
+    OPTS["action-execution-list"]="-h --help -f --format -c --column --max-width --quote"
+    OPTS["action-execution-update"]="-h --help -f --format -c --column --max-width --prefix --state --output"
     OPTS["action-create"]="-h --help -f --format -c --column --max-width --quote"
     OPTS["action-delete"]="-h --help"
     OPTS["action-get"]="-h --help -f --format -c --column --max-width --variable --prefix"
@@ -30,22 +35,23 @@ _mistral()
     OPTS["execution-update"]="-h --help -f --format -c --column --max-width --variable --prefix"
     OPTS["help"]="-h --help"
     OPTS["task-get"]="-h --help -f --format -c --column --max-width --variable --prefix"
-    OPTS["task-get-input"]="-h --help"
     OPTS["task-get-result"]="-h --help"
+    OPTS["task-get-published"]="-h --help -f --format -c --column --max-width --variable --prefix"
     OPTS["task-list"]="-h --help -f --format -c --column --max-width --quote"
-    OPTS["task-update"]="-h --help -f --format -c --column --max-width --variable --prefix"
     OPTS["workbook-create"]="-h --help -f --format -c --column --max-width --variable --prefix"
     OPTS["workbook-delete"]="-h --help"
     OPTS["workbook-get"]="-h --help -f --format -c --column --max-width --variable --prefix"
     OPTS["workbook-get-definition"]="-h --help"
     OPTS["workbook-list"]="-h --help -f --format -c --column --max-width --quote"
     OPTS["workbook-update"]="-h --help -f --format -c --column --max-width --variable --prefix"
+    OPTS["workbook-validate"]="-h --help -f --format -c --column --max-width --prefix"
     OPTS["workflow-create"]="-h --help -f --format -c --column --max-width --quote"
     OPTS["workflow-delete"]="-h --help"
     OPTS["workflow-get"]="-h --help -f --format -c --column --max-width --variable --prefix"
     OPTS["workflow-get-definition"]="-h --help"
     OPTS["workflow-list"]="-h --help -f --format -c --column --max-width --quote"
     OPTS["workflow-update"]="-h --help -f --format -c --column --max-width --quote"
+    OPTS["workflow-validate"]="-h --help -f --format -c --column --max-width --prefix"
 
     COMMANDS="${!OPTS[*]}"
     COMPREPLY=()
