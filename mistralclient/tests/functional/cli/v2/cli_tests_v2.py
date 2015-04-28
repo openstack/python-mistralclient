@@ -646,12 +646,22 @@ class ActionExecutionCLITests(base_v2.MistralClientTestBase):
     def test_act_execution_get(self):
         self.wait_execution_success(self.direct_ex_id)
 
+        task = self.mistral_admin(
+            'task-list', params=self.direct_ex_id)[0]
+
+        act_ex_from_list = self.mistral_admin(
+            'action-execution-list', params=task['ID'])[0]
+
         act_ex = self.mistral_admin(
-            'action-execution-get', params=self.direct_ex_id)
+            'action-execution-get', params=act_ex_from_list['ID'])
 
         wf_name = self.get_value_of_field(act_ex, 'Workflow name')
         status = self.get_value_of_field(act_ex, 'State')
 
+        self.assertEqual(
+            act_ex_from_list['ID'],
+            self.get_value_of_field(act_ex, 'ID')
+        )
         self.assertEqual(wf_name, self.direct_wf['Name'])
         self.assertEqual(status, 'SUCCESS')
 
