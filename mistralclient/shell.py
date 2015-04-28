@@ -32,11 +32,52 @@ from mistralclient.openstack.common import cliutils as c
 
 from cliff import app
 from cliff import commandmanager
-from cliff import help
 
 import argparse
 
 LOG = logging.getLogger(__name__)
+
+
+class OpenStackHelpFormatter(argparse.HelpFormatter):
+    def __init__(self, prog, indent_increment=2, max_help_position=32,
+                 width=None):
+        super(OpenStackHelpFormatter, self).__init__(prog, indent_increment,
+                                                     max_help_position, width)
+
+    def start_section(self, heading):
+        # Title-case the headings.
+        heading = '%s%s' % (heading[0].upper(), heading[1:])
+        super(OpenStackHelpFormatter, self).start_section(heading)
+
+
+class HelpAction(argparse.Action):
+    """Custom help action.
+
+    Provide a custom action so the -h and --help options
+    to the main app will print a list of the commands.
+
+    The commands are determined by checking the CommandManager
+    instance, passed in as the "default" value for the action.
+
+    """
+    def __call__(self, parser, namespace, values, option_string=None):
+        outputs = []
+        max_len = 0
+        app = self.default
+        parser.print_help(app.stdout)
+        app.stdout.write('\nCommands for API v2 :\n')
+
+        for name, ep in sorted(app.command_manager):
+            factory = ep.load()
+            cmd = factory(self, None)
+            one_liner = cmd.get_description().split('\n')[0]
+            outputs.append((name, one_liner))
+            max_len = max(len(name), max_len)
+
+        for (name, one_liner) in outputs:
+            app.stdout.write('  %s  %s\n' % (name.ljust(max_len), one_liner))
+
+        sys.exit(0)
 
 
 class MistralShell(app.App):
@@ -76,6 +117,7 @@ class MistralShell(app.App):
         parser = argparse.ArgumentParser(
             description=description,
             add_help=False,
+            formatter_class=OpenStackHelpFormatter,
             **argparse_kwargs
         )
         parser.add_argument(
@@ -106,7 +148,7 @@ class MistralShell(app.App):
         )
         parser.add_argument(
             '-h', '--help',
-            action=help.HelpAction,
+            action=HelpAction,
             nargs=0,
             default=self,  # tricky
             help="Show this help message and exit.",
