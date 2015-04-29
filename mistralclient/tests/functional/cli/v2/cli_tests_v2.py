@@ -490,7 +490,7 @@ class ActionCLITests(base_v2.MistralClientTestBase):
         self.assertEqual(action_2['Is system'], 'False')
 
         self.assertEqual(action_1['Input'], 'name')
-        self.assertEqual(action_2['Input'], '')
+        self.assertEqual(action_2['Input'], 'None')
 
         acts = self.mistral_admin('action-list')
         self.assertIn(action_1['Name'], [action['Name'] for action in acts])
