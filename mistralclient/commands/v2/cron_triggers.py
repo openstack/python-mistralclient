@@ -22,6 +22,7 @@ from cliff import show
 
 from mistralclient.api.v2 import cron_triggers
 from mistralclient.commands.v2 import base
+from mistralclient import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -160,11 +161,15 @@ class Delete(command.Command):
     def get_parser(self, prog_name):
         parser = super(Delete, self).get_parser(prog_name)
 
-        parser.add_argument('name', help='Cron trigger name')
+        parser.add_argument('name', nargs='+', help='Name of cron trigger(s).')
 
         return parser
 
     def take_action(self, parsed_args):
         mgr = cron_triggers.CronTriggerManager(self.app.client)
-
-        mgr.delete(parsed_args.name)
+        utils.do_action_on_many(
+            lambda s: mgr.delete(s),
+            parsed_args.name,
+            "Request to delete cron trigger %s has been accepted.",
+            "Unable to delete the specified cron trigger(s)."
+        )
