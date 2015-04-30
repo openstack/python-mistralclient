@@ -35,6 +35,7 @@ def format(trigger=None, lister=False):
     columns = (
         'Name',
         'Workflow',
+        'Params',
         'Pattern',
         # TODO(rakhmerov): Uncomment when passwords are handled properly.
         # TODO(rakhmerov): Add 'Workflow input' column.
@@ -52,6 +53,7 @@ def format(trigger=None, lister=False):
         data = (
             trigger.name,
             trigger.workflow_name,
+            trigger.workflow_params,
             trigger.pattern,
             # TODO(rakhmerov): Uncomment when passwords are handled properly.
             # TODo(rakhmerov): Add 'wf_input' here.
@@ -112,6 +114,11 @@ class Create(show.ShowOne):
         )
 
         parser.add_argument(
+            '--params',
+            help='Workflow params',
+        )
+
+        parser.add_argument(
             '--pattern',
             type=str,
             help='Cron trigger pattern',
@@ -132,21 +139,27 @@ class Create(show.ShowOne):
 
         return parser
 
+    @staticmethod
+    def _get_file_content_or_dict(string):
+        if string:
+            try:
+                return json.loads(string)
+            except:
+                return json.load(open(string))
+        else:
+            return {}
+
     def take_action(self, parsed_args):
         mgr = cron_triggers.CronTriggerManager(self.app.client)
 
-        if parsed_args.workflow_input:
-            try:
-                wf_input = json.loads(parsed_args.workflow_input)
-            except:
-                wf_input = json.load(open(parsed_args.workflow_input))
-        else:
-            wf_input = {}
+        wf_input = self._get_file_content_or_dict(parsed_args.workflow_input)
+        wf_params = self._get_file_content_or_dict(parsed_args.params)
 
         trigger = mgr.create(
             parsed_args.name,
             parsed_args.workflow_name,
             wf_input,
+            wf_params,
             parsed_args.pattern,
             parsed_args.first_time,
             parsed_args.count
