@@ -22,6 +22,7 @@ from cliff import show
 
 from mistralclient.api.v2 import executions
 from mistralclient.commands.v2 import base
+from mistralclient import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -140,12 +141,22 @@ class Delete(command.Command):
     def get_parser(self, prog_name):
         parser = super(Delete, self).get_parser(prog_name)
 
-        parser.add_argument('id', help='Execution identifier')
+        parser.add_argument(
+            'id',
+            nargs='+',
+            help='Id of execution identifier(s).'
+        )
 
         return parser
 
     def take_action(self, parsed_args):
-        executions.ExecutionManager(self.app.client).delete(parsed_args.id)
+        exe_mgr = executions.ExecutionManager(self.app.client)
+        utils.do_action_on_many(
+            lambda s: exe_mgr.delete(s),
+            parsed_args.id,
+            "Request to delete execution %s has been accepted.",
+            "Unable to delete the specified execution(s)."
+        )
 
 
 class Update(show.ShowOne):

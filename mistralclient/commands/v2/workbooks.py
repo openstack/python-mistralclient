@@ -22,6 +22,7 @@ from cliff import show
 from mistralclient.api.v2 import workbooks
 from mistralclient.commands.v2 import base
 from mistralclient import exceptions as exc
+from mistralclient import utils
 
 
 LOG = logging.getLogger(__name__)
@@ -110,12 +111,18 @@ class Delete(command.Command):
     def get_parser(self, prog_name):
         parser = super(Delete, self).get_parser(prog_name)
 
-        parser.add_argument('name', help='Workbook name')
+        parser.add_argument('name', nargs='+', help='Name of workbook(s).')
 
         return parser
 
     def take_action(self, parsed_args):
-        workbooks.WorkbookManager(self.app.client).delete(parsed_args.name)
+        wb_mgr = workbooks.WorkbookManager(self.app.client)
+        utils.do_action_on_many(
+            lambda s: wb_mgr.delete(s),
+            parsed_args.name,
+            "Request to delete workbook %s has been accepted.",
+            "Unable to delete the specified workbook(s)."
+        )
 
 
 class Update(show.ShowOne):
