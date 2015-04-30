@@ -24,7 +24,8 @@ class CronTrigger(base.Resource):
 class CronTriggerManager(base.ResourceManager):
     resource_class = CronTrigger
 
-    def create(self, name, workflow_name, workflow_input=None, pattern=None,
+    def create(self, name, workflow_name, workflow_input=None,
+               workflow_params=None, pattern=None,
                first_time=None, count=None):
         self._ensure_not_empty(
             name=name,
@@ -41,6 +42,9 @@ class CronTriggerManager(base.ResourceManager):
 
         if workflow_input:
             data.update({'workflow_input': json.dumps(workflow_input)})
+
+        if workflow_params:
+            data.update({'workflow_params': json.dumps(workflow_params)})
 
         return self._create('/cron_triggers', data)
 

@@ -1,7 +1,7 @@
 # Copyright 2014 Mirantis, Inc.
 # All Rights Reserved
 #
-#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
 #    a copy of the License at
 #
@@ -25,6 +25,7 @@ TRIGGER_DICT = {
     'name': 'my_trigger',
     'workflow_name': 'flow1',
     'workflow_input': {},
+    'workflow_params': {},
     'pattern': '* * * * *',
     'next_execution_time': '4242-12-20 13:37',
     'remaining_executions': 5,
@@ -32,11 +33,10 @@ TRIGGER_DICT = {
     'updated_at': '1'
 }
 
-
 TRIGGER = cron_triggers.CronTrigger(mock, TRIGGER_DICT)
 
 
-class TestCLIWorkbooksV2(base.BaseCommandTest):
+class TestCLITriggersV2(base.BaseCommandTest):
     @mock.patch('argparse.open', create=True)
     @mock.patch('mistralclient.api.v2.cron_triggers.CronTriggerManager.create')
     def test_create(self, mock, mock_open):
@@ -46,12 +46,15 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
         result = self.call(
             cron_triggers_cmd.Create,
             app_args=['my_trigger', 'flow1', '--pattern', '* * * * *',
-                      '--count', '5', '--first-time', '4242-12-20 13:37']
+                      '--params', '{}', '--count', '5', '--first-time',
+                      '4242-12-20 13:37']
         )
 
         self.assertEqual(
-            ('my_trigger', 'flow1', '* * * * *', '4242-12-20 13:37', 5, '1',
-             '1'),
+            (
+                'my_trigger', 'flow1', {}, '* * * * *',
+                '4242-12-20 13:37', 5, '1', '1'
+            ),
             result[1]
         )
 
@@ -62,8 +65,10 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
         result = self.call(cron_triggers_cmd.List)
 
         self.assertEqual(
-            [('my_trigger', 'flow1', '* * * * *', '4242-12-20 13:37', 5, '1',
-             '1')],
+            [(
+                'my_trigger', 'flow1', {}, '* * * * *',
+                '4242-12-20 13:37', 5, '1', '1'
+            )],
             result[1]
         )
 
@@ -74,8 +79,10 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
         result = self.call(cron_triggers_cmd.Get, app_args=['name'])
 
         self.assertEqual(
-            ('my_trigger', 'flow1', '* * * * *', '4242-12-20 13:37', 5, '1',
-             '1'),
+            (
+                'my_trigger', 'flow1', {}, '* * * * *',
+                '4242-12-20 13:37', 5, '1', '1'
+            ),
             result[1]
         )
 
