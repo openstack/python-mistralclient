@@ -26,11 +26,11 @@ class MistralCLIAuth(base.ClientTestBase):
 
     def _get_admin_clients(self):
         clients = base.CLIClient(
-            CONF.identity.admin_username,
-            CONF.identity.admin_password,
-            CONF.identity.admin_tenant_name,
-            CONF.identity.uri,
-            CONF.cli.cli_dir)
+            username=CONF.identity.admin_username,
+            password=CONF.identity.admin_password,
+            tenant_name=CONF.identity.admin_tenant_name,
+            uri=CONF.identity.uri,
+            cli_dir='/usr/local/bin')
 
         return clients
 
@@ -57,11 +57,11 @@ class MistralCLIAltAuth(base.ClientTestBase):
 
     def _get_alt_clients(self):
         clients = base.CLIClient(
-            CONF.identity.alt_username,
-            CONF.identity.alt_password,
-            CONF.identity.alt_tenant_name,
-            CONF.identity.uri,
-            CONF.cli.cli_dir)
+            username=CONF.identity.alt_username,
+            password=CONF.identity.alt_password,
+            tenant_name=CONF.identity.alt_tenant_name,
+            uri=CONF.identity.uri,
+            cli_dir='/usr/local/bin')
 
         return clients
 
