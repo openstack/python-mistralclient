@@ -31,6 +31,7 @@ import mistralclient.commands.v2.workflows
 from mistralclient.openstack.common import cliutils as c
 
 from cliff import app
+from cliff import command
 from cliff import commandmanager
 
 import argparse
@@ -78,6 +79,22 @@ class HelpAction(argparse.Action):
             app.stdout.write('  %s  %s\n' % (name.ljust(max_len), one_liner))
 
         sys.exit(0)
+
+
+class BashCompletionCommand(command.Command):
+    """Prints all of the commands and options for bash-completion."""
+
+    def take_action(self, parsed_args):
+        commands = set()
+        options = set()
+
+        for option, _action in self.app.parser._option_string_actions.items():
+            options.add(option)
+
+        for command_name, _cmd in self.app.command_manager:
+            commands.add(command_name)
+
+        print(' '.join(commands | options))
 
 
 class MistralShell(app.App):
@@ -257,6 +274,7 @@ class MistralShell(app.App):
     @staticmethod
     def _get_commands_v2():
         return {
+            'bash-completion': BashCompletionCommand,
             'workbook-list': mistralclient.commands.v2.workbooks.List,
             'workbook-get': mistralclient.commands.v2.workbooks.Get,
             'workbook-create': mistralclient.commands.v2.workbooks.Create,
