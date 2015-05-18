@@ -1,71 +1,25 @@
-#!/bin/bash
-
+_mistral_opts="" # lazy init
+_mistral_flags="" # lazy init
+_mistral_opts_exp="" # lazy init
 _mistral()
 {
-    declare -A SUBCOMMANDS
-    declare -A OPTS
+	local cur prev mbc cflags
+	COMPREPLY=()
+	cur="${COMP_WORDS[COMP_CWORD]}"
+	prev="${COMP_WORDS[COMP_CWORD-1]}"
 
-    OPTS["action-execution-get"]="-h --help -f --format -c --column --max-width --prefix"
-    OPTS["action-execution-get-input"]="-h --help"
-    OPTS["action-execution-get-output"]="-h --help"
-    OPTS["action-execution-list"]="-h --help -f --format -c --column --max-width --quote"
-    OPTS["action-execution-update"]="-h --help -f --format -c --column --max-width --prefix --state --output"
-    OPTS["action-create"]="-h --help -f --format -c --column --max-width --quote"
-    OPTS["action-delete"]="-h --help"
-    OPTS["action-get"]="-h --help -f --format -c --column --max-width --variable --prefix"
-    OPTS["action-get-definition"]="-h --help"
-    OPTS["action-list"]="-h --help -f --format -c --column --max-width --quote"
-    OPTS["action-update"]="-h --help -f --format -c --column --max-width --quote"
-    OPTS["complete"]="-h --help --name --shell"
-    OPTS["cron-trigger-create"]="-h --help -f --format -c --column --max-width --variable --prefix"
-    OPTS["cron-trigger-delete"]="-h --help"
-    OPTS["cron-trigger-get"]="-h --help -f --format -c --column --max-width --variable --prefix"
-    OPTS["cron-trigger-list"]="-h --help -f --format -c --column --max-width --quote"
-    OPTS["environment-create"]="-h --help -f --format -c --column --max-width --variable --prefix"
-    OPTS["environment-delete"]="-h --help"
-    OPTS["environment-get"]="-h --help -f --format -c --column --max-width --variable --prefix"
-    OPTS["environment-list"]="-h --help -f --format -c --column --max-width --quote"
-    OPTS["environment-update"]="-h --help -f --format -c --column --max-width --variable --prefix"
-    OPTS["execution-create"]="-h --help -f --format -c --column --max-width --variable --prefix"
-    OPTS["execution-delete"]="-h --help"
-    OPTS["execution-get"]="-h --help -f --format -c --column --max-width --variable --prefix"
-    OPTS["execution-get-input"]="-h --help"
-    OPTS["execution-get-output"]="-h --help"
-    OPTS["execution-list"]="-h --help -f --format -c --column --max-width --quote"
-    OPTS["execution-update"]="-h --help -f --format -c --column --max-width --variable --prefix"
-    OPTS["help"]="-h --help"
-    OPTS["task-get"]="-h --help -f --format -c --column --max-width --variable --prefix"
-    OPTS["task-get-result"]="-h --help"
-    OPTS["task-get-published"]="-h --help -f --format -c --column --max-width --variable --prefix"
-    OPTS["task-list"]="-h --help -f --format -c --column --max-width --quote"
-    OPTS["workbook-create"]="-h --help -f --format -c --column --max-width --variable --prefix"
-    OPTS["workbook-delete"]="-h --help"
-    OPTS["workbook-get"]="-h --help -f --format -c --column --max-width --variable --prefix"
-    OPTS["workbook-get-definition"]="-h --help"
-    OPTS["workbook-list"]="-h --help -f --format -c --column --max-width --quote"
-    OPTS["workbook-update"]="-h --help -f --format -c --column --max-width --variable --prefix"
-    OPTS["workbook-validate"]="-h --help -f --format -c --column --max-width --prefix"
-    OPTS["workflow-create"]="-h --help -f --format -c --column --max-width --quote"
-    OPTS["workflow-delete"]="-h --help"
-    OPTS["workflow-get"]="-h --help -f --format -c --column --max-width --variable --prefix"
-    OPTS["workflow-get-definition"]="-h --help"
-    OPTS["workflow-list"]="-h --help -f --format -c --column --max-width --quote"
-    OPTS["workflow-update"]="-h --help -f --format -c --column --max-width --quote"
-    OPTS["workflow-validate"]="-h --help -f --format -c --column --max-width --prefix"
+	if [ "x$_mistral_opts" == "x" ] ; then
+		mbc="`mistral bash-completion`"
+		_mistral_opts="`echo "$mbc" | sed -e "s/\s-[a-z0-9_-]*//g" -e "s/\s\s*/ /g"`"
+		_mistral_flags="`echo " $mbc" | sed -e "s/ [^-][^-][a-z0-9_-]*//g" -e "s/\s\s*/ /g"`"
+		_mistral_opts_exp="`echo "$_mistral_opts" | sed -e "s/\s/|/g"`"
+	fi
 
-    COMMANDS="${!OPTS[*]}"
-    COMPREPLY=()
-
-    local cur="${COMP_WORDS[COMP_CWORD]}"
-    local prev="${COMP_WORDS[COMP_CWORD-1]}"
-
-    if [[ $cur =~ (\.|\~|\/).* ]] ; then
-        _filedir
-    elif [ $COMP_CWORD == "1" ] ; then
-        COMPREPLY=($(compgen -W "$COMMANDS" -- ${cur}))
-    elif [ $COMP_CWORD == "2" ] ; then
-        COMPREPLY=($(compgen -W "${OPTS[${prev}]}" -- ${cur}))
-    fi
-    return 0
+	if [[ " ${COMP_WORDS[@]} " =~ " "($_mistral_opts_exp)" " && "$prev" != "help" ]] ; then
+		COMPREPLY=($(compgen -W "${_mistral_flags}" -- ${cur}))
+	else
+		COMPREPLY=($(compgen -W "${_mistral_opts}" -- ${cur}))
+	fi
+	return 0
 }
 complete -F _mistral mistral
