@@ -14,8 +14,10 @@
 #    limitations under the License.
 
 import mock
+import six
 
 from mistralclient.api.v2 import workflows
+from mistralclient.commands.v2 import base as cmd_base
 from mistralclient.commands.v2 import workflows as workflow_cmd
 from mistralclient import exceptions as exc
 from mistralclient.tests.unit import base
@@ -53,6 +55,24 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.Create, app_args=['1.txt'])
 
         self.assertEqual([('a', 'a, b', 'param', '1', '1')], result[1])
+
+    @mock.patch('argparse.open', create=True)
+    @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.create')
+    def test_create_long_input(self, mock, mock_open):
+        wf_long_input_dict = WORKFLOW_DICT.copy()
+        long_input = ', '.join(
+            ['var%s' % i for i in six.moves.xrange(10)]
+        )
+        wf_long_input_dict['input'] = long_input
+        workflow_long_input = workflows.Workflow(mock, wf_long_input_dict)
+        mock.return_value = (workflow_long_input,)
+
+        result = self.call(workflow_cmd.Create, app_args=['1.txt'])
+
+        self.assertEqual(
+            [('a', 'a, b', cmd_base.cut(long_input), '1', '1')],
+            result[1]
+        )
 
     @mock.patch('argparse.open', create=True)
     @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.update')
