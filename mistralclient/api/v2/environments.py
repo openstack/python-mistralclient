@@ -50,15 +50,6 @@ class EnvironmentManager(base.ResourceManager):
         name = kwargs.get('name', None)
         self._ensure_not_empty(name=name)
 
-        attrs = kwargs.keys()
-        attrs.remove('name')
-        allowed = ['description', 'variables', 'scope']
-        disallowed = list(set(attrs) - set(allowed))
-
-        if disallowed:
-            raise ValueError('The attributes %s cannot be updated.' %
-                             disallowed)
-
         # Convert dict to text for the variables attribute.
         if kwargs.get('variables') and isinstance(kwargs['variables'], dict):
             kwargs['variables'] = json.dumps(kwargs['variables'])
