@@ -113,7 +113,7 @@ class Create(base.MistralLister):
             raise RuntimeError("Provide action definition file.")
 
     def _get_format_function(self):
-        return format
+        return format_list
 
     def _get_resources(self, parsed_args):
         return actions.ActionManager(self.app.client).create(

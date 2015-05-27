@@ -102,7 +102,7 @@ class Create(base.MistralLister):
         return parser
 
     def _get_format_function(self):
-        return format
+        return format_list
 
     def _validate_parsed_args(self, parsed_args):
         if not parsed_args.definition:
