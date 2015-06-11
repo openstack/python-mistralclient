@@ -49,7 +49,7 @@ def format(action_ex=None, lister=False):
             action_ex.id,
             action_ex.name,
             action_ex.workflow_name,
-            action_ex.task_name,
+            action_ex.task_name if hasattr(action_ex, 'task_name') else None,
             action_ex.state,
             state_info,
             action_ex.accepted,
@@ -58,6 +58,80 @@ def format(action_ex=None, lister=False):
         data = (tuple('<none>' for _ in range(len(columns))),)
 
     return columns, data
+
+
+class Create(show.ShowOne):
+    """Create new Action execution or just run specific action."""
+
+    def produce_output(self, parsed_args, column_names, data):
+        if not column_names:
+            return 0
+
+        return super(Create, self).produce_output(
+            parsed_args,
+            column_names,
+            data
+        )
+
+    def get_parser(self, prog_name):
+        parser = super(Create, self).get_parser(prog_name)
+
+        parser.add_argument(
+            'name',
+            help='Action name to execute.'
+        )
+        parser.add_argument(
+            dest='input',
+            nargs='?',
+            help='Action input.'
+        )
+        parser.add_argument(
+            '-s',
+            '--save-result',
+            dest='save_result',
+            action='store_true',
+            help='Save the result into DB.'
+        )
+        parser.add_argument(
+            '-t',
+            '--target',
+            dest='target',
+            help='Action will be executed on <target> executor.'
+        )
+
+        return parser
+
+    def take_action(self, parsed_args):
+        params = {}
+
+        if parsed_args.save_result:
+            params['save_result'] = parsed_args.save_result
+
+        if parsed_args.target:
+            params['target'] = parsed_args.target
+
+        action_input = None
+
+        if parsed_args.input:
+            try:
+                action_input = json.loads(parsed_args.input)
+            except:
+                action_input = json.load(open(parsed_args.input))
+
+        action_ex = action_executions.ActionExecutionManager(
+            self.app.client
+        ).create(
+            parsed_args.name,
+            action_input,
+            **params
+        )
+
+        if parsed_args.save_result:
+            return format(action_ex)
+        else:
+            self.app.stdout.write("%s\n" % action_ex.output)
+
+            return None, None
 
 
 class List(base.MistralLister):

@@ -51,6 +51,38 @@ ACTION_EX_WITH_INPUT = action_ex.ActionExecution(
 
 class TestCLIActionExecutions(base.BaseCommandTest):
     @mock.patch(
+        'mistralclient.api.v2.action_executions.ActionExecutionManager.create'
+    )
+    def test_create(self, mock):
+        mock.return_value = ACTION_EX_WITH_OUTPUT
+
+        self.call(
+            action_ex_cmd.Create,
+            app_args=['some', '{"output": "Hello!"}']
+        )
+
+        self.app.stdout.write.assert_called_with(
+            json.dumps(ACTION_EX_RESULT) + "\n")
+
+    @mock.patch(
+        'mistralclient.api.v2.action_executions.ActionExecutionManager.create'
+    )
+    def test_create_save_result(self, mock):
+        mock.return_value = ACTION_EX_WITH_OUTPUT
+
+        result = self.call(
+            action_ex_cmd.Create,
+            app_args=[
+                'some', '{"output": "Hello!"}', '--save-result'
+            ]
+        )
+
+        self.assertEqual(
+            ('123', 'some', 'thing', 'task1', 'RUNNING',
+             'RUNNING somehow.', True), result[1]
+        )
+
+    @mock.patch(
         'mistralclient.api.v2.action_executions.ActionExecutionManager.update'
     )
     def test_update(self, mock):
