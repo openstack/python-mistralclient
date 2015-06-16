@@ -180,9 +180,34 @@ class MistralShell(app.App):
             '--os-mistral-url',
             action='store',
             dest='mistral_url',
-            default=c.env('OS_MISTRAL_URL',
-                          default='http://localhost:8989/v2'),
+            default=c.env('OS_MISTRAL_URL'),
             help='Mistral API host (Env: OS_MISTRAL_URL)'
+        )
+        parser.add_argument(
+            '--os-mistral-version',
+            action='store',
+            dest='mistral_version',
+            default=c.env('OS_MISTRAL_VERSION', default='v2'),
+            help='Mistral API version (default = v2) (Env: '
+                 'OS_MISTRAL_VERSION)'
+        )
+        parser.add_argument(
+            '--os-mistral-service-type',
+            action='store',
+            dest='service_type',
+            default=c.env('OS_MISTRAL_SERVICE_TYPE', default='workflowv2'),
+            help='Mistral service-type (should be the same name as in '
+                 'keystone-endpoint) (default = workflowv2) (Env: '
+                 'OS_MISTRAL_SERVICE_TYPE)'
+        )
+        parser.add_argument(
+            '--os-mistral-endpoint-type',
+            action='store',
+            dest='endpoint_type',
+            default=c.env('OS_MISTRAL_ENDPOINT_TYPE', default='publicURL'),
+            help='Mistral endpoint-type (should be the same name as in '
+                 'keystone-endpoint) (default = publicURL) (Env: '
+                 'OS_MISTRAL_ENDPOINT_TYPE)'
         )
         parser.add_argument(
             '--os-username',
@@ -238,7 +263,7 @@ class MistralShell(app.App):
     def initialize_app(self, argv):
         self._clear_shell_commands()
 
-        ver = client.determine_client_version(self.options.mistral_url)
+        ver = client.determine_client_version(self.options.mistral_version)
 
         self._set_shell_commands(self._get_commands(ver))
 
@@ -248,8 +273,8 @@ class MistralShell(app.App):
                                     project_name=self.options.tenant_name,
                                     auth_url=self.options.auth_url,
                                     project_id=self.options.tenant_id,
-                                    endpoint_type='publicURL',
-                                    service_type='workflow',
+                                    endpoint_type=self.options.endpoint_type,
+                                    service_type=self.options.service_type,
                                     auth_token=self.options.token,
                                     cacert=self.options.cacert)
 

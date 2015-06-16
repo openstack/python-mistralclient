@@ -25,9 +25,6 @@ def client(mistral_url=None, username=None, api_key=None,
         if mistral_url and not isinstance(mistral_url, six.string_types):
             raise RuntimeError('Mistral url should be a string.')
 
-        if not mistral_url:
-            mistral_url = "http://localhost:8989/v2"
-
         return client_v2.Client(
             mistral_url=mistral_url,
             username=username,
@@ -43,8 +40,8 @@ def client(mistral_url=None, username=None, api_key=None,
         )
 
 
-def determine_client_version(mistral_url):
-    if mistral_url.find("v2") != -1:
+def determine_client_version(mistral_version):
+    if mistral_version.find("v2") != -1:
         return 2
 
     raise RuntimeError("Can not determine mistral API version")

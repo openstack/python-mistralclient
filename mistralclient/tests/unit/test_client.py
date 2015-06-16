@@ -12,12 +12,21 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import mistralclient.tests.unit.base_shell_test as base
+import mock
+import testtools
+
+from mistralclient.api import client
 
 
-class TestCLIBashCompletionV2(base.BaseShellTests):
-    def test_bash_completion(self):
-        bash_completion, stderr = self.shell('bash-completion')
+class BaseClientTests(testtools.TestCase):
 
-        self.assertIn('bash-completion', bash_completion)
-        self.assertFalse(stderr)
+    @mock.patch('keystoneclient.v3.client.Client')
+    @mock.patch('mistralclient.api.httpclient.HTTPClient')
+    def test_mistral_url_defult(self, mock, keystone_client_mock):
+        client.client(username='mistral',
+                      project_name='misteal',
+                      auth_url="http://localhost:35357/v3")
+        self.assertTrue(mock.called)
+        params = mock.call_args
+        self.assertEqual(params[0][0],
+                         'http://localhost:8989/v2')
