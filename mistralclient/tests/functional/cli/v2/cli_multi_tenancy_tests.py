@@ -351,7 +351,10 @@ class ActionExecutionIsolationCLITests(base_v2.MistralClientTestBase):
 
     def test_action_execution_isolation(self):
         wf = self.workflow_create(self.wf_def)
-        self.execution_create(wf[0]["Name"])
+        wf_exec = self.execution_create(wf[0]["Name"])
+        direct_ex_id = self.get_value_of_field(wf_exec, 'ID')
+
+        self.wait_execution_success(direct_ex_id)
 
         act_execs = self.mistral_admin("action-execution-list")
         self.assertIn(wf[0]["Name"],

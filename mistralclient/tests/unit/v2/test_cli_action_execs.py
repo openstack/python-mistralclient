@@ -26,6 +26,7 @@ ACTION_EX_DICT = {
     'id': '123',
     'name': 'some',
     'workflow_name': 'thing',
+    'task_name': 'task1',
     'state': 'RUNNING',
     'state_info': 'RUNNING somehow.',
     'accepted': True
@@ -59,7 +60,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
                            app_args=['id', '--state', 'ERROR'])
 
         self.assertEqual(
-            ('123', 'some', 'thing', 'RUNNING',
+            ('123', 'some', 'thing', 'task1', 'RUNNING',
              'RUNNING somehow.', True), result[1]
         )
 
@@ -72,7 +73,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
         result = self.call(action_ex_cmd.List)
 
         self.assertEqual(
-            [('123', 'some', 'thing', 'RUNNING',
+            [('123', 'some', 'thing', 'task1', 'RUNNING',
               'RUNNING somehow.', True)], result[1]
         )
 
@@ -85,7 +86,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
         result = self.call(action_ex_cmd.Get, app_args=['id'])
 
         self.assertEqual(
-            ('123', 'some', 'thing', 'RUNNING',
+            ('123', 'some', 'thing', 'task1', 'RUNNING',
              'RUNNING somehow.', True), result[1]
         )
 
