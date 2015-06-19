@@ -35,6 +35,7 @@ def format(execution=None, lister=False):
     columns = (
         'ID',
         'Workflow',
+        'Description',
         'State',
         'State info',
         'Created at',
@@ -49,6 +50,7 @@ def format(execution=None, lister=False):
         data = (
             execution.id,
             execution.workflow_name,
+            execution.description,
             execution.state,
             state_info,
             execution.created_at,
@@ -107,6 +109,13 @@ class Create(show.ShowOne):
             nargs='?',
             help='Workflow additional parameters'
         )
+        parser.add_argument(
+            '-d',
+            '--description',
+            dest='description',
+            default='',
+            help='Execution description'
+        )
 
         return parser
 
@@ -130,6 +139,7 @@ class Create(show.ShowOne):
         execution = executions.ExecutionManager(self.app.client).create(
             parsed_args.workflow_name,
             wf_input,
+            parsed_args.description,
             **params)
 
         return format(execution)
@@ -169,10 +179,20 @@ class Update(show.ShowOne):
             'id',
             help='Execution identifier'
         )
-        parser.add_argument(
-            'state',
+
+        group = parser.add_mutually_exclusive_group(required=True)
+        group.add_argument(
+            '-s',
+            '--state',
+            dest='state',
             choices=['RUNNING', 'PAUSED', 'SUCCESS', 'ERROR'],
             help='Execution state'
+        )
+        group.add_argument(
+            '-d',
+            '--description',
+            dest='description',
+            help='Execution description'
         )
 
         return parser
@@ -180,7 +200,8 @@ class Update(show.ShowOne):
     def take_action(self, parsed_args):
         execution = executions.ExecutionManager(self.app.client).update(
             parsed_args.id,
-            parsed_args.state)
+            parsed_args.state,
+            parsed_args.description)
 
         return format(execution)
 

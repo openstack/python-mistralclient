@@ -24,6 +24,7 @@ from mistralclient.tests.unit import base
 EXECUTION = executions.Execution(mock, {
     'id': '123',
     'workflow_name': 'some',
+    'description': '',
     'state': 'RUNNING',
     'state_info': None,
     'created_at': '1',
@@ -39,7 +40,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         result = self.call(execution_cmd.Create,
                            app_args=['id', '{ "context": true }'])
 
-        self.assertEqual(('123', 'some', 'RUNNING', None,
+        self.assertEqual(('123', 'some', '', 'RUNNING', None,
                           '1', '1'), result[1])
 
     @mock.patch('mistralclient.api.v2.executions.ExecutionManager.create')
@@ -50,7 +51,17 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         result = self.call(execution_cmd.Create,
                            app_args=['id', path])
 
-        self.assertEqual(('123', 'some', 'RUNNING', None,
+        self.assertEqual(('123', 'some', '', 'RUNNING', None,
+                          '1', '1'), result[1])
+
+    @mock.patch('mistralclient.api.v2.executions.ExecutionManager.create')
+    def test_create_with_description(self, mock):
+        mock.return_value = EXECUTION
+
+        result = self.call(execution_cmd.Create,
+                           app_args=['id', '{ "context": true }', '-d', ''])
+
+        self.assertEqual(('123', 'some', '', 'RUNNING', None,
                           '1', '1'), result[1])
 
     @mock.patch('mistralclient.api.v2.executions.ExecutionManager.update')
@@ -58,9 +69,9 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         mock.return_value = EXECUTION
 
         result = self.call(execution_cmd.Update,
-                           app_args=['id', 'SUCCESS'])
+                           app_args=['id', '-s', 'SUCCESS'])
 
-        self.assertEqual(('123', 'some', 'RUNNING', None,
+        self.assertEqual(('123', 'some', '', 'RUNNING', None,
                           '1', '1'), result[1])
 
     @mock.patch('mistralclient.api.v2.executions.ExecutionManager.list')
@@ -69,7 +80,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
 
         result = self.call(execution_cmd.List)
 
-        self.assertEqual([('123', 'some', 'RUNNING', None,
+        self.assertEqual([('123', 'some', '', 'RUNNING', None,
                           '1', '1')], result[1])
 
     @mock.patch('mistralclient.api.v2.executions.ExecutionManager.get')
@@ -78,7 +89,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
 
         result = self.call(execution_cmd.Get, app_args=['id'])
 
-        self.assertEqual(('123', 'some', 'RUNNING', None,
+        self.assertEqual(('123', 'some', '', 'RUNNING', None,
                           '1', '1'), result[1])
 
     @mock.patch('mistralclient.api.v2.executions.ExecutionManager.delete')
