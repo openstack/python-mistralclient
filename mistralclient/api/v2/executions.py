@@ -26,10 +26,14 @@ class Execution(base.Resource):
 class ExecutionManager(base.ResourceManager):
     resource_class = Execution
 
-    def create(self, workflow_name, workflow_input=None, **params):
+    def create(self, workflow_name, workflow_input=None, description='',
+               **params):
         self._ensure_not_empty(workflow_name=workflow_name)
 
-        data = {'workflow_name': workflow_name}
+        data = {
+            'workflow_name': workflow_name,
+            'description': description
+        }
 
         if workflow_input:
             if isinstance(workflow_input, six.string_types):
@@ -51,12 +55,12 @@ class ExecutionManager(base.ResourceManager):
     def create_direct_workflow(self, workflow_name, workflow_input, **params):
         return self.create(workflow_name, workflow_input, **params)
 
-    def update(self, id, state):
-        self._ensure_not_empty(id=id, state=state)
+    def update(self, id, state, description=None):
+        if state:
+            data = {'state': state}
 
-        data = {
-            'state': state
-        }
+        if description:
+            data = ({'description': description})
 
         return self._update('/executions/%s' % id, data)
 

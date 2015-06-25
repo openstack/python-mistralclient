@@ -24,6 +24,7 @@ from mistralclient.tests.unit.v2 import base
 EXEC = {
     'id': "123",
     'workflow_name': 'my_wf',
+    'description': '',
     'state': 'RUNNING',
     'input': {
         "person": {
@@ -43,6 +44,7 @@ class TestExecutionsV2(base.BaseClientV2Test):
         mock = self.mock_http_post(content=EXEC)
         body = {
             'workflow_name': EXEC['workflow_name'],
+            'description': '',
             'input': json.dumps(EXEC['input']),
         }
 

@@ -289,15 +289,19 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
 
     def test_execution_create_delete(self):
         execution = self.mistral_admin(
-            'execution-create', params=self.direct_wf['Name'])
+            'execution-create',
+            params='{0} -d "execution test"'.format(self.direct_wf['Name'])
+        )
         exec_id = self.get_value_of_field(execution, 'ID')
         self.assertTableStruct(execution, ['Field', 'Value'])
 
         wf = self.get_value_of_field(execution, 'Workflow')
         created_at = self.get_value_of_field(execution, 'Created at')
+        description = self.get_value_of_field(execution, 'Description')
 
         self.assertEqual(self.direct_wf['Name'], wf)
         self.assertIsNotNone(created_at)
+        self.assertEqual(description, "execution test")
 
         execs = self.mistral_admin('execution-list')
         self.assertIn(exec_id, [ex['ID'] for ex in execs])
@@ -321,14 +325,25 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
 
         self.assertEqual('RUNNING', status)
 
+        # update execution state
         execution = self.mistral_admin(
-            'execution-update', params='{0} "PAUSED"'.format(exec_id))
+            'execution-update', params='{0} -s PAUSED'.format(exec_id))
 
         updated_exec_id = self.get_value_of_field(execution, 'ID')
         status = self.get_value_of_field(execution, 'State')
 
         self.assertEqual(exec_id, updated_exec_id)
         self.assertEqual('PAUSED', status)
+
+        # update execution description
+        execution = self.mistral_admin(
+            'execution-update',
+            params='{0} -d "execution update test"'.format(exec_id)
+        )
+
+        description = self.get_value_of_field(execution, 'Description')
+
+        self.assertEqual(description, "execution update test")
 
     def test_execution_get(self):
         execution = self.execution_create(self.direct_wf['Name'])
@@ -892,7 +907,16 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
                           'execution-update',
-                          params='%s ERROR' % exec_id)
+                          params='%s -s ERROR' % exec_id)
+
+    def test_ex_update_both_state_and_description(self):
+        wf = self.workflow_create(self.wf_def)
+        execution = self.execution_create(params=wf[0]['Name'])
+        exec_id = self.get_value_of_field(execution, 'ID')
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral_admin,
+                          'execution-update',
+                          params='%s -s ERROR -d update' % exec_id)
 
     def test_ex_delete_nonexistent_execution(self):
         self.assertRaises(exceptions.CommandFailed,
