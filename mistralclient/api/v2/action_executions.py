@@ -12,6 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import json
+
 from mistralclient.api import base
 
 
@@ -21,6 +23,27 @@ class ActionExecution(base.Resource):
 
 class ActionExecutionManager(base.ResourceManager):
     resource_class = ActionExecution
+
+    def create(self, name, input=None, **params):
+        self._ensure_not_empty(name=name)
+
+        data = {'name': name}
+
+        if input:
+            data['input'] = json.dumps(input)
+
+        if params:
+            data['params'] = params
+
+        resp = self.client.http_client.post(
+            '/action_executions',
+            json.dumps(data)
+        )
+
+        if resp.status_code != 201:
+            self._raise_api_exception(resp)
+
+        return self.resource_class(self, base.get_json(resp))
 
     def update(self, id, state=None, output=None):
         self._ensure_not_empty(id=id)

@@ -32,6 +32,25 @@ URL_TEMPLATE_ID = '/action_executions/%s'
 
 
 class TestActionExecutions(base.BaseClientV2Test):
+    def test_create(self):
+        mock = self.mock_http_post(content=ACTION_EXEC)
+        body = {
+            'name': ACTION_EXEC['name']
+        }
+
+        action_execution = self.action_executions.create(
+            'my_action_execution',
+            {}
+        )
+
+        self.assertIsNotNone(action_execution)
+        self.assertEqual(action_executions.ActionExecution(
+            self.action_executions, ACTION_EXEC
+        ).__dict__, action_execution.__dict__)
+
+        mock.assert_called_once_with(
+            URL_TEMPLATE, json.dumps(body))
+
     def test_update(self):
         mock = self.mock_http_put(content=ACTION_EXEC)
         body = {
