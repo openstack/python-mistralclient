@@ -110,7 +110,10 @@ class MistralShell(app.App):
         self._set_shell_commands(self._get_commands_v2())
 
     def configure_logging(self):
-        super(MistralShell, self).configure_logging()
+        log_lvl = logging.DEBUG if self.options.debug else logging.WARNING
+        logging.basicConfig(
+            format="%(levelname)s (%(module)s) %(message)s",
+            level=log_lvl)
         logging.getLogger('iso8601').setLevel(logging.WARNING)
         if self.options.verbose_level <= 1:
             logging.getLogger('requests').setLevel(logging.WARNING)
