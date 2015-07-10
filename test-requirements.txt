@@ -8,4 +8,5 @@ unittest2
 fixtures>=0.3.14
 mock>=1.0
 nose
+tempest-lib>=0.6.1
 testtools>=1.4.0
