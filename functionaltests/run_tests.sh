@@ -27,7 +27,7 @@ export MISTRALCLIENT_DIR="$BASE/new/python-mistralclient"
 
 # Get demo credentials.
 cd ${BASE}/new/devstack
-source openrc demo demo
+source openrc alt_demo alt_demo
 
 export OS_ALT_USERNAME=${OS_USERNAME}
 export OS_ALT_TENANT_NAME=${OS_TENANT_NAME}
