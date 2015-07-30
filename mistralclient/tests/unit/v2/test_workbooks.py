@@ -103,8 +103,8 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         wb = workbook_list[0]
 
         self.assertEqual(
-            workbooks.Workbook(self.workbooks, WORKBOOK).__dict__,
-            wb.__dict__
+            workbooks.Workbook(self.workbooks, WORKBOOK).to_dict(),
+            wb.to_dict()
         )
 
         mock.assert_called_once_with(URL_TEMPLATE)
@@ -116,8 +116,8 @@ class TestWorkbooksV2(base.BaseClientV2Test):
 
         self.assertIsNotNone(wb)
         self.assertEqual(
-            workbooks.Workbook(self.workbooks, WORKBOOK).__dict__,
-            wb.__dict__
+            workbooks.Workbook(self.workbooks, WORKBOOK).to_dict(),
+            wb.to_dict()
         )
 
         mock.assert_called_once_with(URL_TEMPLATE_NAME % 'wb')

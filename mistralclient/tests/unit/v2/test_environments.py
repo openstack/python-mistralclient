@@ -69,8 +69,8 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
         env = environment_list[0]
 
         self.assertDictEqual(
-            environments.Environment(self.environments, ENVIRONMENT).__dict__,
-            env.__dict__
+            environments.Environment(self.environments, ENVIRONMENT).to_dict(),
+            env.to_dict()
         )
 
         mock.assert_called_once_with(URL_TEMPLATE)
@@ -82,8 +82,8 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
 
         self.assertIsNotNone(env)
         self.assertDictEqual(
-            environments.Environment(self.environments, ENVIRONMENT).__dict__,
-            env.__dict__
+            environments.Environment(self.environments, ENVIRONMENT).to_dict(),
+            env.to_dict()
         )
 
         mock.assert_called_once_with(URL_TEMPLATE_NAME % 'env')

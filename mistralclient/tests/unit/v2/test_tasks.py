@@ -41,7 +41,10 @@ class TestTasksV2(base.BaseClientV2Test):
         self.assertEqual(1, len(task_list))
         task = task_list[0]
 
-        self.assertEqual(tasks.Task(self.tasks, TASK).__dict__, task.__dict__)
+        self.assertEqual(
+            tasks.Task(self.tasks, TASK).to_dict(),
+            task.to_dict()
+        )
         mock.assert_called_once_with(URL_TEMPLATE)
 
     def test_get(self):
@@ -49,6 +52,9 @@ class TestTasksV2(base.BaseClientV2Test):
 
         task = self.tasks.get(TASK['id'])
 
-        self.assertEqual(tasks.Task(self.tasks, TASK).__dict__, task.__dict__)
+        self.assertEqual(
+            tasks.Task(self.tasks, TASK).to_dict(),
+            task.to_dict()
+        )
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % TASK['id'])
