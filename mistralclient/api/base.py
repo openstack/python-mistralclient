@@ -29,12 +29,12 @@ class Resource(object):
         self._set_attributes()
 
     def _set_defaults(self):
-        for k, v in self.defaults.iteritems():
+        for k, v in self.defaults.items():
             if k not in self._data:
                 self._data[k] = v
 
     def _set_attributes(self):
-        for k, v in self._data.iteritems():
+        for k, v in self._data.items():
             try:
                 setattr(self, k, v)
             except AttributeError:
@@ -43,7 +43,7 @@ class Resource(object):
 
     def __str__(self):
         vals = ", ".join(["%s='%s'" % (n, v)
-                          for n, v in self._data.iteritems()])
+                          for n, v in self._data.items()])
         return "%s [%s]" % (self.resource_name, vals)
 
 
@@ -71,13 +71,13 @@ class ResourceManager(object):
         return [i for i in self.list() if _check_items(i, kwargs.items())]
 
     def _ensure_not_empty(self, **kwargs):
-        for name, value in kwargs.iteritems():
+        for name, value in kwargs.items():
             if value is None or (isinstance(value, str) and len(value) == 0):
                 raise APIException('%s is missing field "%s"' %
                                    (self.resource_class.__name__, name))
 
     def _copy_if_defined(self, data, **kwargs):
-        for name, value in kwargs.iteritems():
+        for name, value in kwargs.items():
             if value is not None:
                 data[name] = value
 

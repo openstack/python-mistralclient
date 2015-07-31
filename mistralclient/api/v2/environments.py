@@ -14,6 +14,8 @@
 
 import json
 
+import six
+
 from mistralclient.api import base
 
 
@@ -22,8 +24,8 @@ class Environment(base.Resource):
 
     def _set_attributes(self):
         """Override loading of the "variables" attribute from text to dict."""
-        for k, v in self._data.iteritems():
-            if k == 'variables' and isinstance(v, basestring):
+        for k, v in self._data.items():
+            if k == 'variables' and isinstance(v, six.string_types):
                 v = json.loads(v)
 
             try:

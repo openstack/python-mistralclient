@@ -56,7 +56,7 @@ class TestCLIEnvironmentsV2(base.BaseCommandTest):
         mock.return_value = ENVIRONMENT
 
         with tempfile.NamedTemporaryFile() as f:
-            f.write(content)
+            f.write(content.encode('utf-8'))
             f.flush()
             file_path = os.path.abspath(f.name)
             result = self.call(environment_cmd.Create, app_args=[file_path])
@@ -74,7 +74,7 @@ class TestCLIEnvironmentsV2(base.BaseCommandTest):
         mock.return_value = ENVIRONMENT
 
         with tempfile.NamedTemporaryFile() as f:
-            f.write(content)
+            f.write(content.encode('utf-8'))
             f.flush()
             file_path = os.path.abspath(f.name)
             result = self.call(environment_cmd.Update, app_args=[file_path])

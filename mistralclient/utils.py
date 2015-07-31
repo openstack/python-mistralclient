@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import exceptions
+from mistralclient import exceptions
 
 
 def do_action_on_many(action, resources, success_msg, error_msg):

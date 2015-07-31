@@ -128,7 +128,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
     @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.validate')
     def test_validate(self, mock, mock_open):
         mock.return_value = {'valid': True}
-        mock_open.return_value = mock.MagicMock(spec=file)
+        mock_open.return_value = mock.MagicMock(spec=open)
 
         result = self.call(workflow_cmd.Validate, app_args=['wf.yaml'])
 
@@ -139,7 +139,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
     @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.validate')
     def test_validate_failed(self, mock, mock_open):
         mock.return_value = {'valid': False, 'error': 'Invalid DSL...'}
-        mock_open.return_value = mock.MagicMock(spec=file)
+        mock_open.return_value = mock.MagicMock(spec=open)
 
         self.assertRaises(exc.MistralClientException,
                           self.call,

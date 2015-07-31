@@ -41,7 +41,7 @@ class TestCLITriggersV2(base.BaseCommandTest):
     @mock.patch('mistralclient.api.v2.cron_triggers.CronTriggerManager.create')
     def test_create(self, mock, mock_open):
         mock.return_value = TRIGGER
-        mock_open.return_value = mock.MagicMock(spec=file)
+        mock_open.return_value = mock.MagicMock(spec=open)
 
         result = self.call(
             cron_triggers_cmd.Create,

@@ -53,7 +53,7 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
     @mock.patch('mistralclient.api.v2.workbooks.WorkbookManager.create')
     def test_create(self, mock, mock_open):
         mock.return_value = WORKBOOK
-        mock_open.return_value = mock.MagicMock(spec=file)
+        mock_open.return_value = mock.MagicMock(spec=open)
 
         result = self.call(workbook_cmd.Create, app_args=['wb.yaml'])
 
@@ -63,7 +63,7 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
     @mock.patch('mistralclient.api.v2.workbooks.WorkbookManager.update')
     def test_update(self, mock, mock_open):
         mock.return_value = WORKBOOK
-        mock_open.return_value = mock.MagicMock(spec=file)
+        mock_open.return_value = mock.MagicMock(spec=open)
 
         result = self.call(workbook_cmd.Update, app_args=['definition'])
 
@@ -113,7 +113,7 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
     @mock.patch('mistralclient.api.v2.workbooks.WorkbookManager.validate')
     def test_validate(self, mock, mock_open):
         mock.return_value = {'valid': True}
-        mock_open.return_value = mock.MagicMock(spec=file)
+        mock_open.return_value = mock.MagicMock(spec=open)
 
         result = self.call(workbook_cmd.Validate, app_args=['wb.yaml'])
 
@@ -124,7 +124,7 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
     @mock.patch('mistralclient.api.v2.workbooks.WorkbookManager.validate')
     def test_validate_failed(self, mock, mock_open):
         mock.return_value = {'valid': False, 'error': 'Invalid DSL...'}
-        mock_open.return_value = mock.MagicMock(spec=file)
+        mock_open.return_value = mock.MagicMock(spec=open)
 
         self.assertRaises(exc.MistralClientException,
                           self.call,
