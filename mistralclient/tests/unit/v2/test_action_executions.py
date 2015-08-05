@@ -46,7 +46,7 @@ class TestActionExecutions(base.BaseClientV2Test):
         self.assertIsNotNone(action_execution)
         self.assertEqual(action_executions.ActionExecution(
             self.action_executions, ACTION_EXEC
-        ).__dict__, action_execution.__dict__)
+        ).to_dict(), action_execution.to_dict())
 
         mock.assert_called_once_with(
             URL_TEMPLATE, json.dumps(body))
@@ -65,7 +65,7 @@ class TestActionExecutions(base.BaseClientV2Test):
         self.assertIsNotNone(action_execution)
         self.assertEqual(action_executions.ActionExecution(
             self.action_executions, ACTION_EXEC
-        ).__dict__, action_execution.__dict__)
+        ).to_dict(), action_execution.to_dict())
 
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % ACTION_EXEC['id'], json.dumps(body))
@@ -82,7 +82,7 @@ class TestActionExecutions(base.BaseClientV2Test):
 
         self.assertEqual(action_executions.ActionExecution(
             self.action_executions, ACTION_EXEC
-        ).__dict__, action_execution.__dict__)
+        ).to_dict(), action_execution.to_dict())
 
         mock.assert_called_once_with(URL_TEMPLATE)
 
@@ -93,7 +93,7 @@ class TestActionExecutions(base.BaseClientV2Test):
 
         self.assertEqual(action_executions.ActionExecution(
             self.action_executions, ACTION_EXEC
-        ).__dict__, action_execution.__dict__)
+        ).to_dict(), action_execution.to_dict())
 
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % ACTION_EXEC['id'])

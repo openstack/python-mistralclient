@@ -52,8 +52,8 @@ class TestExecutionsV2(base.BaseClientV2Test):
                                     EXEC['input'])
 
         self.assertIsNotNone(ex)
-        self.assertEqual(executions.Execution(self.executions, EXEC).__dict__,
-                         ex.__dict__)
+        self.assertEqual(executions.Execution(self.executions, EXEC).to_dict(),
+                         ex.to_dict())
         mock.assert_called_once_with(URL_TEMPLATE, json.dumps(body))
 
     @unittest2.expectedFailure
@@ -76,8 +76,8 @@ class TestExecutionsV2(base.BaseClientV2Test):
         ex = self.executions.update(EXEC['id'], EXEC['state'])
 
         self.assertIsNotNone(ex)
-        self.assertEqual(executions.Execution(self.executions, EXEC).__dict__,
-                         ex.__dict__)
+        self.assertEqual(executions.Execution(self.executions, EXEC).to_dict(),
+                         ex.to_dict())
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % EXEC['id'], json.dumps(body))
 
@@ -89,8 +89,8 @@ class TestExecutionsV2(base.BaseClientV2Test):
         self.assertEqual(1, len(execution_list))
         ex = execution_list[0]
 
-        self.assertEqual(executions.Execution(self.executions, EXEC).__dict__,
-                         ex.__dict__)
+        self.assertEqual(executions.Execution(self.executions, EXEC).to_dict(),
+                         ex.to_dict())
         mock.assert_called_once_with(URL_TEMPLATE)
 
     def test_get(self):
@@ -98,8 +98,8 @@ class TestExecutionsV2(base.BaseClientV2Test):
 
         ex = self.executions.get(EXEC['id'])
 
-        self.assertEqual(executions.Execution(self.executions, EXEC).__dict__,
-                         ex.__dict__)
+        self.assertEqual(executions.Execution(self.executions, EXEC).to_dict(),
+                         ex.to_dict())
         mock.assert_called_once_with(URL_TEMPLATE_ID % EXEC['id'])
 
     def test_delete(self):
