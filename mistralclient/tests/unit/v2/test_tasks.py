@@ -12,6 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import json
+
 from mistralclient.api.v2 import tasks
 from mistralclient.tests.unit.v2 import base
 
@@ -58,3 +60,33 @@ class TestTasksV2(base.BaseClientV2Test):
         )
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % TASK['id'])
+
+    def test_rerun(self):
+        mock = self.mock_http_put(content=TASK)
+
+        task = self.tasks.rerun(TASK['id'])
+
+        self.assertDictEqual(
+            tasks.Task(self.tasks, TASK).to_dict(),
+            task.to_dict()
+        )
+
+        mock.assert_called_once_with(
+            URL_TEMPLATE_ID % TASK['id'],
+            json.dumps({'reset': True, 'state': 'RUNNING', 'id': TASK['id']})
+        )
+
+    def test_rerun_no_reset(self):
+        mock = self.mock_http_put(content=TASK)
+
+        task = self.tasks.rerun(TASK['id'], reset=False)
+
+        self.assertDictEqual(
+            tasks.Task(self.tasks, TASK).to_dict(),
+            task.to_dict()
+        )
+
+        mock.assert_called_once_with(
+            URL_TEMPLATE_ID % TASK['id'],
+            json.dumps({'reset': False, 'state': 'RUNNING', 'id': TASK['id']})
+        )

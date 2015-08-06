@@ -351,6 +351,7 @@ class MistralShell(app.App):
             'task-get': mistralclient.commands.v2.tasks.Get,
             'task-get-published': mistralclient.commands.v2.tasks.GetPublished,
             'task-get-result': mistralclient.commands.v2.tasks.GetResult,
+            'task-rerun': mistralclient.commands.v2.tasks.Rerun,
             'action-list': mistralclient.commands.v2.actions.List,
             'action-get': mistralclient.commands.v2.actions.Get,
             'action-create': mistralclient.commands.v2.actions.Create,

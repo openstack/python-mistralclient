@@ -1,4 +1,5 @@
 # Copyright 2014 - Mirantis, Inc.
+# Copyright 2015 - StackStorm, Inc.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -134,3 +135,34 @@ class GetPublished(command.Command):
             LOG.debug("Task result is not JSON.")
 
         self.app.stdout.write(result or "\n")
+
+
+class Rerun(show.ShowOne):
+    """Rerun an existing task."""
+
+    def get_parser(self, prog_name):
+        parser = super(Rerun, self).get_parser(prog_name)
+
+        parser.add_argument(
+            'id',
+            help='Task identifier'
+        )
+
+        parser.add_argument(
+            '--resume',
+            action='store_true',
+            dest='resume',
+            default=False,
+            help=('rerun only failed or unstarted action '
+                  'executions for with-items task')
+        )
+
+        return parser
+
+    def take_action(self, parsed_args):
+        execution = tasks.TaskManager(self.app.client).rerun(
+            parsed_args.id,
+            reset=(not parsed_args.resume)
+        )
+
+        return format(execution)

@@ -89,3 +89,21 @@ class TestCLITasksV2(base.BaseCommandTest):
         self.app.stdout.write.assert_called_with(
             json.dumps(TASK_PUBLISHED, indent=4) + "\n"
         )
+
+    @mock.patch('mistralclient.api.v2.tasks.TaskManager.rerun')
+    def test_rerun(self, mock):
+        mock.return_value = TASK
+
+        result = self.call(task_cmd.Rerun, app_args=['id'])
+
+        self.assertEqual(('123', 'some', 'thing', '321', 'RUNNING'),
+                         result[1])
+
+    @mock.patch('mistralclient.api.v2.tasks.TaskManager.rerun')
+    def test_rerun_no_reset(self, mock):
+        mock.return_value = TASK
+
+        result = self.call(task_cmd.Rerun, app_args=['id', '--resume'])
+
+        self.assertEqual(('123', 'some', 'thing', '321', 'RUNNING'),
+                         result[1])

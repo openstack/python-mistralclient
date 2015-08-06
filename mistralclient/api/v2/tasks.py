@@ -1,4 +1,5 @@
 # Copyright 2014 - Mirantis, Inc.
+# Copyright 2015 - StackStorm, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -34,3 +35,14 @@ class TaskManager(base.ResourceManager):
         self._ensure_not_empty(id=id)
 
         return self._get('/tasks/%s' % id)
+
+    def rerun(self, task_ex_id, reset=True):
+        url = '/tasks/%s' % task_ex_id
+
+        body = {
+            'id': task_ex_id,
+            'state': 'RUNNING',
+            'reset': reset
+        }
+
+        return self._update(url, body)
