@@ -58,8 +58,7 @@ class TestTasksV2(base.BaseClientV2Test):
             tasks.Task(self.tasks, TASK).to_dict(),
             task.to_dict()
         )
-        mock.assert_called_once_with(
-            URL_TEMPLATE_ID % TASK['id'])
+        mock.assert_called_once_with(URL_TEMPLATE_ID % TASK['id'])
 
     def test_rerun(self):
         mock = self.mock_http_put(content=TASK)
@@ -71,9 +70,15 @@ class TestTasksV2(base.BaseClientV2Test):
             task.to_dict()
         )
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_ID % TASK['id'],
-            json.dumps({'reset': True, 'state': 'RUNNING', 'id': TASK['id']})
+        self.assertEqual(1, mock.call_count)
+        self.assertEqual(URL_TEMPLATE_ID % TASK['id'], mock.call_args[0][0])
+        self.assertDictEqual(
+            {
+                'reset': True,
+                'state': 'RUNNING',
+                'id': TASK['id']
+            },
+            json.loads(mock.call_args[0][1])
         )
 
     def test_rerun_no_reset(self):
@@ -86,7 +91,13 @@ class TestTasksV2(base.BaseClientV2Test):
             task.to_dict()
         )
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_ID % TASK['id'],
-            json.dumps({'reset': False, 'state': 'RUNNING', 'id': TASK['id']})
+        self.assertEqual(1, mock.call_count)
+        self.assertEqual(URL_TEMPLATE_ID % TASK['id'], mock.call_args[0][0])
+        self.assertDictEqual(
+            {
+                'reset': False,
+                'state': 'RUNNING',
+                'id': TASK['id']
+            },
+            json.loads(mock.call_args[0][1])
         )
