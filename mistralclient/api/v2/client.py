@@ -21,6 +21,7 @@ from mistralclient.api.v2 import actions
 from mistralclient.api.v2 import cron_triggers
 from mistralclient.api.v2 import environments
 from mistralclient.api.v2 import executions
+from mistralclient.api.v2 import services
 from mistralclient.api.v2 import tasks
 from mistralclient.api.v2 import workbooks
 from mistralclient.api.v2 import workflows
@@ -58,6 +59,7 @@ class Client(object):
         self.cron_triggers = cron_triggers.CronTriggerManager(self)
         self.environments = environments.EnvironmentManager(self)
         self.action_executions = action_executions.ActionExecutionManager(self)
+        self.services = services.ServiceManager(self)
 
     def authenticate(self, mistral_url=None, username=None, api_key=None,
                      project_name=None, auth_url=None, project_id=None,
