@@ -144,3 +144,23 @@ class TestCLIActionExecutions(base.BaseCommandTest):
         self.app.stdout.write.assert_called_with(
             json.dumps(ACTION_EX_INPUT, indent=4) + "\n"
         )
+
+    @mock.patch(
+        'mistralclient.api.v2.action_executions.ActionExecutionManager.delete'
+    )
+    def test_delete(self, del_mock):
+        self.call(action_ex_cmd.Delete, app_args=['id'])
+
+        del_mock.assert_called_once_with('id')
+
+    @mock.patch(
+        'mistralclient.api.v2.action_executions.ActionExecutionManager.delete'
+    )
+    def test_delete_with_multi_names(self, del_mock):
+        self.call(action_ex_cmd.Delete, app_args=['id1', 'id2'])
+
+        self.assertEqual(2, del_mock.call_count)
+        self.assertEqual(
+            [mock.call('id1'), mock.call('id2')],
+            del_mock.call_args_list
+        )

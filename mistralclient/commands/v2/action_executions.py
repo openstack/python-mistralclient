@@ -22,6 +22,7 @@ from cliff import show
 
 from mistralclient.api.v2 import action_executions
 from mistralclient.commands.v2 import base
+from mistralclient import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -268,3 +269,30 @@ class GetInput(command.Command):
             LOG.debug("Task result is not JSON.")
 
         self.app.stdout.write(result or "\n")
+
+
+class Delete(command.Command):
+    """Delete action execution."""
+
+    def get_parser(self, prog_name):
+        parser = super(Delete, self).get_parser(prog_name)
+
+        parser.add_argument(
+            'id',
+            nargs='+',
+            help='Id of action execution identifier(s).'
+        )
+
+        return parser
+
+    def take_action(self, parsed_args):
+        action_ex_mgr = action_executions.ActionExecutionManager(
+            self.app.client
+        )
+
+        utils.do_action_on_many(
+            lambda s: action_ex_mgr.delete(s),
+            parsed_args.id,
+            "Request to delete action execution %s has been accepted.",
+            "Unable to delete the specified action execution(s)."
+        )

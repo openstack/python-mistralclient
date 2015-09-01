@@ -339,6 +339,8 @@ class MistralShell(app.App):
             mistralclient.commands.v2.action_executions.GetOutput,
             'action-execution-update':
             mistralclient.commands.v2.action_executions.Update,
+            'action-execution-delete':
+            mistralclient.commands.v2.action_executions.Delete,
             'execution-create': mistralclient.commands.v2.executions.Create,
             'execution-delete': mistralclient.commands.v2.executions.Delete,
             'execution-update': mistralclient.commands.v2.executions.Update,

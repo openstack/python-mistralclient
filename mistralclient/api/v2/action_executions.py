@@ -75,3 +75,8 @@ class ActionExecutionManager(base.ResourceManager):
         self._ensure_not_empty(id=id)
 
         return self._get('/action_executions/%s' % id)
+
+    def delete(self, id):
+        self._ensure_not_empty(id=id)
+
+        self._delete('/action_executions/%s' % id)

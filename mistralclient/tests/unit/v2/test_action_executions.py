@@ -97,3 +97,10 @@ class TestActionExecutions(base.BaseClientV2Test):
 
         mock.assert_called_once_with(
             URL_TEMPLATE_ID % ACTION_EXEC['id'])
+
+    def test_delete(self):
+        mock = self.mock_http_delete(status_code=204)
+
+        self.action_executions.delete(ACTION_EXEC['id'])
+
+        mock.assert_called_once_with(URL_TEMPLATE_ID % ACTION_EXEC['id'])
