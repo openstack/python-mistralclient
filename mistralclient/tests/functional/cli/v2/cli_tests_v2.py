@@ -928,15 +928,6 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
                           'execution-create empty',
                           params=wf[1]['Name'])
 
-    def test_ex_invalid_status_changing(self):
-        wf = self.workflow_create(self.wf_def)
-        execution = self.execution_create(params=wf[0]['Name'])
-        exec_id = self.get_value_of_field(execution, 'ID')
-        self.assertRaises(exceptions.CommandFailed,
-                          self.mistral_admin,
-                          'execution-update',
-                          params='%s -s ERROR' % exec_id)
-
     def test_ex_update_both_state_and_description(self):
         wf = self.workflow_create(self.wf_def)
         execution = self.execution_create(params=wf[0]['Name'])
