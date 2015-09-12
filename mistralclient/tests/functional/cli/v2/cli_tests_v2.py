@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from tempest_lib import decorators
 from tempest_lib import exceptions
 
 from mistralclient.tests.functional.cli import base
@@ -615,23 +614,6 @@ class EnvironmentCLITests(base_v2.MistralClientTestBase):
         self.assertEqual(env_created_at.split('.')[0], updated_env_created_at)
         self.assertIsNotNone(updated_env_updated_at)
 
-    @decorators.skip_because(bug="1418545")
-    def test_environment_update_work_as_create(self):
-        env = self.mistral_admin('environment-update', params='env.yaml')
-        env_name = self.get_value_of_field(env, 'Name')
-        env_desc = self.get_value_of_field(env, 'Description')
-
-        self.assertTableStruct(env, ['Field', 'Value'])
-
-        envs = self.mistral_admin('environment-list')
-        self.assertIn(env_name, [en['Name'] for en in envs])
-        self.assertIn(env_desc, [en['Description'] for en in envs])
-
-        self.mistral_admin('environment-delete', params=env_name)
-
-        envs = self.mistral_admin('environment-list')
-        self.assertNotIn(env_name, [en['Name'] for en in envs])
-
     def test_environment_get(self):
         env = self.environment_create('env.yaml')
         env_name = self.get_value_of_field(env, 'Name')
@@ -1100,6 +1082,15 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
                           self.mistral_admin,
                           'environment-update',
                           params='env')
+
+    def test_env_update_nonexistant_env(self):
+        self.create_file('env.yaml',
+                         'name: env'
+                         'variables:\n  var: "value"')
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral_admin,
+                          'environment-update',
+                          params='env.yaml')
 
     def test_env_create_without_name(self):
         self.create_file('env.yaml',
