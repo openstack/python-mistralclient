@@ -19,6 +19,9 @@ import six
 from mistralclient.api import base
 
 
+urlparse = six.moves.urllib.parse
+
+
 class Execution(base.Resource):
     resource_name = 'Execution'
 
@@ -64,8 +67,28 @@ class ExecutionManager(base.ResourceManager):
 
         return self._update('/executions/%s' % id, data)
 
-    def list(self):
-        return self._list('/executions', response_key='executions')
+    def list(self, marker='', limit=None, sort_keys='', sort_dirs=''):
+        qparams = {}
+
+        if marker:
+            qparams['marker'] = marker
+
+        if limit:
+            qparams['limit'] = limit
+
+        if sort_keys:
+            qparams['sort_keys'] = sort_keys
+
+        if sort_dirs:
+            qparams['sort_dirs'] = sort_dirs
+
+        query_string = ("?%s" % urlparse.urlencode(list(qparams.items()))
+                        if qparams else "")
+
+        return self._list(
+            '/executions%s' % query_string,
+            response_key='executions',
+        )
 
     def get(self, id):
         self._ensure_not_empty(id=id)
