@@ -93,6 +93,24 @@ class TestExecutionsV2(base.BaseClientV2Test):
                          ex.to_dict())
         mock.assert_called_once_with(URL_TEMPLATE)
 
+    def test_list_with_pagination(self):
+        mock = self.mock_http_get(
+            content={'executions': [EXEC], 'next': '/executions?fake'}
+        )
+
+        execution_list = self.executions.list(
+            limit=1,
+            sort_keys='created_at',
+            sort_dirs='asc'
+        )
+
+        self.assertEqual(1, len(execution_list))
+
+        # The url param order is unpredictable.
+        self.assertIn('limit=1', mock.call_args[0][0])
+        self.assertIn('sort_keys=created_at', mock.call_args[0][0])
+        self.assertIn('sort_dirs=asc', mock.call_args[0][0])
+
     def test_get(self):
         mock = self.mock_http_get(content=EXEC)
 
