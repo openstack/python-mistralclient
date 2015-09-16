@@ -22,11 +22,11 @@ class Action(base.Resource):
 class ActionManager(base.ResourceManager):
     resource_class = Action
 
-    def create(self, definition):
+    def create(self, definition, scope='private'):
         self._ensure_not_empty(definition=definition)
 
         resp = self.client.http_client.post(
-            '/actions',
+            '/actions?scope=%s' % scope,
             definition,
             headers={'content-type': 'text/plain'}
         )
@@ -37,11 +37,11 @@ class ActionManager(base.ResourceManager):
         return [self.resource_class(self, resource_data)
                 for resource_data in base.extract_json(resp, 'actions')]
 
-    def update(self, definition):
+    def update(self, definition, scope='private'):
         self._ensure_not_empty(definition=definition)
 
         resp = self.client.http_client.put(
-            '/actions',
+            '/actions?scope=%s' % scope,
             definition,
             headers={'content-type': 'text/plain'}
         )

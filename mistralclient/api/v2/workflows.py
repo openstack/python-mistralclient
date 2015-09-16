@@ -23,11 +23,11 @@ class Workflow(base.Resource):
 class WorkflowManager(base.ResourceManager):
     resource_class = Workflow
 
-    def create(self, definition):
+    def create(self, definition, scope='private'):
         self._ensure_not_empty(definition=definition)
 
         resp = self.client.http_client.post(
-            '/workflows',
+            '/workflows?scope=%s' % scope,
             definition,
             headers={'content-type': 'text/plain'}
         )
@@ -38,11 +38,11 @@ class WorkflowManager(base.ResourceManager):
         return [self.resource_class(self, resource_data)
                 for resource_data in base.extract_json(resp, 'workflows')]
 
-    def update(self, definition):
+    def update(self, definition, scope='private'):
         self._ensure_not_empty(definition=definition)
 
         resp = self.client.http_client.put(
-            '/workflows',
+            '/workflows?scope=%s' % scope,
             definition,
             headers={'content-type': 'text/plain'}
         )

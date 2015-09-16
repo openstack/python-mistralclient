@@ -64,6 +64,23 @@ class TestCLIActionsV2(base.BaseCommandTest):
 
     @mock.patch('argparse.open', create=True)
     @mock.patch('mistralclient.api.v2.actions.ActionManager.create')
+    def test_create_public(self, mock, mock_open):
+        mock.return_value = (ACTION,)
+
+        result = self.call(
+            action_cmd.Create,
+            app_args=['1.txt', '--public']
+        )
+
+        self.assertEqual(
+            [('a', True, "param1", 'My cool action', 'test', '1', '1')],
+            result[1]
+        )
+
+        self.assertEqual('public', mock.call_args[1]['scope'])
+
+    @mock.patch('argparse.open', create=True)
+    @mock.patch('mistralclient.api.v2.actions.ActionManager.create')
     def test_create_long_input(self, mock, mock_open):
         action_long_input_dict = ACTION_DICT.copy()
         long_input = ', '.join(
@@ -92,6 +109,23 @@ class TestCLIActionsV2(base.BaseCommandTest):
             [('a', True, "param1", 'My cool action', 'test', '1', '1')],
             result[1]
         )
+
+    @mock.patch('argparse.open', create=True)
+    @mock.patch('mistralclient.api.v2.actions.ActionManager.update')
+    def test_update_public(self, mock, mock_open):
+        mock.return_value = (ACTION,)
+
+        result = self.call(
+            action_cmd.Update,
+            app_args=['my_action.yaml', '--public']
+        )
+
+        self.assertEqual(
+            [('a', True, "param1", 'My cool action', 'test', '1', '1')],
+            result[1]
+        )
+
+        self.assertEqual('public', mock.call_args[1]['scope'])
 
     @mock.patch('mistralclient.api.v2.actions.ActionManager.list')
     def test_list(self, mock):

@@ -58,6 +58,20 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
 
     @mock.patch('argparse.open', create=True)
     @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.create')
+    def test_create_public(self, mock, mock_open):
+        mock.return_value = (WORKFLOW,)
+
+        result = self.call(
+            workflow_cmd.Create,
+            app_args=['1.txt', '--public']
+        )
+
+        self.assertEqual([('a', 'a, b', 'param', '1', '1')], result[1])
+
+        self.assertEqual('public', mock.call_args[1]['scope'])
+
+    @mock.patch('argparse.open', create=True)
+    @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.create')
     def test_create_long_input(self, mock, mock_open):
         wf_long_input_dict = WORKFLOW_DICT.copy()
         long_input = ', '.join(
@@ -82,6 +96,20 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.Update, app_args=['1.txt'])
 
         self.assertEqual([('a', 'a, b', 'param', '1', '1')], result[1])
+
+    @mock.patch('argparse.open', create=True)
+    @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.update')
+    def test_update_public(self, mock, mock_open):
+        mock.return_value = (WORKFLOW,)
+
+        result = self.call(
+            workflow_cmd.Update,
+            app_args=['1.txt', '--public']
+        )
+
+        self.assertEqual([('a', 'a, b', 'param', '1', '1')], result[1])
+
+        self.assertEqual('public', mock.call_args[1]['scope'])
 
     @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.list')
     def test_list(self, mock):

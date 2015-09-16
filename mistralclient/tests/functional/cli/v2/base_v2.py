@@ -92,29 +92,47 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
 
         return wb
 
-    def workflow_create(self, wf_def, admin=True):
+    def workflow_create(self, wf_def, admin=True, scope='private'):
+        params = '{0}'.format(wf_def)
+
+        if scope == 'public':
+            params += ' --public'
+
         wf = self.mistral_cli(
             admin,
             'workflow-create',
-            params='{0}'.format(wf_def))
+            params=params
+        )
+
         for workflow in wf:
-            self.addCleanup(self.mistral_cli,
-                            admin,
-                            'workflow-delete',
-                            params=workflow['Name'])
+            self.addCleanup(
+                self.mistral_cli,
+                admin,
+                'workflow-delete',
+                params=workflow['Name']
+            )
 
         return wf
 
-    def action_create(self, act_def, admin=True):
+    def action_create(self, act_def, admin=True, scope='private'):
+        params = '{0}'.format(act_def)
+
+        if scope == 'public':
+            params += ' --public'
+
         acts = self.mistral_cli(
             admin,
             'action-create',
-            params='{0}'.format(act_def))
+            params=params
+        )
+
         for action in acts:
-            self.addCleanup(self.mistral_cli,
-                            admin,
-                            'action-delete',
-                            params=action['Name'])
+            self.addCleanup(
+                self.mistral_cli,
+                admin,
+                'action-delete',
+                params=action['Name']
+            )
 
         return acts
 

@@ -156,6 +156,19 @@ class WorkflowIsolationCLITests(base_v2.MistralClientTestBase):
             params=wf[0]["Name"]
         )
 
+    def test_create_public_workflow(self):
+        wf = self.workflow_create(self.wf_def, scope='public')
+
+        same_wf = self.mistral_alt_user(
+            "workflow-get",
+            params=wf[0]["Name"]
+        )
+
+        self.assertEqual(
+            wf[0]["Name"],
+            self.get_value_of_field(same_wf, "Name")
+        )
+
     def test_delete_wf_from_another_tenant(self):
         wf = self.workflow_create(self.wf_def)
 
@@ -216,6 +229,19 @@ class ActionIsolationCLITests(base_v2.MistralClientTestBase):
             self.mistral_alt_user,
             "action-delete",
             params=act[0]["Name"]
+        )
+
+    def test_create_public_action(self):
+        act = self.action_create(self.act_def, scope='public')
+
+        same_act = self.mistral_alt_user(
+            "action-get",
+            params=act[0]["Name"]
+        )
+
+        self.assertEqual(
+            act[0]["Name"],
+            self.get_value_of_field(same_act, "Name")
         )
 
 

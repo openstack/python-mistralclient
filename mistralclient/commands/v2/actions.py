@@ -105,6 +105,11 @@ class Create(base.MistralLister):
             type=argparse.FileType('r'),
             help='Action definition file'
         )
+        parser.add_argument(
+            '--public',
+            action='store_true',
+            help='With this flag action will be marked as "public".'
+        )
 
         return parser
 
@@ -116,8 +121,12 @@ class Create(base.MistralLister):
         return format_list
 
     def _get_resources(self, parsed_args):
+        scope = 'public' if parsed_args.public else 'private'
+
         return actions.ActionManager(self.app.client).create(
-            parsed_args.definition.read())
+            parsed_args.definition.read(),
+            scope=scope
+        )
 
 
 class Delete(command.Command):
@@ -151,6 +160,11 @@ class Update(base.MistralLister):
             type=argparse.FileType('r'),
             help='Action definition file'
         )
+        parser.add_argument(
+            '--public',
+            action='store_true',
+            help='With this flag action will be marked as "public".'
+        )
 
         return parser
 
@@ -158,8 +172,12 @@ class Update(base.MistralLister):
         return format
 
     def _get_resources(self, parsed_args):
+        scope = 'public' if parsed_args.public else 'private'
+
         return actions.ActionManager(self.app.client).update(
-            parsed_args.definition.read())
+            parsed_args.definition.read(),
+            scope=scope
+        )
 
 
 class GetDefinition(command.Command):
