@@ -252,7 +252,7 @@ class MistralShell(app.App):
             '--os-auth-url',
             action='store',
             dest='auth_url',
-            default=c.env('OS_AUTH_URL'),
+            default=c.env('OS_AUTH_URL', default='http://localhost:35357/v3'),
             help='Authentication URL (Env: OS_AUTH_URL)'
         )
         parser.add_argument(
@@ -270,6 +270,12 @@ class MistralShell(app.App):
         ver = client.determine_client_version(self.options.mistral_version)
 
         self._set_shell_commands(self._get_commands(ver))
+
+        do_help = ('help' in argv) or ('-h' in argv) or not argv
+
+        # bash-completion should not require authentification.
+        if do_help or ('bash-completion' in argv):
+            self.options.auth_url = None
 
         self.client = client.client(mistral_url=self.options.mistral_url,
                                     username=self.options.username,
