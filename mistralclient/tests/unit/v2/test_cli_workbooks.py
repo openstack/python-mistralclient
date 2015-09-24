@@ -17,7 +17,6 @@ import mock
 
 from mistralclient.api.v2 import workbooks
 from mistralclient.commands.v2 import workbooks as workbook_cmd
-from mistralclient import exceptions as exc
 from mistralclient.tests.unit import base
 
 
@@ -117,8 +116,7 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
 
         result = self.call(workbook_cmd.Validate, app_args=['wb.yaml'])
 
-        self.assertEqual(result[0], tuple())
-        self.assertEqual(result[1], tuple())
+        self.assertEqual(result[1], (True, None))
 
     @mock.patch('argparse.open', create=True)
     @mock.patch('mistralclient.api.v2.workbooks.WorkbookManager.validate')
@@ -126,7 +124,6 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
         mock.return_value = {'valid': False, 'error': 'Invalid DSL...'}
         mock_open.return_value = mock.MagicMock(spec=open)
 
-        self.assertRaises(exc.MistralClientException,
-                          self.call,
-                          workbook_cmd.Validate,
-                          app_args=['wb.yaml'])
+        result = self.call(workbook_cmd.Validate, app_args=['wb.yaml'])
+
+        self.assertEqual(result[1], (False, 'Invalid DSL...'))

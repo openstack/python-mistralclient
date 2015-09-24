@@ -183,6 +183,27 @@ class WorkbookCLITests(base_v2.MistralClientTestBase):
             'workbook-get-definition', params=wb_name)
         self.assertNotIn('404 Not Found', definition)
 
+    def test_workbook_validate_with_valid_def(self):
+        wb = self.mistral_admin(
+            'workbook-validate', params=self.wb_def)
+        wb_valid = self.get_value_of_field(wb, 'Valid')
+        wb_error = self.get_value_of_field(wb, 'Error')
+
+        self.assertEqual('True', wb_valid)
+        self.assertEqual('None', wb_error)
+
+    def test_workbook_validate_with_invalid_def(self):
+        self.create_file('wb.yaml',
+                         'name: wb\n')
+        wb = self.mistral_admin(
+            'workbook-validate', params='wb.yaml')
+
+        wb_valid = self.get_value_of_field(wb, 'Valid')
+        wb_error = self.get_value_of_field(wb, 'Error')
+
+        self.assertEqual('False', wb_valid)
+        self.assertNotEqual('None', wb_error)
+
 
 class WorkflowCLITests(base_v2.MistralClientTestBase):
     """Test suite checks commands to work with workflows."""
@@ -268,6 +289,27 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
         definition = self.mistral_admin(
             'workflow-get-definition', params=wf_name)
         self.assertNotIn('404 Not Found', definition)
+
+    def test_workflow_validate_with_valid_def(self):
+        wf = self.mistral_admin(
+            'workflow-validate', params=self.wf_def)
+        wf_valid = self.get_value_of_field(wf, 'Valid')
+        wf_error = self.get_value_of_field(wf, 'Error')
+
+        self.assertEqual('True', wf_valid)
+        self.assertEqual('None', wf_error)
+
+    def test_workflow_validate_with_invalid_def(self):
+        self.create_file('wf.yaml',
+                         'name: wf\n')
+        wf = self.mistral_admin(
+            'workflow-validate', params='wf.yaml')
+
+        wf_valid = self.get_value_of_field(wf, 'Valid')
+        wf_error = self.get_value_of_field(wf, 'Error')
+
+        self.assertEqual('False', wf_valid)
+        self.assertNotEqual('None', wf_error)
 
 
 class ExecutionCLITests(base_v2.MistralClientTestBase):
