@@ -66,9 +66,14 @@ def format(environment=None):
     )
 
     if environment:
-        data = (
-            environment.name,
-            environment.description,
+        data = (environment.name,)
+
+        if hasattr(environment, 'description'):
+            data += (environment.description or '<none>',)
+        else:
+            data += (None,)
+
+        data += (
             json.dumps(environment.variables, indent=4),
             environment.scope,
             environment.created_at,

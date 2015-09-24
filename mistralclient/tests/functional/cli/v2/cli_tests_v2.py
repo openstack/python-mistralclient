@@ -585,6 +585,29 @@ class EnvironmentCLITests(base_v2.MistralClientTestBase):
         envs = self.mistral_admin('environment-list')
         self.assertNotIn(env_name, [en['Name'] for en in envs])
 
+    def test_environment_create_without_description(self):
+        self.create_file('env_without_des.yaml',
+                         'name: env\n'
+                         'variables:\n'
+                         '  var: "value"')
+
+        env = self.mistral_admin('environment-create',
+                                 params='env_without_des.yaml')
+
+        env_name = self.get_value_of_field(env, 'Name')
+        env_desc = self.get_value_of_field(env, 'Description')
+
+        self.assertTableStruct(env, ['Field', 'Value'])
+
+        envs = self.mistral_admin('environment-list')
+        self.assertIn(env_name, [en['Name'] for en in envs])
+        self.assertIn(env_desc, 'None')
+
+        self.mistral_admin('environment-delete', params='env')
+
+        envs = self.mistral_admin('environment-list')
+        self.assertNotIn(env_name, [en['Name'] for en in envs])
+
     def test_environment_update(self):
         env = self.environment_create('env.yaml')
         env_name = self.get_value_of_field(env, 'Name')
