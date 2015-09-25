@@ -116,7 +116,7 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
 
         result = self.call(workbook_cmd.Validate, app_args=['wb.yaml'])
 
-        self.assertEqual(result[1], (True, None))
+        self.assertEqual((True, None), result[1])
 
     @mock.patch('argparse.open', create=True)
     @mock.patch('mistralclient.api.v2.workbooks.WorkbookManager.validate')

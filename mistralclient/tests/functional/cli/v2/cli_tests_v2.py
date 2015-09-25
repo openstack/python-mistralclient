@@ -343,7 +343,7 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
 
         self.assertEqual(self.direct_wf['Name'], wf)
         self.assertIsNotNone(created_at)
-        self.assertEqual(description, "execution test")
+        self.assertEqual("execution test", description)
 
         execs = self.mistral_admin('execution-list')
         self.assertIn(exec_id, [ex['ID'] for ex in execs])
@@ -385,7 +385,7 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
 
         description = self.get_value_of_field(execution, 'Description')
 
-        self.assertEqual(description, "execution update test")
+        self.assertEqual("execution update test", description)
 
     def test_execution_get(self):
         execution = self.execution_create(self.direct_wf['Name'])
@@ -540,14 +540,14 @@ class ActionCLITests(base_v2.MistralClientTestBase):
         action_2 = self.get_item_info(
             get_from=init_acts, get_by='Name', value='farewell')
 
-        self.assertEqual(action_1['Tags'], '<none>')
-        self.assertEqual(action_2['Tags'], '<none>')
+        self.assertEqual('<none>', action_1['Tags'])
+        self.assertEqual('<none>', action_2['Tags'])
 
-        self.assertEqual(action_1['Is system'], 'False')
-        self.assertEqual(action_2['Is system'], 'False')
+        self.assertEqual('False', action_1['Is system'])
+        self.assertEqual('False', action_2['Is system'])
 
-        self.assertEqual(action_1['Input'], 'name')
-        self.assertEqual(action_2['Input'], 'None')
+        self.assertEqual('name', action_1['Input'])
+        self.assertEqual('None', action_2['Input'])
 
         acts = self.mistral_admin('action-list')
         self.assertIn(action_1['Name'], [action['Name'] for action in acts])
@@ -584,7 +584,7 @@ class ActionCLITests(base_v2.MistralClientTestBase):
         updated_action = self.get_item_info(
             get_from=acts, get_by='Name', value='greeting')
 
-        self.assertEqual(updated_action['Tags'], 'tag, tag1')
+        self.assertEqual('tag, tag1', updated_action['Tags'])
         self.assertEqual(created_action['Created at'].split(".")[0],
                          updated_action['Created at'])
         self.assertEqual(created_action['Name'], updated_action['Name'])
@@ -635,7 +635,7 @@ class EnvironmentCLITests(base_v2.MistralClientTestBase):
         env_updated_at = self.get_value_of_field(env, 'Updated at')
 
         self.assertIsNotNone(env_created_at)
-        self.assertEqual(env_updated_at, 'None')
+        self.assertEqual('None', env_updated_at)
 
         self.create_file('env_upd.yaml',
                          'name: env\n'
@@ -653,7 +653,7 @@ class EnvironmentCLITests(base_v2.MistralClientTestBase):
 
         self.assertEqual(env_name, updated_env_name)
         self.assertNotEqual(env_desc, updated_env_desc)
-        self.assertEqual(updated_env_desc, 'Updated env')
+        self.assertEqual('Updated env', updated_env_desc)
         self.assertEqual(env_created_at.split('.')[0], updated_env_created_at)
         self.assertIsNotNone(updated_env_updated_at)
 
@@ -719,8 +719,8 @@ class ActionExecutionCLITests(base_v2.MistralClientTestBase):
             act_ex_from_list['ID'],
             self.get_value_of_field(act_ex, 'ID')
         )
-        self.assertEqual(wf_name, self.direct_wf['Name'])
-        self.assertEqual(status, 'SUCCESS')
+        self.assertEqual(self.direct_wf['Name'], wf_name)
+        self.assertEqual('SUCCESS', status)
 
     def test_act_execution_create_delete(self):
         action_ex = self.mistral_admin(
