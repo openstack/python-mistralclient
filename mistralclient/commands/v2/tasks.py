@@ -27,22 +27,31 @@ from mistralclient.commands.v2 import base
 LOG = logging.getLogger(__name__)
 
 
-def format(task=None):
+def format_list(task=None):
+    return format(task, lister=True)
+
+
+def format(task=None, lister=False):
     columns = (
         'ID',
         'Name',
         'Workflow name',
         'Execution ID',
         'State',
+        'State info'
     )
 
     if task:
+        state_info = (task.state_info if not lister
+                      else base.cut(task.state_info))
+
         data = (
             task.id,
             task.name,
             task.workflow_name,
             task.workflow_execution_id,
             task.state,
+            state_info
         )
     else:
         data = (tuple('<none>' for _ in range(len(columns))),)
@@ -63,7 +72,7 @@ class List(base.MistralLister):
         return parser
 
     def _get_format_function(self):
-        return format
+        return format_list
 
     def _get_resources(self, parsed_args):
         return tasks.TaskManager(self.app.client).list(
@@ -77,9 +86,8 @@ class Get(show.ShowOne):
     def get_parser(self, prog_name):
         parser = super(Get, self).get_parser(prog_name)
 
-        parser.add_argument(
-            'id',
-            help='Task identifier')
+        parser.add_argument('id', help='Task identifier')
+
         return parser
 
     def take_action(self, parsed_args):
