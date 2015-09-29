@@ -28,6 +28,7 @@ TASK_DICT = {
     'workflow_name': 'thing',
     'workflow_execution_id': '321',
     'state': 'RUNNING',
+    'state_info': None
 }
 
 TASK_RESULT = {"test": "is", "passed": "successfully"}
@@ -42,6 +43,8 @@ TASK = tasks.Task(mock, TASK_DICT)
 TASK_WITH_RESULT = tasks.Task(mock, TASK_WITH_RESULT_DICT)
 TASK_WITH_PUBLISHED = tasks.Task(mock, TASK_WITH_PUBLISHED_DICT)
 
+EXPECTED_TASK_RESULT = ('123', 'some', 'thing', '321', 'RUNNING', None)
+
 
 class TestCLITasksV2(base.BaseCommandTest):
     @mock.patch('mistralclient.api.v2.tasks.TaskManager.list')
@@ -50,8 +53,7 @@ class TestCLITasksV2(base.BaseCommandTest):
 
         result = self.call(task_cmd.List)
 
-        self.assertEqual([('123', 'some', 'thing', '321', 'RUNNING')],
-                         result[1])
+        self.assertEqual([EXPECTED_TASK_RESULT], result[1])
 
     @mock.patch('mistralclient.api.v2.tasks.TaskManager.list')
     def test_list_with_workflow_execution(self, mock):
@@ -59,8 +61,7 @@ class TestCLITasksV2(base.BaseCommandTest):
 
         result = self.call(task_cmd.List, app_args=['workflow_execution'])
 
-        self.assertEqual([('123', 'some', 'thing', '321', 'RUNNING')],
-                         result[1])
+        self.assertEqual([EXPECTED_TASK_RESULT], result[1])
 
     @mock.patch('mistralclient.api.v2.tasks.TaskManager.get')
     def test_get(self, mock):
@@ -68,8 +69,7 @@ class TestCLITasksV2(base.BaseCommandTest):
 
         result = self.call(task_cmd.Get, app_args=['id'])
 
-        self.assertEqual(('123', 'some', 'thing', '321', 'RUNNING'),
-                         result[1])
+        self.assertEqual(EXPECTED_TASK_RESULT, result[1])
 
     @mock.patch('mistralclient.api.v2.tasks.TaskManager.get')
     def test_get_result(self, mock):
@@ -96,8 +96,7 @@ class TestCLITasksV2(base.BaseCommandTest):
 
         result = self.call(task_cmd.Rerun, app_args=['id'])
 
-        self.assertEqual(('123', 'some', 'thing', '321', 'RUNNING'),
-                         result[1])
+        self.assertEqual(EXPECTED_TASK_RESULT, result[1])
 
     @mock.patch('mistralclient.api.v2.tasks.TaskManager.rerun')
     def test_rerun_no_reset(self, mock):
@@ -105,5 +104,4 @@ class TestCLITasksV2(base.BaseCommandTest):
 
         result = self.call(task_cmd.Rerun, app_args=['id', '--resume'])
 
-        self.assertEqual(('123', 'some', 'thing', '321', 'RUNNING'),
-                         result[1])
+        self.assertEqual(EXPECTED_TASK_RESULT, result[1])
