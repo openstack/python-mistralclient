@@ -159,7 +159,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
 
         result = self.call(workflow_cmd.Validate, app_args=['wf.yaml'])
 
-        self.assertEqual(result[1], (True, None))
+        self.assertEqual((True, None), result[1])
 
     @mock.patch('argparse.open', create=True)
     @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.validate')

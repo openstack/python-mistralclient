@@ -26,7 +26,7 @@ class TestShell(base.BaseShellTests):
         )
         self.assertTrue(mock.called)
         params = mock.call_args
-        self.assertEqual(params[1]['mistral_url'], '')
+        self.assertEqual('', params[1]['mistral_url'])
 
     @mock.patch('mistralclient.api.client.client')
     def test_command_with_mistral_url(self, mock):
@@ -35,8 +35,8 @@ class TestShell(base.BaseShellTests):
         )
         self.assertTrue(mock.called)
         params = mock.call_args
-        self.assertEqual(params[1]['mistral_url'],
-                         'http://localhost:8989/v2')
+        self.assertEqual('http://localhost:8989/v2',
+                         params[1]['mistral_url'])
 
     @mock.patch('mistralclient.api.client.determine_client_version')
     def test_mistral_version(self, mock):
@@ -45,39 +45,39 @@ class TestShell(base.BaseShellTests):
         )
         self.assertTrue(mock.called)
         mistral_version = mock.call_args
-        self.assertEqual(mistral_version[0][0], 'v1')
+        self.assertEqual('v1', mistral_version[0][0])
 
     @mock.patch('mistralclient.api.client.determine_client_version')
     def test_no_mistral_version(self, mock):
         self.shell('workbook-list')
         self.assertTrue(mock.called)
         mistral_version = mock.call_args
-        self.assertEqual(mistral_version[0][0], 'v2')
+        self.assertEqual('v2', mistral_version[0][0])
 
     @mock.patch('mistralclient.api.client.client')
     def test_service_type(self, mock):
         self.shell('--os-mistral-service-type=test workbook-list')
         self.assertTrue(mock.called)
         parmters = mock.call_args
-        self.assertEqual(parmters[1]['service_type'], 'test')
+        self.assertEqual('test', parmters[1]['service_type'])
 
     @mock.patch('mistralclient.api.client.client')
     def test_no_service_type(self, mock):
         self.shell('workbook-list')
         self.assertTrue(mock.called)
         params = mock.call_args
-        self.assertEqual(params[1]['service_type'], 'workflowv2')
+        self.assertEqual('workflowv2', params[1]['service_type'])
 
     @mock.patch('mistralclient.api.client.client')
     def test_endpoint_type(self, mock):
         self.shell('--os-mistral-endpoint-type=adminURL workbook-list')
         self.assertTrue(mock.called)
         params = mock.call_args
-        self.assertEqual(params[1]['endpoint_type'], 'adminURL')
+        self.assertEqual('adminURL', params[1]['endpoint_type'])
 
     @mock.patch('mistralclient.api.client.client')
     def test_no_endpoint_type(self, mock):
         self.shell('workbook-list')
         self.assertTrue(mock.called)
         params = mock.call_args
-        self.assertEqual(params[1]['endpoint_type'], 'publicURL')
+        self.assertEqual('publicURL', params[1]['endpoint_type'])

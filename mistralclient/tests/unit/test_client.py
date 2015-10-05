@@ -28,5 +28,5 @@ class BaseClientTests(testtools.TestCase):
                       auth_url="http://localhost:35357/v3")
         self.assertTrue(mock.called)
         params = mock.call_args
-        self.assertEqual(params[0][0],
-                         'http://localhost:8989/v2')
+        self.assertEqual('http://localhost:8989/v2',
+                         params[0][0])
