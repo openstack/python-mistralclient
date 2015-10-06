@@ -1118,6 +1118,12 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
                           self.mistral_admin,
                           'environment-get')
 
+    def test_env_get_nonexistent(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral_admin,
+                          'environment-get',
+                          params='nonexist')
+
     def test_env_create_same_name(self):
         self.create_file('env.yaml',
                          'name: env\n'
@@ -1126,6 +1132,12 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
                          '  var: "value"')
 
         self.environment_create('env.yaml')
+        self.assertRaises(exceptions.CommandFailed,
+                          self.environment_create,
+                          'env.yaml')
+
+    def test_env_create_empty(self):
+        self.create_file('env.yaml')
         self.assertRaises(exceptions.CommandFailed,
                           self.environment_create,
                           'env.yaml')
@@ -1143,6 +1155,13 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
                           params='env')
 
     def test_env_update_wrong_path_to_def(self):
+        self.assertRaises(exceptions.CommandFailed,
+                          self.mistral_admin,
+                          'environment-update',
+                          params='env')
+
+    def test_env_update_empty(self):
+        self.create_file('env.yaml')
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
                           'environment-update',
