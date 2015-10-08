@@ -224,7 +224,7 @@ class MistralShell(app.App):
             '--os-password',
             action='store',
             dest='password',
-            default=c.env('OS_PASSWORD', default='openstack'),
+            default=c.env('OS_PASSWORD'),
             help='Authentication password (Env: OS_PASSWORD)'
         )
         parser.add_argument(
@@ -252,7 +252,7 @@ class MistralShell(app.App):
             '--os-auth-url',
             action='store',
             dest='auth_url',
-            default=c.env('OS_AUTH_URL', default='http://localhost:35357/v3'),
+            default=c.env('OS_AUTH_URL'),
             help='Authentication URL (Env: OS_AUTH_URL)'
         )
         parser.add_argument(
@@ -272,6 +272,13 @@ class MistralShell(app.App):
         self._set_shell_commands(self._get_commands(ver))
 
         do_help = ('help' in argv) or ('-h' in argv) or not argv
+
+        # Set default for auth_url if not supplied. The default is not
+        # set at the parser to support use cases where auth is not enabled.
+        # An example use case would be a developer's environment.
+        if not self.options.auth_url:
+            if self.options.password or self.options.token:
+                self.options.auth_url = 'http://localhost:35357/v3'
 
         # bash-completion should not require authentification.
         if do_help or ('bash-completion' in argv):
