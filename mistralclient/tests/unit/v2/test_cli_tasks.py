@@ -77,8 +77,10 @@ class TestCLITasksV2(base.BaseCommandTest):
 
         self.call(task_cmd.GetResult, app_args=['id'])
 
-        self.app.stdout.write.assert_called_with(
-            json.dumps(TASK_RESULT, indent=4) + "\n")
+        self.assertDictEqual(
+            TASK_RESULT,
+            json.loads(self.app.stdout.write.call_args[0][0])
+        )
 
     @mock.patch('mistralclient.api.v2.tasks.TaskManager.get')
     def test_get_published(self, mock):
@@ -86,8 +88,9 @@ class TestCLITasksV2(base.BaseCommandTest):
 
         self.call(task_cmd.GetPublished, app_args=['id'])
 
-        self.app.stdout.write.assert_called_with(
-            json.dumps(TASK_PUBLISHED, indent=4) + "\n"
+        self.assertDictEqual(
+            TASK_PUBLISHED,
+            json.loads(self.app.stdout.write.call_args[0][0])
         )
 
     @mock.patch('mistralclient.api.v2.tasks.TaskManager.rerun')
