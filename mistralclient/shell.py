@@ -103,7 +103,7 @@ class MistralShell(app.App):
     def __init__(self):
         super(MistralShell, self).__init__(
             description=__doc__.strip(),
-            version='0.1',
+            version=mistralclient.__version__,
             command_manager=commandmanager.CommandManager('mistral.cli'),
         )
 
