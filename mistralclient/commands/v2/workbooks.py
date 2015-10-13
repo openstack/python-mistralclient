@@ -21,7 +21,6 @@ from cliff import show
 
 from mistralclient.api.v2 import workbooks
 from mistralclient.commands.v2 import base
-from mistralclient import exceptions as exc
 from mistralclient import utils
 
 
@@ -166,6 +165,20 @@ class GetDefinition(command.Command):
 class Validate(show.ShowOne):
     """Validate workbook."""
 
+    def _format(self, result=None):
+        columns = ('Valid', 'Error')
+
+        if result:
+            data = (result.get('valid'),)
+            if not result.get('error'):
+                data += (None,)
+            else:
+                data += (result.get('error'),)
+        else:
+            data = (tuple('<none>' for _ in range(len(columns))),)
+
+        return columns, data
+
     def get_parser(self, prog_name):
         parser = super(Validate, self).get_parser(prog_name)
 
@@ -181,8 +194,4 @@ class Validate(show.ShowOne):
         result = workbooks.WorkbookManager(self.app.client).validate(
             parsed_args.definition.read())
 
-        if not result.get('valid', None):
-            raise exc.MistralClientException(
-                result.get('error', 'Unknown exception.'))
-
-        return tuple(), tuple()
+        return self._format(result)
