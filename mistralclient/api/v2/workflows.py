@@ -13,7 +13,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import six
+
 from mistralclient.api import base
+
+
+urlparse = six.moves.urllib.parse
 
 
 class Workflow(base.Resource):
@@ -53,8 +58,28 @@ class WorkflowManager(base.ResourceManager):
         return [self.resource_class(self, resource_data)
                 for resource_data in base.extract_json(resp, 'workflows')]
 
-    def list(self):
-        return self._list('/workflows', response_key='workflows')
+    def list(self, marker='', limit=None, sort_keys='', sort_dirs=''):
+        qparams = {}
+
+        if marker:
+            qparams['marker'] = marker
+
+        if limit:
+            qparams['limit'] = limit
+
+        if sort_keys:
+            qparams['sort_keys'] = sort_keys
+
+        if sort_dirs:
+            qparams['sort_dirs'] = sort_dirs
+
+        query_string = ("?%s" % urlparse.urlencode(list(qparams.items()))
+                        if qparams else "")
+
+        return self._list(
+            '/workflows%s' % query_string,
+            response_key='workflows',
+        )
 
     def get(self, name):
         self._ensure_not_empty(name=name)
