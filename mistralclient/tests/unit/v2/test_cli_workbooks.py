@@ -126,4 +126,4 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
 
         result = self.call(workbook_cmd.Validate, app_args=['wb.yaml'])
 
-        self.assertEqual(result[1], (False, 'Invalid DSL...'))
+        self.assertEqual((False, 'Invalid DSL...'), result[1])
