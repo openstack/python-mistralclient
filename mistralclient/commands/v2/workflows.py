@@ -162,7 +162,7 @@ class Update(base.MistralLister):
         return parser
 
     def _get_format_function(self):
-        return format
+        return format_list
 
     def _get_resources(self, parsed_args):
         scope = 'public' if parsed_args.public else 'private'

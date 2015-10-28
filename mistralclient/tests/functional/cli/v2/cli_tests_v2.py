@@ -273,6 +273,26 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
         self.assertNotEqual(created_wf_info['Updated at'],
                             updated_wf_info['Updated at'])
 
+    def test_workflow_update_truncate_input(self):
+        input_value = "very_long_input_parameter_name_that_should_be_truncated"
+        wf_def = """
+        version: "2.0"
+        workflow1:
+          input:
+            - {0}
+          tasks:
+            task1:
+              action: std.noop
+        """.format(input_value)
+        self.create_file('wf.yaml', wf_def)
+        self.workflow_create('wf.yaml')
+        upd_wf = self.mistral_admin(
+            'workflow-update', params='wf.yaml')
+        upd_wf_info = self.get_item_info(
+            get_from=upd_wf, get_by='Name', value='workflow1')
+
+        self.assertEqual(upd_wf_info['Input'][:-3], input_value[:25])
+
     def test_workflow_get(self):
         created = self.workflow_create(self.wf_def)
         wf_name = created[0]['Name']
@@ -589,6 +609,24 @@ class ActionCLITests(base_v2.MistralClientTestBase):
         self.assertEqual(created_action['Name'], updated_action['Name'])
         self.assertNotEqual(created_action['Updated at'],
                             updated_action['Updated at'])
+
+    def test_action_update_truncate_input(self):
+        input_value = "very_long_input_parameter_name_that_should_be_truncated"
+        act_def = """
+        version: "2.0"
+        action1:
+          input:
+            - {0}
+          base: std.noop
+        """.format(input_value)
+        self.create_file('action.yaml', act_def)
+        self.action_create('action.yaml')
+        upd_act = self.mistral_admin(
+            'action-update', params='action.yaml')
+        upd_act_info = self.get_item_info(
+            get_from=upd_act, get_by='Name', value='action1')
+
+        self.assertEqual(upd_act_info['Input'][:-3], input_value[:25])
 
     def test_action_get_definition(self):
         self.action_create(self.act_def)
