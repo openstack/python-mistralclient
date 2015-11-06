@@ -53,7 +53,7 @@ def format(action=None, lister=False):
             action.is_system,
             input,
             desc,
-            ', '.join(tags) or '<none>',
+            base.wrap(', '.join(tags)) or '<none>',
             action.created_at,
         )
 

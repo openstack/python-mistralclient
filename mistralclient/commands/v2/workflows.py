@@ -45,7 +45,7 @@ def format(workflow=None, lister=False):
 
         data = (
             workflow.name,
-            ', '.join(tags) or '<none>',
+            base.wrap(', '.join(tags)) or '<none>',
             workflow.input if not lister else base.cut(workflow.input),
             workflow.created_at
         )

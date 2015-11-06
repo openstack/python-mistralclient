@@ -38,7 +38,7 @@ def format(workbook=None):
     if workbook:
         data = (
             workbook.name,
-            ', '.join(workbook.tags or '') or '<none>',
+            base.wrap(', '.join(workbook.tags or '')) or '<none>',
             workbook.created_at,
         )
 

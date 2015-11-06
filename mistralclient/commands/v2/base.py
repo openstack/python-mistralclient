@@ -18,6 +18,7 @@ import abc
 
 from cliff import lister
 import six
+import textwrap
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -51,5 +52,12 @@ class MistralLister(lister.Lister):
 def cut(string, length=25):
     if string and len(string) > length:
         return "%s..." % string[:length]
+    else:
+        return string
+
+
+def wrap(string, width=25):
+    if string and len(string) > width:
+        return textwrap.fill(string, width)
     else:
         return string
