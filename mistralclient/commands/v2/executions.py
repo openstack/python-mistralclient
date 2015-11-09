@@ -68,8 +68,45 @@ class List(base.MistralLister):
     def _get_format_function(self):
         return format_list
 
+    def get_parser(self, parsed_args):
+        parser = super(List, self).get_parser(parsed_args)
+
+        parser.add_argument('--marker',
+                            type=str,
+                            help='Pagination marker for large data sets('
+                                 'workflow execution id).'
+                                 'Example: mistral execution-list --marker '
+                                 'workflow_execution_id ',
+                            default='',
+                            nargs='?')
+        parser.add_argument('--limit',
+                            type=int,
+                            help='Maximum number of resources to '
+                                 'return in a single result.'
+                                 'Example: mistral execution-list --limit 5',
+                            nargs='?')
+        parser.add_argument('--sort_keys',
+                            help='Columns to sort results by.'
+                                 ' Default: created_at.'
+                                 'Example : mistral execution-list '
+                                 '--sort_keys=id,Description',
+                            default='created_at', nargs='?')
+        parser.add_argument('--sort_dirs',
+                            help='Sorting Directions (asc/desc)'
+                                 'Default:asc.'
+                                 'Example : mistral execution-list '
+                                 '--sort_keys=id --sort_dirs=desc',
+                            default='asc', nargs='?')
+
+        return parser
+
     def _get_resources(self, parsed_args):
-        return executions.ExecutionManager(self.app.client).list()
+        return executions.ExecutionManager(self.app.client).list(
+            marker=parsed_args.marker,
+            limit=parsed_args.limit,
+            sort_keys=parsed_args.sort_keys,
+            sort_dirs=parsed_args.sort_dirs
+        )
 
 
 class Get(show.ShowOne):

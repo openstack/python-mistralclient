@@ -435,6 +435,74 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
 
         self.assertEqual([], ex_output)
 
+    def test_executions_list_with_pagination(self):
+
+        execution1 = self.mistral_admin(
+            'execution-create',
+            params='{0} -d "a"'.format(self.direct_wf['Name'])
+        )
+
+        execution2 = self.mistral_admin(
+            'execution-create',
+            params='{0} -d "b"'.format(self.direct_wf['Name'])
+        )
+
+        executions = self.mistral_cli(
+            True,
+            'execution-list',
+            params="--limit 1"
+        )
+
+        self.assertEqual(1, len(executions))
+
+        exec_id_1 = self.get_value_of_field(execution1, 'ID')
+        exec_id_2 = self.get_value_of_field(execution2, 'ID')
+        executions = self.mistral_cli(
+            True,
+            'execution-list',
+            params="--marker %s" % exec_id_1
+        )
+        self.assertNotIn(exec_id_1, [ex['ID'] for ex in executions])
+        self.assertIn(exec_id_2, [ex['ID'] for ex in executions])
+
+        executions = self.mistral_cli(
+            True,
+            'execution-list',
+            params="--sort_keys Description"
+        )
+
+        self.assertIn(exec_id_1, [ex['ID'] for ex in executions])
+        self.assertIn(exec_id_2, [ex['ID'] for ex in executions])
+
+        ex1_index = -1
+        ex2_index = -1
+        for idx, ex in enumerate(executions):
+            if ex['ID'] == exec_id_1:
+                ex1_index = idx
+            elif ex['ID'] == exec_id_2:
+                ex2_index = idx
+
+        self.assertTrue(ex1_index < ex2_index)
+
+        executions = self.mistral_cli(
+            True,
+            'execution-list',
+            params="--sort_keys Description --sort_dirs=desc"
+        )
+
+        self.assertIn(exec_id_1, [ex['ID'] for ex in executions])
+        self.assertIn(exec_id_2, [ex['ID'] for ex in executions])
+
+        ex1_index = -1
+        ex2_index = -1
+        for idx, ex in enumerate(executions):
+            if ex['ID'] == exec_id_1:
+                ex1_index = idx
+            elif ex['ID'] == exec_id_2:
+                ex2_index = idx
+
+        self.assertTrue(ex1_index > ex2_index)
+
 
 class CronTriggerCLITests(base_v2.MistralClientTestBase):
     """Test suite checks commands to work with cron-triggers."""
