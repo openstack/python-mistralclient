@@ -83,6 +83,23 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         self.assertEqual([('123', 'some', '', 'RUNNING', None,
                           '1', '1')], result[1])
 
+    @mock.patch('mistralclient.api.v2.executions.ExecutionManager.list')
+    def test_list_with_pagination(self, mock):
+
+        self.call(execution_cmd.List)
+        mock.assert_called_once_with(limit=None, marker='',
+                                     sort_dirs='asc',
+                                     sort_keys='created_at')
+
+        self.call(execution_cmd.List, app_args=['--limit', '5',
+                                                '--sort_dirs', 'id, Workflow',
+                                                '--sort_keys', 'desc',
+                                                '--marker', 'abc'])
+
+        mock.assert_called_with(limit=5, marker='abc',
+                                sort_dirs='id, Workflow',
+                                sort_keys='desc')
+
     @mock.patch('mistralclient.api.v2.executions.ExecutionManager.get')
     def test_get(self, mock):
         mock.return_value = EXECUTION
