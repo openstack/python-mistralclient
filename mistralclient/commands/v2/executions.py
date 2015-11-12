@@ -71,32 +71,36 @@ class List(base.MistralLister):
     def get_parser(self, parsed_args):
         parser = super(List, self).get_parser(parsed_args)
 
-        parser.add_argument('--marker',
-                            type=str,
-                            help='Pagination marker for large data sets('
-                                 'workflow execution id).'
-                                 'Example: mistral execution-list --marker '
-                                 'workflow_execution_id ',
-                            default='',
-                            nargs='?')
-        parser.add_argument('--limit',
-                            type=int,
-                            help='Maximum number of resources to '
-                                 'return in a single result.'
-                                 'Example: mistral execution-list --limit 5',
-                            nargs='?')
-        parser.add_argument('--sort_keys',
-                            help='Columns to sort results by.'
-                                 ' Default: created_at.'
-                                 'Example : mistral execution-list '
-                                 '--sort_keys=id,Description',
-                            default='created_at', nargs='?')
-        parser.add_argument('--sort_dirs',
-                            help='Sorting Directions (asc/desc)'
-                                 'Default:asc.'
-                                 'Example : mistral execution-list '
-                                 '--sort_keys=id --sort_dirs=desc',
-                            default='asc', nargs='?')
+        parser.add_argument(
+            '--marker',
+            type=str,
+            help='The last execution uuid of the previous page, displays list '
+                 'of executions after "marker".',
+            default='',
+            nargs='?'
+        )
+        parser.add_argument(
+            '--limit',
+            type=int,
+            help='Maximum number of executions to return in a single result.',
+            nargs='?'
+        )
+        parser.add_argument(
+            '--sort_keys',
+            help='Comma-separated list of sort keys to sort results by. '
+                 'Default: created_at. '
+                 'Example: mistral execution-list --sort_keys=id,description',
+            default='created_at',
+            nargs='?'
+        )
+        parser.add_argument(
+            '--sort_dirs',
+            help='Comma-separated list of sort directions. Default: asc. '
+                 'Example: mistral execution-list --sort_keys=id,description '
+                 '--sort_dirs=asc,desc',
+            default='asc',
+            nargs='?'
+        )
 
         return parser
 
