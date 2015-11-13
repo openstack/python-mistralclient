@@ -20,7 +20,6 @@ import logging
 from cliff import command
 from cliff import show
 
-from mistralclient.api.v2 import executions
 from mistralclient.commands.v2 import base
 from mistralclient import utils
 
@@ -101,7 +100,8 @@ class List(base.MistralLister):
         return parser
 
     def _get_resources(self, parsed_args):
-        return executions.ExecutionManager(self.app.client).list(
+        mistral_client = self.app.client_manager.workflow_engine
+        return mistral_client.executions.list(
             marker=parsed_args.marker,
             limit=parsed_args.limit,
             sort_keys=parsed_args.sort_keys,
@@ -120,8 +120,8 @@ class Get(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        execution = executions.ExecutionManager(self.app.client).get(
-            parsed_args.id)
+        mistral_client = self.app.client_manager.workflow_engine
+        execution = mistral_client.executions.get(parsed_args.id)
 
         return format(execution)
 
@@ -173,11 +173,14 @@ class Create(show.ShowOne):
         else:
             params = {}
 
-        execution = executions.ExecutionManager(self.app.client).create(
+        mistral_client = self.app.client_manager.workflow_engine
+
+        execution = mistral_client.executions.create(
             parsed_args.workflow_name,
             wf_input,
             parsed_args.description,
-            **params)
+            **params
+        )
 
         return format(execution)
 
@@ -197,9 +200,10 @@ class Delete(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        exe_mgr = executions.ExecutionManager(self.app.client)
+        mistral_client = self.app.client_manager.workflow_engine
+
         utils.do_action_on_many(
-            lambda s: exe_mgr.delete(s),
+            lambda s: mistral_client.executions.delete(s),
             parsed_args.id,
             "Request to delete execution %s has been accepted.",
             "Unable to delete the specified execution(s)."
@@ -235,7 +239,9 @@ class Update(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        execution = executions.ExecutionManager(self.app.client).update(
+        mistral_client = self.app.client_manager.workflow_engine
+
+        execution = mistral_client.executions.update(
             parsed_args.id,
             parsed_args.state,
             parsed_args.description)
@@ -254,8 +260,8 @@ class GetInput(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        ex_input = executions.ExecutionManager(self.app.client).get(
-            parsed_args.id).input
+        mistral_client = self.app.client_manager.workflow_engine
+        ex_input = mistral_client.executions.get(parsed_args.id).input
 
         try:
             ex_input = json.loads(ex_input)
@@ -277,8 +283,8 @@ class GetOutput(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        output = executions.ExecutionManager(self.app.client).get(
-            parsed_args.id).output
+        mistral_client = self.app.client_manager.workflow_engine
+        output = mistral_client.executions.get(parsed_args.id).output
 
         try:
             output = json.loads(output)

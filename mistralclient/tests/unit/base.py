@@ -70,7 +70,7 @@ class BaseClientTest(unittest2.TestCase):
 class BaseCommandTest(unittest2.TestCase):
     def setUp(self):
         self.app = mock.Mock()
-        self.app.client = mock.Mock()
+        self.client = self.app.client_manager.workflow_engine
 
     def call(self, command, app_args=[], prog_name=''):
         cmd = command(self.app, app_args)

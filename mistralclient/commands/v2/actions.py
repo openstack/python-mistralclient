@@ -20,7 +20,6 @@ import logging
 from cliff import command
 from cliff import show
 
-from mistralclient.api.v2 import actions
 from mistralclient.commands.v2 import base
 from mistralclient import utils
 
@@ -74,7 +73,9 @@ class List(base.MistralLister):
         return format_list
 
     def _get_resources(self, parsed_args):
-        return actions.ActionManager(self.app.client).list()
+        mistral_client = self.app.client_manager.workflow_engine
+
+        return mistral_client.actions.list()
 
 
 class Get(show.ShowOne):
@@ -88,8 +89,8 @@ class Get(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        action = actions.ActionManager(self.app.client).get(
-            parsed_args.name)
+        mistral_client = self.app.client_manager.workflow_engine
+        action = mistral_client.actions.get(parsed_args.name)
 
         return format(action)
 
@@ -123,7 +124,9 @@ class Create(base.MistralLister):
     def _get_resources(self, parsed_args):
         scope = 'public' if parsed_args.public else 'private'
 
-        return actions.ActionManager(self.app.client).create(
+        mistral_client = self.app.client_manager.workflow_engine
+
+        return mistral_client.actions.create(
             parsed_args.definition.read(),
             scope=scope
         )
@@ -140,9 +143,10 @@ class Delete(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        action_mgr = actions.ActionManager(self.app.client)
+        mistral_client = self.app.client_manager.workflow_engine
+
         utils.do_action_on_many(
-            lambda s: action_mgr.delete(s),
+            lambda s: mistral_client.actions.delete(s),
             parsed_args.name,
             "Request to delete action %s has been accepted.",
             "Unable to delete the specified action(s)."
@@ -174,7 +178,9 @@ class Update(base.MistralLister):
     def _get_resources(self, parsed_args):
         scope = 'public' if parsed_args.public else 'private'
 
-        return actions.ActionManager(self.app.client).update(
+        mistral_client = self.app.client_manager.workflow_engine
+
+        return mistral_client.actions.update(
             parsed_args.definition.read(),
             scope=scope
         )
@@ -191,7 +197,7 @@ class GetDefinition(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        definition = actions.ActionManager(self.app.client).get(
-            parsed_args.name).definition
+        mistral_client = self.app.client_manager.workflow_engine
+        definition = mistral_client.actions.get(parsed_args.name).definition
 
         self.app.stdout.write(definition or "\n")

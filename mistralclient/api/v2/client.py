@@ -46,10 +46,13 @@ class Client(object):
         if not mistral_url:
             mistral_url = "http://localhost:8989/v2"
 
-        self.http_client = httpclient.HTTPClient(mistral_url,
-                                                 auth_token,
-                                                 project_id,
-                                                 user_id)
+        self.http_client = httpclient.HTTPClient(
+            mistral_url,
+            auth_token,
+            project_id,
+            user_id
+        )
+
         # Create all resource managers.
         self.workbooks = workbooks.WorkbookManager(self)
         self.executions = executions.ExecutionManager(self)

@@ -20,7 +20,6 @@ from cliff import command
 from cliff import show
 import yaml
 
-from mistralclient.api.v2 import environments
 from mistralclient.commands.v2 import base
 from mistralclient import utils
 
@@ -108,7 +107,8 @@ class List(base.MistralLister):
         return format_list
 
     def _get_resources(self, parsed_args):
-        return environments.EnvironmentManager(self.app.client).list()
+        mistral_client = self.app.client_manager.workflow_engine
+        return mistral_client.environments.list()
 
 
 class Get(show.ShowOne):
@@ -125,8 +125,8 @@ class Get(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        environment = environments.EnvironmentManager(self.app.client).get(
-            parsed_args.name)
+        mistral_client = self.app.client_manager.workflow_engine
+        environment = mistral_client.environments.get(parsed_args.name)
 
         return format(environment)
 
@@ -147,8 +147,9 @@ class Create(show.ShowOne):
 
     def take_action(self, parsed_args):
         data = load_file_content(parsed_args.file)
-        manager = environments.EnvironmentManager(self.app.client)
-        environment = manager.create(**data)
+
+        mistral_client = self.app.client_manager.workflow_engine
+        environment = mistral_client.environments.create(**data)
 
         return format(environment)
 
@@ -164,9 +165,10 @@ class Delete(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        env_mgr = environments.EnvironmentManager(self.app.client)
+        mistral_client = self.app.client_manager.workflow_engine
+
         utils.do_action_on_many(
-            lambda s: env_mgr.delete(s),
+            lambda s: mistral_client.environments.delete(s),
             parsed_args.name,
             "Request to delete environment %s has been accepted.",
             "Unable to delete the specified environment(s)."
@@ -189,7 +191,8 @@ class Update(show.ShowOne):
 
     def take_action(self, parsed_args):
         data = load_file_content(parsed_args.file)
-        manager = environments.EnvironmentManager(self.app.client)
-        environment = manager.update(**data)
+
+        mistral_client = self.app.client_manager.workflow_engine
+        environment = mistral_client.environments.update(**data)
 
         return format(environment)

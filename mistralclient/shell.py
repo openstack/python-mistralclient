@@ -295,6 +295,16 @@ class MistralShell(app.App):
                                     auth_token=self.options.token,
                                     cacert=self.options.cacert)
 
+        # Adding client_manager variable to make mistral client work with
+        # unified openstack client.
+        ClientManager = type(
+            'ClientManager',
+            (object,),
+            dict(workflow_engine=self.client)
+        )
+
+        self.client_manager = ClientManager()
+
     def _set_shell_commands(self, cmds_dict):
         for k, v in cmds_dict.items():
             self.command_manager.add_command(k, v)

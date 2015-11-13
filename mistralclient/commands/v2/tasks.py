@@ -21,7 +21,6 @@ import logging
 from cliff import command
 from cliff import show
 
-from mistralclient.api.v2 import tasks
 from mistralclient.commands.v2 import base
 
 LOG = logging.getLogger(__name__)
@@ -75,9 +74,8 @@ class List(base.MistralLister):
         return format_list
 
     def _get_resources(self, parsed_args):
-        return tasks.TaskManager(self.app.client).list(
-            parsed_args.workflow_execution
-        )
+        mistral_client = self.app.client_manager.workflow_engine
+        return mistral_client.tasks.list(parsed_args.workflow_execution)
 
 
 class Get(show.ShowOne):
@@ -91,8 +89,8 @@ class Get(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        execution = tasks.TaskManager(self.app.client).get(
-            parsed_args.id)
+        mistral_client = self.app.client_manager.workflow_engine
+        execution = mistral_client.tasks.get(parsed_args.id)
 
         return format(execution)
 
@@ -109,8 +107,8 @@ class GetResult(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        result = tasks.TaskManager(self.app.client).get(
-            parsed_args.id).result
+        mistral_client = self.app.client_manager.workflow_engine
+        result = mistral_client.tasks.get(parsed_args.id).result
 
         try:
             result = json.loads(result)
@@ -133,8 +131,8 @@ class GetPublished(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        result = tasks.TaskManager(self.app.client).get(
-            parsed_args.id).published
+        mistral_client = self.app.client_manager.workflow_engine
+        result = mistral_client.tasks.get(parsed_args.id).published
 
         try:
             result = json.loads(result)
@@ -168,7 +166,8 @@ class Rerun(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        execution = tasks.TaskManager(self.app.client).rerun(
+        mistral_client = self.app.client_manager.workflow_engine
+        execution = mistral_client.tasks.rerun(
             parsed_args.id,
             reset=(not parsed_args.resume)
         )

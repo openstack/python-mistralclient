@@ -28,9 +28,8 @@ SERVICE = services.Service(mock, SERVICE_DICT)
 
 
 class TestCLIServicesV2(base.BaseCommandTest):
-    @mock.patch('mistralclient.api.v2.services.ServiceManager.list')
-    def test_list(self, mock):
-        mock.return_value = (SERVICE,)
+    def test_list(self):
+        self.client.services.list.return_value = (SERVICE,)
         expected = (SERVICE_DICT['name'], SERVICE_DICT['type'],)
 
         result = self.call(service_cmd.List)

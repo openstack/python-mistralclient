@@ -51,9 +51,8 @@ EXPECTED_RESULT = (ENVIRONMENT_DICT['name'],
 
 class TestCLIEnvironmentsV2(base.BaseCommandTest):
 
-    @mock.patch('mistralclient.api.v2.environments.EnvironmentManager.create')
-    def _test_create(self, content, mock):
-        mock.return_value = ENVIRONMENT
+    def _test_create(self, content):
+        self.client.environments.create.return_value = ENVIRONMENT
 
         with tempfile.NamedTemporaryFile() as f:
             f.write(content.encode('utf-8'))
@@ -69,9 +68,8 @@ class TestCLIEnvironmentsV2(base.BaseCommandTest):
         yml = yaml.dump(ENVIRONMENT_DICT, default_flow_style=False)
         self._test_create(yml)
 
-    @mock.patch('mistralclient.api.v2.environments.EnvironmentManager.update')
-    def _test_update(self, content, mock):
-        mock.return_value = ENVIRONMENT
+    def _test_update(self, content):
+        self.client.environments.update.return_value = ENVIRONMENT
 
         with tempfile.NamedTemporaryFile() as f:
             f.write(content.encode('utf-8'))
@@ -93,9 +91,8 @@ class TestCLIEnvironmentsV2(base.BaseCommandTest):
         yml = yaml.dump(env, default_flow_style=False)
         self._test_update(yml)
 
-    @mock.patch('mistralclient.api.v2.environments.EnvironmentManager.list')
-    def test_list(self, mock):
-        mock.return_value = (ENVIRONMENT,)
+    def test_list(self):
+        self.client.environments.list.return_value = (ENVIRONMENT,)
         expected = (ENVIRONMENT_DICT['name'],
                     ENVIRONMENT_DICT['description'],
                     ENVIRONMENT_DICT['scope'],
@@ -106,26 +103,23 @@ class TestCLIEnvironmentsV2(base.BaseCommandTest):
 
         self.assertListEqual([expected], result[1])
 
-    @mock.patch('mistralclient.api.v2.environments.EnvironmentManager.get')
-    def test_get(self, mock):
-        mock.return_value = ENVIRONMENT
+    def test_get(self):
+        self.client.environments.get.return_value = ENVIRONMENT
 
         result = self.call(environment_cmd.Get, app_args=['name'])
 
         self.assertEqual(EXPECTED_RESULT, result[1])
 
-    @mock.patch('mistralclient.api.v2.environments.EnvironmentManager.delete')
-    def test_delete(self, del_mock):
+    def test_delete(self):
         self.call(environment_cmd.Delete, app_args=['name'])
 
-        del_mock.assert_called_once_with('name')
+        self.client.environments.delete.assert_called_once_with('name')
 
-    @mock.patch('mistralclient.api.v2.environments.EnvironmentManager.delete')
-    def test_delete_with_multi_names(self, del_mock):
+    def test_delete_with_multi_names(self):
         self.call(environment_cmd.Delete, app_args=['name1', 'name2'])
 
-        self.assertEqual(2, del_mock.call_count)
+        self.assertEqual(2, self.client.environments.delete.call_count)
         self.assertEqual(
             [mock.call('name1'), mock.call('name2')],
-            del_mock.call_args_list
+            self.client.environments.delete.call_args_list
         )
