@@ -43,8 +43,12 @@ LOG = logging.getLogger(__name__)
 class OpenStackHelpFormatter(argparse.HelpFormatter):
     def __init__(self, prog, indent_increment=2, max_help_position=32,
                  width=None):
-        super(OpenStackHelpFormatter, self).__init__(prog, indent_increment,
-                                                     max_help_position, width)
+        super(OpenStackHelpFormatter, self).__init__(
+            prog,
+            indent_increment,
+            max_help_position,
+            width
+        )
 
     def start_section(self, heading):
         # Title-case the headings.
@@ -114,8 +118,10 @@ class MistralShell(app.App):
         log_lvl = logging.DEBUG if self.options.debug else logging.WARNING
         logging.basicConfig(
             format="%(levelname)s (%(module)s) %(message)s",
-            level=log_lvl)
+            level=log_lvl
+        )
         logging.getLogger('iso8601').setLevel(logging.WARNING)
+
         if self.options.verbose_level <= 1:
             logging.getLogger('requests').setLevel(logging.WARNING)
 
@@ -262,6 +268,14 @@ class MistralShell(app.App):
             default=c.env('OS_CACERT'),
             help='Authentication CA Certificate (Env: OS_CACERT)'
         )
+        parser.add_argument(
+            '--insecure',
+            action='store_true',
+            dest='insecure',
+            default=c.env('MISTRALCLIENT_INSECURE', default=False),
+            help='Disables SSL/TLS certificate verification '
+                 '(Env: MISTRALCLIENT_INSECURE)'
+        )
         return parser
 
     def initialize_app(self, argv):
@@ -284,16 +298,19 @@ class MistralShell(app.App):
         if do_help or ('bash-completion' in argv):
             self.options.auth_url = None
 
-        self.client = client.client(mistral_url=self.options.mistral_url,
-                                    username=self.options.username,
-                                    api_key=self.options.password,
-                                    project_name=self.options.tenant_name,
-                                    auth_url=self.options.auth_url,
-                                    project_id=self.options.tenant_id,
-                                    endpoint_type=self.options.endpoint_type,
-                                    service_type=self.options.service_type,
-                                    auth_token=self.options.token,
-                                    cacert=self.options.cacert)
+        self.client = client.client(
+            mistral_url=self.options.mistral_url,
+            username=self.options.username,
+            api_key=self.options.password,
+            project_name=self.options.tenant_name,
+            auth_url=self.options.auth_url,
+            project_id=self.options.tenant_id,
+            endpoint_type=self.options.endpoint_type,
+            service_type=self.options.service_type,
+            auth_token=self.options.token,
+            cacert=self.options.cacert,
+            insecure=self.options.insecure
+        )
 
     def _set_shell_commands(self, cmds_dict):
         for k, v in cmds_dict.items():
