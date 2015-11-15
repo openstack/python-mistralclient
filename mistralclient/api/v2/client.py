@@ -31,25 +31,39 @@ class Client(object):
     def __init__(self, mistral_url=None, username=None, api_key=None,
                  project_name=None, auth_url=None, project_id=None,
                  endpoint_type='publicURL', service_type='workflowv2',
-                 auth_token=None, user_id=None, cacert=None):
+                 auth_token=None, user_id=None, cacert=None, insecure=False):
 
         if mistral_url and not isinstance(mistral_url, six.string_types):
             raise RuntimeError('Mistral url should be string')
 
         if auth_url:
             (mistral_url, auth_token, project_id, user_id) = (
-                self.authenticate(mistral_url, username, api_key,
-                                  project_name, auth_url, project_id,
-                                  endpoint_type, service_type, auth_token,
-                                  user_id, cacert))
+                self.authenticate(
+                    mistral_url,
+                    username,
+                    api_key,
+                    project_name,
+                    auth_url,
+                    project_id,
+                    endpoint_type,
+                    service_type,
+                    auth_token,
+                    user_id,
+                    cacert,
+                    insecure
+                )
+            )
 
         if not mistral_url:
             mistral_url = "http://localhost:8989/v2"
 
-        self.http_client = httpclient.HTTPClient(mistral_url,
-                                                 auth_token,
-                                                 project_id,
-                                                 user_id)
+        self.http_client = httpclient.HTTPClient(
+            mistral_url,
+            auth_token,
+            project_id,
+            user_id
+        )
+
         # Create all resource managers.
         self.workbooks = workbooks.WorkbookManager(self)
         self.executions = executions.ExecutionManager(self)
@@ -64,15 +78,18 @@ class Client(object):
     def authenticate(self, mistral_url=None, username=None, api_key=None,
                      project_name=None, auth_url=None, project_id=None,
                      endpoint_type='publicURL', service_type='workflowv2',
-                     auth_token=None, user_id=None, cacert=None):
+                     auth_token=None, user_id=None, cacert=None,
+                     insecure=False):
 
         if project_name and project_id:
-            raise RuntimeError('Only project name or '
-                               'project id should be set')
+            raise RuntimeError(
+                'Only project name or project id should be set'
+            )
 
         if username and user_id:
-            raise RuntimeError('Only user name or user id'
-                               ' should be set')
+            raise RuntimeError(
+                'Only user name or user id should be set'
+            )
 
         keystone_client = _get_keystone_client(auth_url)
 
@@ -85,7 +102,9 @@ class Client(object):
             tenant_name=project_name,
             auth_url=auth_url,
             endpoint=auth_url,
-            cacert=cacert)
+            cacert=cacert,
+            insecure=insecure
+        )
 
         keystone.authenticate()
         token = keystone.auth_token
