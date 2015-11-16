@@ -95,7 +95,7 @@ def load_file_content(f):
 
     try:
         data = yaml.safe_load(content)
-    except:
+    except Exception:
         data = json.loads(content)
 
     return data
