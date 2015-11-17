@@ -144,7 +144,7 @@ class Create(show.ShowOne):
         if string:
             try:
                 return json.loads(string)
-            except:
+            except Exception:
                 return json.load(open(string))
         else:
             return {}

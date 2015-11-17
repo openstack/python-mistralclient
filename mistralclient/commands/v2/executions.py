@@ -164,7 +164,7 @@ class Create(show.ShowOne):
         if parsed_args.workflow_input:
             try:
                 wf_input = json.loads(parsed_args.workflow_input)
-            except:
+            except Exception:
                 wf_input = json.load(open(parsed_args.workflow_input))
         else:
             wf_input = {}
@@ -172,7 +172,7 @@ class Create(show.ShowOne):
         if parsed_args.params:
             try:
                 params = json.loads(parsed_args.params)
-            except:
+            except Exception:
                 params = json.load(open(parsed_args.params))
         else:
             params = {}
@@ -264,7 +264,7 @@ class GetInput(command.Command):
         try:
             ex_input = json.loads(ex_input)
             ex_input = json.dumps(ex_input, indent=4) + "\n"
-        except:
+        except Exception:
             LOG.debug("Execution input is not JSON.")
 
         self.app.stdout.write(ex_input or "\n")
@@ -287,7 +287,7 @@ class GetOutput(command.Command):
         try:
             output = json.loads(output)
             output = json.dumps(output, indent=4) + "\n"
-        except:
+        except Exception:
             LOG.debug("Execution output is not JSON.")
 
         self.app.stdout.write(output or "\n")

@@ -115,7 +115,7 @@ class GetResult(command.Command):
         try:
             result = json.loads(result)
             result = json.dumps(result, indent=4) + "\n"
-        except:
+        except Exception:
             LOG.debug("Task result is not JSON.")
 
         self.app.stdout.write(result or "\n")
@@ -139,7 +139,7 @@ class GetPublished(command.Command):
         try:
             result = json.loads(result)
             result = json.dumps(result, indent=4) + "\n"
-        except:
+        except Exception:
             LOG.debug("Task result is not JSON.")
 
         self.app.stdout.write(result or "\n")

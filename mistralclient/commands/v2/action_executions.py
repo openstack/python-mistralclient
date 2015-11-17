@@ -116,7 +116,7 @@ class Create(show.ShowOne):
         if parsed_args.input:
             try:
                 action_input = json.loads(parsed_args.input)
-            except:
+            except Exception:
                 action_input = json.load(open(parsed_args.input))
 
         action_ex = action_executions.ActionExecutionManager(
@@ -202,7 +202,7 @@ class Update(show.ShowOne):
         if parsed_args.output:
             try:
                 output = json.loads(parsed_args.output)
-            except:
+            except Exception:
                 output = json.load(open(parsed_args.output))
 
         execution = action_executions.ActionExecutionManager(
@@ -237,7 +237,7 @@ class GetOutput(command.Command):
         try:
             output = json.loads(output)
             output = json.dumps(output, indent=4) + "\n"
-        except:
+        except Exception:
             LOG.debug("Task result is not JSON.")
 
         self.app.stdout.write(output or "\n")
@@ -265,7 +265,7 @@ class GetInput(command.Command):
         try:
             result = json.loads(result)
             result = json.dumps(result, indent=4) + "\n"
-        except:
+        except Exception:
             LOG.debug("Task result is not JSON.")
 
         self.app.stdout.write(result or "\n")
