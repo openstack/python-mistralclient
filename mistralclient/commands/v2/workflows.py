@@ -33,6 +33,7 @@ def format_list(workflow=None):
 
 def format(workflow=None, lister=False):
     columns = (
+        'ID',
         'Name',
         'Tags',
         'Input',
@@ -44,6 +45,7 @@ def format(workflow=None, lister=False):
         tags = getattr(workflow, 'tags', None) or []
 
         data = (
+            workflow.id,
             workflow.name,
             base.wrap(', '.join(tags)) or '<none>',
             workflow.input if not lister else base.cut(workflow.input),

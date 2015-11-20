@@ -23,6 +23,7 @@ from mistralclient.tests.unit import base
 
 
 WORKFLOW_DICT = {
+    'id': '1-2-3-4',
     'name': 'a',
     'tags': ['a', 'b'],
     'input': 'param',
@@ -53,7 +54,10 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
 
         result = self.call(workflow_cmd.Create, app_args=['1.txt'])
 
-        self.assertEqual([('a', 'a, b', 'param', '1', '1')], result[1])
+        self.assertEqual(
+            [('1-2-3-4', 'a', 'a, b', 'param', '1', '1')],
+            result[1]
+        )
 
     @mock.patch('argparse.open', create=True)
     @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.create')
@@ -65,7 +69,10 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
             app_args=['1.txt', '--public']
         )
 
-        self.assertEqual([('a', 'a, b', 'param', '1', '1')], result[1])
+        self.assertEqual(
+            [('1-2-3-4', 'a', 'a, b', 'param', '1', '1')],
+            result[1]
+        )
 
         self.assertEqual('public', mock.call_args[1]['scope'])
 
@@ -83,7 +90,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.Create, app_args=['1.txt'])
 
         self.assertEqual(
-            [('a', 'a, b', cmd_base.cut(long_input), '1', '1')],
+            [('1-2-3-4', 'a', 'a, b', cmd_base.cut(long_input), '1', '1')],
             result[1]
         )
 
@@ -94,7 +101,10 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
 
         result = self.call(workflow_cmd.Update, app_args=['1.txt'])
 
-        self.assertEqual([('a', 'a, b', 'param', '1', '1')], result[1])
+        self.assertEqual(
+            [('1-2-3-4', 'a', 'a, b', 'param', '1', '1')],
+            result[1]
+        )
 
     @mock.patch('argparse.open', create=True)
     @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.update')
@@ -106,7 +116,10 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
             app_args=['1.txt', '--public']
         )
 
-        self.assertEqual([('a', 'a, b', 'param', '1', '1')], result[1])
+        self.assertEqual(
+            [('1-2-3-4', 'a', 'a, b', 'param', '1', '1')],
+            result[1]
+        )
 
         self.assertEqual('public', mock.call_args[1]['scope'])
 
@@ -116,7 +129,10 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
 
         result = self.call(workflow_cmd.List)
 
-        self.assertEqual([('a', 'a, b', 'param', '1', '1')], result[1])
+        self.assertEqual(
+            [('1-2-3-4', 'a', 'a, b', 'param', '1', '1')],
+            result[1]
+        )
 
     @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.get')
     def test_get(self, mock):
@@ -124,7 +140,10 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
 
         result = self.call(workflow_cmd.Get, app_args=['name'])
 
-        self.assertEqual(('a', 'a, b', 'param', '1', '1'), result[1])
+        self.assertEqual(
+            ('1-2-3-4', 'a', 'a, b', 'param', '1', '1'),
+            result[1]
+        )
 
     @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.delete')
     def test_delete(self, del_mock):

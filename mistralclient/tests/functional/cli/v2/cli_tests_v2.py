@@ -42,7 +42,7 @@ class SimpleMistralCLITests(base.MistralCLIAuth):
             self.mistral('workflow-list'))
         self.assertTableStruct(
             workflows,
-            ['Name', 'Tags', 'Input', 'Created at', 'Updated at']
+            ['ID', 'Name', 'Tags', 'Input', 'Created at', 'Updated at']
         )
 
     def test_executions_list(self):
