@@ -35,6 +35,7 @@ def format(workflow=None, lister=False):
     columns = (
         'ID',
         'Name',
+        'Project ID',
         'Tags',
         'Input',
         'Created at',
@@ -47,6 +48,7 @@ def format(workflow=None, lister=False):
         data = (
             workflow.id,
             workflow.name,
+            workflow.project_id,
             base.wrap(', '.join(tags)) or '<none>',
             workflow.input if not lister else base.cut(workflow.input),
             workflow.created_at

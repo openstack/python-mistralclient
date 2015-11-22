@@ -25,6 +25,7 @@ from mistralclient.tests.unit import base
 WORKFLOW_DICT = {
     'id': '1-2-3-4',
     'name': 'a',
+    'project_id': '12345',
     'tags': ['a', 'b'],
     'input': 'param',
     'created_at': '1',
@@ -55,7 +56,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.Create, app_args=['1.txt'])
 
         self.assertEqual(
-            [('1-2-3-4', 'a', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '12345', 'a, b', 'param', '1', '1')],
             result[1]
         )
 
@@ -70,7 +71,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            [('1-2-3-4', 'a', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '12345', 'a, b', 'param', '1', '1')],
             result[1]
         )
 
@@ -90,7 +91,8 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.Create, app_args=['1.txt'])
 
         self.assertEqual(
-            [('1-2-3-4', 'a', 'a, b', cmd_base.cut(long_input), '1', '1')],
+            [('1-2-3-4', 'a', '12345', 'a, b', cmd_base.cut(long_input),
+              '1', '1')],
             result[1]
         )
 
@@ -102,7 +104,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.Update, app_args=['1.txt'])
 
         self.assertEqual(
-            [('1-2-3-4', 'a', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '12345', 'a, b', 'param', '1', '1')],
             result[1]
         )
 
@@ -117,7 +119,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            [('1-2-3-4', 'a', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '12345', 'a, b', 'param', '1', '1')],
             result[1]
         )
 
@@ -130,7 +132,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.List)
 
         self.assertEqual(
-            [('1-2-3-4', 'a', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '12345', 'a, b', 'param', '1', '1')],
             result[1]
         )
 
@@ -141,7 +143,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.Get, app_args=['name'])
 
         self.assertEqual(
-            ('1-2-3-4', 'a', 'a, b', 'param', '1', '1'),
+            ('1-2-3-4', 'a', '12345', 'a, b', 'param', '1', '1'),
             result[1]
         )
 
