@@ -33,9 +33,8 @@ EXECUTION = executions.Execution(mock, {
 
 
 class TestCLIExecutionsV2(base.BaseCommandTest):
-    @mock.patch('mistralclient.api.v2.executions.ExecutionManager.create')
-    def test_create_wf_input_string(self, mock):
-        mock.return_value = EXECUTION
+    def test_create_wf_input_string(self):
+        self.client.executions.create.return_value = EXECUTION
 
         result = self.call(execution_cmd.Create,
                            app_args=['id', '{ "context": true }'])
@@ -43,9 +42,8 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         self.assertEqual(('123', 'some', '', 'RUNNING', None,
                           '1', '1'), result[1])
 
-    @mock.patch('mistralclient.api.v2.executions.ExecutionManager.create')
-    def test_create_wf_input_file(self, mock):
-        mock.return_value = EXECUTION
+    def test_create_wf_input_file(self):
+        self.client.executions.create.return_value = EXECUTION
         path = pkg.resource_filename('mistralclient',
                                      'tests/unit/resources/ctx.json')
         result = self.call(execution_cmd.Create,
@@ -54,9 +52,8 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         self.assertEqual(('123', 'some', '', 'RUNNING', None,
                           '1', '1'), result[1])
 
-    @mock.patch('mistralclient.api.v2.executions.ExecutionManager.create')
-    def test_create_with_description(self, mock):
-        mock.return_value = EXECUTION
+    def test_create_with_description(self):
+        self.client.executions.create.return_value = EXECUTION
 
         result = self.call(execution_cmd.Create,
                            app_args=['id', '{ "context": true }', '-d', ''])
@@ -64,9 +61,8 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         self.assertEqual(('123', 'some', '', 'RUNNING', None,
                           '1', '1'), result[1])
 
-    @mock.patch('mistralclient.api.v2.executions.ExecutionManager.update')
-    def test_update(self, mock):
-        mock.return_value = EXECUTION
+    def test_update(self):
+        self.client.executions.update.return_value = EXECUTION
 
         result = self.call(execution_cmd.Update,
                            app_args=['id', '-s', 'SUCCESS'])
@@ -74,53 +70,60 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         self.assertEqual(('123', 'some', '', 'RUNNING', None,
                           '1', '1'), result[1])
 
-    @mock.patch('mistralclient.api.v2.executions.ExecutionManager.list')
-    def test_list(self, mock):
-        mock.return_value = (EXECUTION,)
+    def test_list(self):
+        self.client.executions.list.return_value = (EXECUTION,)
 
         result = self.call(execution_cmd.List)
 
         self.assertEqual([('123', 'some', '', 'RUNNING', None,
                           '1', '1')], result[1])
 
-    @mock.patch('mistralclient.api.v2.executions.ExecutionManager.list')
-    def test_list_with_pagination(self, mock):
+    def test_list_with_pagination(self):
+        self.client.executions.list.return_value = (EXECUTION,)
 
         self.call(execution_cmd.List)
-        mock.assert_called_once_with(limit=None, marker='',
-                                     sort_dirs='asc',
-                                     sort_keys='created_at')
+        self.client.executions.list.assert_called_once_with(
+            limit=None,
+            marker='',
+            sort_dirs='asc',
+            sort_keys='created_at'
+        )
 
-        self.call(execution_cmd.List, app_args=['--limit', '5',
-                                                '--sort_dirs', 'id, Workflow',
-                                                '--sort_keys', 'desc',
-                                                '--marker', 'abc'])
+        self.call(
+            execution_cmd.List,
+            app_args=[
+                '--limit', '5',
+                '--sort_dirs', 'id, Workflow',
+                '--sort_keys', 'desc',
+                '--marker', 'abc'
+            ]
+        )
 
-        mock.assert_called_with(limit=5, marker='abc',
-                                sort_dirs='id, Workflow',
-                                sort_keys='desc')
+        self.client.executions.list.assert_called_with(
+            limit=5,
+            marker='abc',
+            sort_dirs='id, Workflow',
+            sort_keys='desc'
+        )
 
-    @mock.patch('mistralclient.api.v2.executions.ExecutionManager.get')
-    def test_get(self, mock):
-        mock.return_value = EXECUTION
+    def test_get(self):
+        self.client.executions.get.return_value = EXECUTION
 
         result = self.call(execution_cmd.Get, app_args=['id'])
 
         self.assertEqual(('123', 'some', '', 'RUNNING', None,
                           '1', '1'), result[1])
 
-    @mock.patch('mistralclient.api.v2.executions.ExecutionManager.delete')
-    def test_delete(self, del_mock):
+    def test_delete(self):
         self.call(execution_cmd.Delete, app_args=['id'])
 
-        del_mock.assert_called_once_with('id')
+        self.client.executions.delete.assert_called_once_with('id')
 
-    @mock.patch('mistralclient.api.v2.executions.ExecutionManager.delete')
-    def test_delete_with_multi_names(self, del_mock):
+    def test_delete_with_multi_names(self):
         self.call(execution_cmd.Delete, app_args=['id1', 'id2'])
 
-        self.assertEqual(2, del_mock.call_count)
+        self.assertEqual(2, self.client.executions.delete.call_count)
         self.assertEqual(
             [mock.call('id1'), mock.call('id2')],
-            del_mock.call_args_list
+            self.client.executions.delete.call_args_list
         )

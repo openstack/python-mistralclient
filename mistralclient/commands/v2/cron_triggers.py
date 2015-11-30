@@ -20,7 +20,6 @@ import logging
 from cliff import command
 from cliff import show
 
-from mistralclient.api.v2 import cron_triggers
 from mistralclient.commands.v2 import base
 from mistralclient import utils
 
@@ -79,7 +78,8 @@ class List(base.MistralLister):
         return format_list
 
     def _get_resources(self, parsed_args):
-        return cron_triggers.CronTriggerManager(self.app.client).list()
+        mistral_client = self.app.client_manager.workflow_engine
+        return mistral_client.cron_triggers.list()
 
 
 class Get(show.ShowOne):
@@ -93,9 +93,9 @@ class Get(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        mgr = cron_triggers.CronTriggerManager(self.app.client)
+        mistral_client = self.app.client_manager.workflow_engine
 
-        return format(mgr.get(parsed_args.name))
+        return format(mistral_client.cron_triggers.get(parsed_args.name))
 
 
 class Create(show.ShowOne):
@@ -150,12 +150,12 @@ class Create(show.ShowOne):
             return {}
 
     def take_action(self, parsed_args):
-        mgr = cron_triggers.CronTriggerManager(self.app.client)
+        mistral_client = self.app.client_manager.workflow_engine
 
         wf_input = self._get_file_content_or_dict(parsed_args.workflow_input)
         wf_params = self._get_file_content_or_dict(parsed_args.params)
 
-        trigger = mgr.create(
+        trigger = mistral_client.cron_triggers.create(
             parsed_args.name,
             parsed_args.workflow_name,
             wf_input,
@@ -179,9 +179,10 @@ class Delete(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        mgr = cron_triggers.CronTriggerManager(self.app.client)
+        mistral_client = self.app.client_manager.workflow_engine
+
         utils.do_action_on_many(
-            lambda s: mgr.delete(s),
+            lambda s: mistral_client.cron_triggers.delete(s),
             parsed_args.name,
             "Request to delete cron trigger %s has been accepted.",
             "Unable to delete the specified cron trigger(s)."

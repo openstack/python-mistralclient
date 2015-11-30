@@ -15,10 +15,10 @@
 #
 
 import abc
+import textwrap
 
 from cliff import lister
 import six
-import textwrap
 
 
 @six.add_metaclass(abc.ABCMeta)

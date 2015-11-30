@@ -49,9 +49,8 @@ WORKFLOW_WITH_DEF = workflows.Workflow(mock, WF_WITH_DEF_DICT)
 
 class TestCLIWorkflowsV2(base.BaseCommandTest):
     @mock.patch('argparse.open', create=True)
-    @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.create')
-    def test_create(self, mock, mock_open):
-        mock.return_value = (WORKFLOW,)
+    def test_create(self, mock_open):
+        self.client.workflows.create.return_value = (WORKFLOW,)
 
         result = self.call(workflow_cmd.Create, app_args=['1.txt'])
 
@@ -61,9 +60,8 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         )
 
     @mock.patch('argparse.open', create=True)
-    @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.create')
-    def test_create_public(self, mock, mock_open):
-        mock.return_value = (WORKFLOW,)
+    def test_create_public(self, mock_open):
+        self.client.workflows.create.return_value = (WORKFLOW,)
 
         result = self.call(
             workflow_cmd.Create,
@@ -75,18 +73,20 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
             result[1]
         )
 
-        self.assertEqual('public', mock.call_args[1]['scope'])
+        self.assertEqual(
+            'public',
+            self.client.workflows.create.call_args[1]['scope']
+        )
 
     @mock.patch('argparse.open', create=True)
-    @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.create')
-    def test_create_long_input(self, mock, mock_open):
+    def test_create_long_input(self, mock_open):
         wf_long_input_dict = WORKFLOW_DICT.copy()
         long_input = ', '.join(
             ['var%s' % i for i in six.moves.xrange(10)]
         )
         wf_long_input_dict['input'] = long_input
         workflow_long_input = workflows.Workflow(mock, wf_long_input_dict)
-        mock.return_value = (workflow_long_input,)
+        self.client.workflows.create.return_value = (workflow_long_input,)
 
         result = self.call(workflow_cmd.Create, app_args=['1.txt'])
 
@@ -97,9 +97,8 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         )
 
     @mock.patch('argparse.open', create=True)
-    @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.update')
-    def test_update(self, mock, mock_open):
-        mock.return_value = (WORKFLOW,)
+    def test_update(self, mock_open):
+        self.client.workflows.update.return_value = (WORKFLOW,)
 
         result = self.call(workflow_cmd.Update, app_args=['1.txt'])
 
@@ -109,9 +108,8 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         )
 
     @mock.patch('argparse.open', create=True)
-    @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.update')
-    def test_update_public(self, mock, mock_open):
-        mock.return_value = (WORKFLOW,)
+    def test_update_public(self, mock_open):
+        self.client.workflows.update.return_value = (WORKFLOW,)
 
         result = self.call(
             workflow_cmd.Update,
@@ -123,11 +121,13 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
             result[1]
         )
 
-        self.assertEqual('public', mock.call_args[1]['scope'])
+        self.assertEqual(
+            'public',
+            self.client.workflows.update.call_args[1]['scope']
+        )
 
-    @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.list')
-    def test_list(self, mock):
-        mock.return_value = (WORKFLOW,)
+    def test_list(self):
+        self.client.workflows.list.return_value = (WORKFLOW,)
 
         result = self.call(workflow_cmd.List)
 
@@ -136,9 +136,8 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
             result[1]
         )
 
-    @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.get')
-    def test_get(self, mock):
-        mock.return_value = WORKFLOW
+    def test_get(self):
+        self.client.workflows.get.return_value = WORKFLOW
 
         result = self.call(workflow_cmd.Get, app_args=['name'])
 
@@ -147,46 +146,41 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
             result[1]
         )
 
-    @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.delete')
-    def test_delete(self, del_mock):
+    def test_delete(self):
         self.call(workflow_cmd.Delete, app_args=['name'])
 
-        del_mock.assert_called_once_with('name')
+        self.client.workflows.delete.assert_called_once_with('name')
 
-    @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.delete')
-    def test_delete_with_multi_names(self, del_mock):
+    def test_delete_with_multi_names(self):
         self.call(workflow_cmd.Delete, app_args=['name1', 'name2'])
 
-        self.assertEqual(2, del_mock.call_count)
+        self.assertEqual(2, self.client.workflows.delete.call_count)
         self.assertEqual(
             [mock.call('name1'), mock.call('name2')],
-            del_mock.call_args_list
+            self.client.workflows.delete.call_args_list
         )
 
-    @mock.patch('mistralclient.api.v2.workflows.'
-                'WorkflowManager.get')
-    def test_get_definition(self, mock):
-        mock.return_value = WORKFLOW_WITH_DEF
+    def test_get_definition(self):
+        self.client.workflows.get.return_value = WORKFLOW_WITH_DEF
 
         self.call(workflow_cmd.GetDefinition, app_args=['name'])
 
         self.app.stdout.write.assert_called_with(WF_DEF)
 
     @mock.patch('argparse.open', create=True)
-    @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.validate')
-    def test_validate(self, mock, mock_open):
-        mock.return_value = {'valid': True}
-        mock_open.return_value = mock.MagicMock(spec=open)
+    def test_validate(self, mock_open):
+        self.client.workflows.validate.return_value = {'valid': True}
 
         result = self.call(workflow_cmd.Validate, app_args=['wf.yaml'])
 
         self.assertEqual((True, None), result[1])
 
     @mock.patch('argparse.open', create=True)
-    @mock.patch('mistralclient.api.v2.workflows.WorkflowManager.validate')
-    def test_validate_failed(self, mock, mock_open):
-        mock.return_value = {'valid': False, 'error': 'Invalid DSL...'}
-        mock_open.return_value = mock.MagicMock(spec=open)
+    def test_validate_failed(self, mock_open):
+        self.client.workflows.validate.return_value = {
+            'valid': False,
+            'error': 'Invalid DSL...'
+        }
 
         result = self.call(workflow_cmd.Validate, app_args=['wf.yaml'])
 

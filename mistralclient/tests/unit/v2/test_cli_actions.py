@@ -51,9 +51,8 @@ ACTION_WITH_DEF = actions.Action(mock, ACTION_WITH_DEF_DICT)
 
 class TestCLIActionsV2(base.BaseCommandTest):
     @mock.patch('argparse.open', create=True)
-    @mock.patch('mistralclient.api.v2.actions.ActionManager.create')
-    def test_create(self, mock, mock_open):
-        mock.return_value = (ACTION,)
+    def test_create(self, mock_open):
+        self.client.actions.create.return_value = (ACTION,)
 
         result = self.call(action_cmd.Create, app_args=['1.txt'])
 
@@ -63,9 +62,8 @@ class TestCLIActionsV2(base.BaseCommandTest):
         )
 
     @mock.patch('argparse.open', create=True)
-    @mock.patch('mistralclient.api.v2.actions.ActionManager.create')
-    def test_create_public(self, mock, mock_open):
-        mock.return_value = (ACTION,)
+    def test_create_public(self, mock_open):
+        self.client.actions.create.return_value = (ACTION,)
 
         result = self.call(
             action_cmd.Create,
@@ -77,18 +75,23 @@ class TestCLIActionsV2(base.BaseCommandTest):
             result[1]
         )
 
-        self.assertEqual('public', mock.call_args[1]['scope'])
+        self.assertEqual(
+            'public',
+            self.client.actions.create.call_args[1]['scope']
+        )
 
     @mock.patch('argparse.open', create=True)
-    @mock.patch('mistralclient.api.v2.actions.ActionManager.create')
-    def test_create_long_input(self, mock, mock_open):
+    def test_create_long_input(self, mock_open):
         action_long_input_dict = ACTION_DICT.copy()
         long_input = ', '.join(
             ['var%s' % i for i in six.moves.xrange(10)]
         )
         action_long_input_dict['input'] = long_input
-        workflow_long_input = actions.Action(mock, action_long_input_dict)
-        mock.return_value = (workflow_long_input,)
+        workflow_long_input = actions.Action(
+            mock.Mock(),
+            action_long_input_dict
+        )
+        self.client.actions.create.return_value = (workflow_long_input,)
 
         result = self.call(action_cmd.Create, app_args=['1.txt'])
 
@@ -99,9 +102,8 @@ class TestCLIActionsV2(base.BaseCommandTest):
         )
 
     @mock.patch('argparse.open', create=True)
-    @mock.patch('mistralclient.api.v2.actions.ActionManager.update')
-    def test_update(self, mock, mock_open):
-        mock.return_value = (ACTION,)
+    def test_update(self, mock_open):
+        self.client.actions.update.return_value = (ACTION,)
 
         result = self.call(action_cmd.Update, app_args=['my_action.yaml'])
 
@@ -111,9 +113,8 @@ class TestCLIActionsV2(base.BaseCommandTest):
         )
 
     @mock.patch('argparse.open', create=True)
-    @mock.patch('mistralclient.api.v2.actions.ActionManager.update')
-    def test_update_public(self, mock, mock_open):
-        mock.return_value = (ACTION,)
+    def test_update_public(self, mock_open):
+        self.client.actions.update.return_value = (ACTION,)
 
         result = self.call(
             action_cmd.Update,
@@ -125,11 +126,13 @@ class TestCLIActionsV2(base.BaseCommandTest):
             result[1]
         )
 
-        self.assertEqual('public', mock.call_args[1]['scope'])
+        self.assertEqual(
+            'public',
+            self.client.actions.update.call_args[1]['scope']
+        )
 
-    @mock.patch('mistralclient.api.v2.actions.ActionManager.list')
-    def test_list(self, mock):
-        mock.return_value = (ACTION,)
+    def test_list(self):
+        self.client.actions.list.return_value = (ACTION,)
 
         result = self.call(action_cmd.List)
 
@@ -138,9 +141,8 @@ class TestCLIActionsV2(base.BaseCommandTest):
             result[1]
         )
 
-    @mock.patch('mistralclient.api.v2.actions.ActionManager.get')
-    def test_get(self, mock):
-        mock.return_value = ACTION
+    def test_get(self):
+        self.client.actions.get.return_value = ACTION
 
         result = self.call(action_cmd.Get, app_args=['name'])
 
@@ -149,26 +151,22 @@ class TestCLIActionsV2(base.BaseCommandTest):
             result[1]
         )
 
-    @mock.patch('mistralclient.api.v2.actions.ActionManager.delete')
-    def test_delete(self, del_mock):
+    def test_delete(self):
         self.call(action_cmd.Delete, app_args=['name'])
 
-        del_mock.assert_called_once_with('name')
+        self.client.actions.delete.assert_called_once_with('name')
 
-    @mock.patch('mistralclient.api.v2.actions.ActionManager.delete')
-    def test_delete_with_multi_names(self, del_mock):
+    def test_delete_with_multi_names(self):
         self.call(action_cmd.Delete, app_args=['name1', 'name2'])
 
-        self.assertEqual(2, del_mock.call_count)
+        self.assertEqual(2, self.client.actions.delete.call_count)
         self.assertEqual(
             [mock.call('name1'), mock.call('name2')],
-            del_mock.call_args_list
+            self.client.actions.delete.call_args_list
         )
 
-    @mock.patch('mistralclient.api.v2.actions.'
-                'ActionManager.get')
-    def test_get_definition(self, mock):
-        mock.return_value = ACTION_WITH_DEF
+    def test_get_definition(self):
+        self.client.actions.get.return_value = ACTION_WITH_DEF
 
         self.call(action_cmd.GetDefinition, app_args=['name'])
 

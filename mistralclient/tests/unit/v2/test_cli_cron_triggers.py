@@ -38,9 +38,8 @@ TRIGGER = cron_triggers.CronTrigger(mock, TRIGGER_DICT)
 
 class TestCLITriggersV2(base.BaseCommandTest):
     @mock.patch('argparse.open', create=True)
-    @mock.patch('mistralclient.api.v2.cron_triggers.CronTriggerManager.create')
-    def test_create(self, mock, mock_open):
-        mock.return_value = TRIGGER
+    def test_create(self, mock_open):
+        self.client.cron_triggers.create.return_value = TRIGGER
         mock_open.return_value = mock.MagicMock(spec=open)
 
         result = self.call(
@@ -58,9 +57,8 @@ class TestCLITriggersV2(base.BaseCommandTest):
             result[1]
         )
 
-    @mock.patch('mistralclient.api.v2.cron_triggers.CronTriggerManager.list')
-    def test_list(self, mock):
-        mock.return_value = (TRIGGER,)
+    def test_list(self):
+        self.client.cron_triggers.list.return_value = (TRIGGER,)
 
         result = self.call(cron_triggers_cmd.List)
 
@@ -72,9 +70,8 @@ class TestCLITriggersV2(base.BaseCommandTest):
             result[1]
         )
 
-    @mock.patch('mistralclient.api.v2.cron_triggers.CronTriggerManager.get')
-    def test_get(self, mock):
-        mock.return_value = TRIGGER
+    def test_get(self):
+        self.client.cron_triggers.get.return_value = TRIGGER
 
         result = self.call(cron_triggers_cmd.Get, app_args=['name'])
 
@@ -86,18 +83,16 @@ class TestCLITriggersV2(base.BaseCommandTest):
             result[1]
         )
 
-    @mock.patch('mistralclient.api.v2.cron_triggers.CronTriggerManager.delete')
-    def test_delete(self, del_mock):
+    def test_delete(self):
         self.call(cron_triggers_cmd.Delete, app_args=['name'])
 
-        del_mock.assert_called_once_with('name')
+        self.client.cron_triggers.delete.assert_called_once_with('name')
 
-    @mock.patch('mistralclient.api.v2.cron_triggers.CronTriggerManager.delete')
-    def test_delete_with_multi_names(self, del_mock):
+    def test_delete_with_multi_names(self):
         self.call(cron_triggers_cmd.Delete, app_args=['name1', 'name2'])
 
-        self.assertEqual(2, del_mock.call_count)
+        self.assertEqual(2, self.client.cron_triggers.delete.call_count)
         self.assertEqual(
             [mock.call('name1'), mock.call('name2')],
-            del_mock.call_args_list
+            self.client.cron_triggers.delete.call_args_list
         )

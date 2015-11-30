@@ -14,7 +14,6 @@
 
 import logging
 
-from mistralclient.api.v2 import services
 from mistralclient.commands.v2 import base
 
 
@@ -39,4 +38,5 @@ class List(base.MistralLister):
         return format_list
 
     def _get_resources(self, parsed_args):
-        return services.ServiceManager(self.app.client).list()
+        mistral_client = self.app.client_manager.workflow_engine
+        return mistral_client.services.list()
