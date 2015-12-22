@@ -1,4 +1,5 @@
 # Copyright 2014 - Mirantis, Inc.
+# Copyright 2015 - StackStorm, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -48,12 +49,18 @@ class TestExecutionsV2(base.BaseClientV2Test):
             'input': json.dumps(EXEC['input']),
         }
 
-        ex = self.executions.create(EXEC['workflow_name'],
-                                    EXEC['input'])
+        ex = self.executions.create(
+            EXEC['workflow_name'],
+            EXEC['input']
+        )
 
         self.assertIsNotNone(ex)
-        self.assertEqual(executions.Execution(self.executions, EXEC).to_dict(),
-                         ex.to_dict())
+
+        self.assertEqual(
+            executions.Execution(self.executions, EXEC).to_dict(),
+            ex.to_dict()
+        )
+
         mock.assert_called_once_with(URL_TEMPLATE, json.dumps(body))
 
     @unittest2.expectedFailure
@@ -64,8 +71,10 @@ class TestExecutionsV2(base.BaseClientV2Test):
     @unittest2.expectedFailure
     def test_create_failure2(self):
         self.mock_http_post(content=EXEC)
-        self.executions.create(EXEC['workflow_name'],
-                               list('343', 'sdfsd'))
+        self.executions.create(
+            EXEC['workflow_name'],
+            list('343', 'sdfsd')
+        )
 
     def test_update(self):
         mock = self.mock_http_put(content=EXEC)
@@ -76,10 +85,43 @@ class TestExecutionsV2(base.BaseClientV2Test):
         ex = self.executions.update(EXEC['id'], EXEC['state'])
 
         self.assertIsNotNone(ex)
-        self.assertEqual(executions.Execution(self.executions, EXEC).to_dict(),
-                         ex.to_dict())
+
+        self.assertEqual(
+            executions.Execution(self.executions, EXEC).to_dict(),
+            ex.to_dict()
+        )
+
         mock.assert_called_once_with(
-            URL_TEMPLATE_ID % EXEC['id'], json.dumps(body))
+            URL_TEMPLATE_ID % EXEC['id'],
+            json.dumps(body)
+        )
+
+    def test_update_env(self):
+        mock = self.mock_http_put(content=EXEC)
+        body = {
+            'state': EXEC['state'],
+            'params': {
+                'env': {'k1': 'foobar'}
+            }
+        }
+
+        ex = self.executions.update(
+            EXEC['id'],
+            EXEC['state'],
+            env={'k1': 'foobar'}
+        )
+
+        self.assertIsNotNone(ex)
+
+        self.assertEqual(
+            executions.Execution(self.executions, EXEC).to_dict(),
+            ex.to_dict()
+        )
+
+        mock.assert_called_once_with(
+            URL_TEMPLATE_ID % EXEC['id'],
+            json.dumps(body)
+        )
 
     def test_list(self):
         mock = self.mock_http_get(content={'executions': [EXEC]})
@@ -116,8 +158,11 @@ class TestExecutionsV2(base.BaseClientV2Test):
 
         ex = self.executions.get(EXEC['id'])
 
-        self.assertEqual(executions.Execution(self.executions, EXEC).to_dict(),
-                         ex.to_dict())
+        self.assertEqual(
+            executions.Execution(self.executions, EXEC).to_dict(),
+            ex.to_dict()
+        )
+
         mock.assert_called_once_with(URL_TEMPLATE_ID % EXEC['id'])
 
     def test_delete(self):

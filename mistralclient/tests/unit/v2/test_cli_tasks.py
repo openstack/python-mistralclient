@@ -1,4 +1,5 @@
-# Copyright 2014 Mirantis, Inc.
+# Copyright 2014 - Mirantis, Inc.
+# Copyright 2015 - StackStorm, Inc.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -99,5 +100,25 @@ class TestCLITasksV2(base.BaseCommandTest):
         self.client.tasks.rerun.return_value = TASK
 
         result = self.call(task_cmd.Rerun, app_args=['id', '--resume'])
+
+        self.assertEqual(EXPECTED_TASK_RESULT, result[1])
+
+    def test_rerun_update_env(self):
+        self.client.tasks.rerun.return_value = TASK
+
+        result = self.call(
+            task_cmd.Rerun,
+            app_args=['id', '--env', '{"k1": "foobar"}']
+        )
+
+        self.assertEqual(EXPECTED_TASK_RESULT, result[1])
+
+    def test_rerun_no_reset_update_env(self):
+        self.client.tasks.rerun.return_value = TASK
+
+        result = self.call(
+            task_cmd.Rerun,
+            app_args=['id', '--resume', '--env', '{"k1": "foobar"}']
+        )
 
         self.assertEqual(EXPECTED_TASK_RESULT, result[1])

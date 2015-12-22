@@ -18,7 +18,6 @@ import logging
 
 from cliff import command
 from cliff import show
-import yaml
 
 from mistralclient.commands.v2 import base
 from mistralclient import utils
@@ -89,17 +88,6 @@ def format(environment=None):
     return columns, data
 
 
-def load_file_content(f):
-    content = f.read()
-
-    try:
-        data = yaml.safe_load(content)
-    except Exception:
-        data = json.loads(content)
-
-    return data
-
-
 class List(base.MistralLister):
     """List all environments."""
 
@@ -146,7 +134,7 @@ class Create(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        data = load_file_content(parsed_args.file)
+        data = utils.load_content(parsed_args.file.read())
 
         mistral_client = self.app.client_manager.workflow_engine
         environment = mistral_client.environments.create(**data)
@@ -190,7 +178,7 @@ class Update(show.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
-        data = load_file_content(parsed_args.file)
+        data = utils.load_content(parsed_args.file.read())
 
         mistral_client = self.app.client_manager.workflow_engine
         environment = mistral_client.environments.update(**data)

@@ -1,4 +1,5 @@
 # Copyright 2014 - Mirantis, Inc.
+# Copyright 2015 - StackStorm, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -98,6 +99,28 @@ class TestTasksV2(base.BaseClientV2Test):
                 'reset': False,
                 'state': 'RUNNING',
                 'id': TASK['id']
+            },
+            json.loads(mock.call_args[0][1])
+        )
+
+    def test_rerun_update_env(self):
+        mock = self.mock_http_put(content=TASK)
+
+        task = self.tasks.rerun(TASK['id'], env={'k1': 'foobar'})
+
+        self.assertDictEqual(
+            tasks.Task(self.tasks, TASK).to_dict(),
+            task.to_dict()
+        )
+
+        self.assertEqual(1, mock.call_count)
+        self.assertEqual(URL_TEMPLATE_ID % TASK['id'], mock.call_args[0][0])
+        self.assertDictEqual(
+            {
+                'reset': True,
+                'state': 'RUNNING',
+                'id': TASK['id'],
+                'env': json.dumps({'k1': 'foobar'})
             },
             json.loads(mock.call_args[0][1])
         )

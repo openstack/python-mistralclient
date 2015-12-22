@@ -1,4 +1,5 @@
 # Copyright 2014 - Mirantis, Inc.
+# Copyright 2015 - StackStorm, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -58,12 +59,17 @@ class ExecutionManager(base.ResourceManager):
     def create_direct_workflow(self, workflow_name, workflow_input, **params):
         return self.create(workflow_name, workflow_input, **params)
 
-    def update(self, id, state, description=None):
+    def update(self, id, state, description=None, env=None):
+        data = {}
+
         if state:
-            data = {'state': state}
+            data['state'] = state
 
         if description:
-            data = ({'description': description})
+            data['description'] = description
+
+        if env:
+            data['params'] = {'env': env}
 
         return self._update('/executions/%s' % id, data)
 
