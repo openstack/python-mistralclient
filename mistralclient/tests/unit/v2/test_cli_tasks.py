@@ -49,14 +49,14 @@ EXPECTED_TASK_RESULT = ('123', 'some', 'thing', '321', 'RUNNING', None)
 
 class TestCLITasksV2(base.BaseCommandTest):
     def test_list(self):
-        self.client.tasks.list.return_value = (TASK,)
+        self.client.tasks.list.return_value = [TASK]
 
         result = self.call(task_cmd.List)
 
         self.assertEqual([EXPECTED_TASK_RESULT], result[1])
 
     def test_list_with_workflow_execution(self):
-        self.client.tasks.list.return_value = (TASK,)
+        self.client.tasks.list.return_value = [TASK]
 
         result = self.call(task_cmd.List, app_args=['workflow_execution'])
 

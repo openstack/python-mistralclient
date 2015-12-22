@@ -52,7 +52,7 @@ ACTION_WITH_DEF = actions.Action(mock, ACTION_WITH_DEF_DICT)
 class TestCLIActionsV2(base.BaseCommandTest):
     @mock.patch('argparse.open', create=True)
     def test_create(self, mock_open):
-        self.client.actions.create.return_value = (ACTION,)
+        self.client.actions.create.return_value = [ACTION]
 
         result = self.call(action_cmd.Create, app_args=['1.txt'])
 
@@ -63,7 +63,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
 
     @mock.patch('argparse.open', create=True)
     def test_create_public(self, mock_open):
-        self.client.actions.create.return_value = (ACTION,)
+        self.client.actions.create.return_value = [ACTION]
 
         result = self.call(
             action_cmd.Create,
@@ -91,7 +91,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
             mock.Mock(),
             action_long_input_dict
         )
-        self.client.actions.create.return_value = (workflow_long_input,)
+        self.client.actions.create.return_value = [workflow_long_input]
 
         result = self.call(action_cmd.Create, app_args=['1.txt'])
 
@@ -103,7 +103,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
 
     @mock.patch('argparse.open', create=True)
     def test_update(self, mock_open):
-        self.client.actions.update.return_value = (ACTION,)
+        self.client.actions.update.return_value = [ACTION]
 
         result = self.call(action_cmd.Update, app_args=['my_action.yaml'])
 
@@ -114,7 +114,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
 
     @mock.patch('argparse.open', create=True)
     def test_update_public(self, mock_open):
-        self.client.actions.update.return_value = (ACTION,)
+        self.client.actions.update.return_value = [ACTION]
 
         result = self.call(
             action_cmd.Update,
@@ -132,7 +132,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
         )
 
     def test_list(self):
-        self.client.actions.list.return_value = (ACTION,)
+        self.client.actions.list.return_value = [ACTION]
 
         result = self.call(action_cmd.List)
 

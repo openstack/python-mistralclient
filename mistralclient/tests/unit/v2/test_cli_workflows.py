@@ -50,7 +50,7 @@ WORKFLOW_WITH_DEF = workflows.Workflow(mock, WF_WITH_DEF_DICT)
 class TestCLIWorkflowsV2(base.BaseCommandTest):
     @mock.patch('argparse.open', create=True)
     def test_create(self, mock_open):
-        self.client.workflows.create.return_value = (WORKFLOW,)
+        self.client.workflows.create.return_value = [WORKFLOW]
 
         result = self.call(workflow_cmd.Create, app_args=['1.txt'])
 
@@ -61,7 +61,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
 
     @mock.patch('argparse.open', create=True)
     def test_create_public(self, mock_open):
-        self.client.workflows.create.return_value = (WORKFLOW,)
+        self.client.workflows.create.return_value = [WORKFLOW]
 
         result = self.call(
             workflow_cmd.Create,
@@ -86,7 +86,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         )
         wf_long_input_dict['input'] = long_input
         workflow_long_input = workflows.Workflow(mock, wf_long_input_dict)
-        self.client.workflows.create.return_value = (workflow_long_input,)
+        self.client.workflows.create.return_value = [workflow_long_input]
 
         result = self.call(workflow_cmd.Create, app_args=['1.txt'])
 
@@ -98,7 +98,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
 
     @mock.patch('argparse.open', create=True)
     def test_update(self, mock_open):
-        self.client.workflows.update.return_value = (WORKFLOW,)
+        self.client.workflows.update.return_value = [WORKFLOW]
 
         result = self.call(workflow_cmd.Update, app_args=['1.txt'])
 
@@ -109,7 +109,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
 
     @mock.patch('argparse.open', create=True)
     def test_update_public(self, mock_open):
-        self.client.workflows.update.return_value = (WORKFLOW,)
+        self.client.workflows.update.return_value = [WORKFLOW]
 
         result = self.call(
             workflow_cmd.Update,
@@ -126,8 +126,22 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
             self.client.workflows.update.call_args[1]['scope']
         )
 
+    @mock.patch('argparse.open', create=True)
+    def test_update_with_id(self, mock_open):
+        self.client.workflows.update.return_value = WORKFLOW
+
+        result = self.call(
+            workflow_cmd.Update,
+            app_args=['1.txt', '--id', '1-2-3-4']
+        )
+
+        self.assertEqual(
+            [('1-2-3-4', 'a', '12345', 'a, b', 'param', '1', '1')],
+            result[1]
+        )
+
     def test_list(self):
-        self.client.workflows.list.return_value = (WORKFLOW,)
+        self.client.workflows.list.return_value = [WORKFLOW]
 
         result = self.call(workflow_cmd.List)
 

@@ -80,13 +80,13 @@ class Get(show.ShowOne):
     def get_parser(self, prog_name):
         parser = super(Get, self).get_parser(prog_name)
 
-        parser.add_argument('name', help='Workflow name')
+        parser.add_argument('identifier', help='Workflow ID or name.')
 
         return parser
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-        wf = mistral_client.workflows.get(parsed_args.name)
+        wf = mistral_client.workflows.get(parsed_args.identifier)
 
         return format(wf)
 
@@ -100,7 +100,7 @@ class Create(base.MistralLister):
         parser.add_argument(
             'definition',
             type=argparse.FileType('r'),
-            help='Workflow definition file'
+            help='Workflow definition file.'
         )
         parser.add_argument(
             '--public',
@@ -134,7 +134,11 @@ class Delete(command.Command):
     def get_parser(self, prog_name):
         parser = super(Delete, self).get_parser(prog_name)
 
-        parser.add_argument('name', nargs='+', help='Name of workflow(s).')
+        parser.add_argument(
+            'identifier',
+            nargs='+',
+            help='Name or ID of workflow(s).'
+        )
 
         return parser
 
@@ -142,7 +146,7 @@ class Delete(command.Command):
         mistral_client = self.app.client_manager.workflow_engine
         utils.do_action_on_many(
             lambda s: mistral_client.workflows.delete(s),
-            parsed_args.name,
+            parsed_args.identifier,
             "Request to delete workflow %s has been accepted.",
             "Unable to delete the specified workflow(s)."
         )
@@ -159,6 +163,7 @@ class Update(base.MistralLister):
             type=argparse.FileType('r'),
             help='Workflow definition'
         )
+        parser.add_argument('--id', help='Workflow ID.')
         parser.add_argument(
             '--public',
             action='store_true',
@@ -176,7 +181,8 @@ class Update(base.MistralLister):
 
         return mistral_client.workflows.update(
             parsed_args.definition.read(),
-            scope=scope
+            scope=scope,
+            id=parsed_args.id
         )
 
 
@@ -186,15 +192,15 @@ class GetDefinition(command.Command):
     def get_parser(self, prog_name):
         parser = super(GetDefinition, self).get_parser(prog_name)
 
-        parser.add_argument('name', help='Workflow name')
+        parser.add_argument('identifier', help='Workflow ID or name.')
 
         return parser
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-        definition = mistral_client.workflows.get(parsed_args.name).definition
+        wf = mistral_client.workflows.get(parsed_args.identifier)
 
-        self.app.stdout.write(definition or "\n")
+        self.app.stdout.write(wf.definition or "\n")
 
 
 class Validate(show.ShowOne):

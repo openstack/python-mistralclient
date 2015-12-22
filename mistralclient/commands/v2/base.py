@@ -41,7 +41,11 @@ class MistralLister(lister.Lister):
 
         f = self._get_format_function()
 
-        data = [f(r)[1] for r in self._get_resources(parsed_args)]
+        ret = self._get_resources(parsed_args)
+        if not isinstance(ret, list):
+            ret = [ret]
+
+        data = [f(r)[1] for r in ret]
 
         if data:
             return f()[0], data

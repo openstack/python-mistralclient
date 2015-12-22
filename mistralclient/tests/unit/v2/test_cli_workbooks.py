@@ -65,7 +65,7 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
         self.assertEqual(('a', 'a, b', '1', '1'), result[1])
 
     def test_list(self):
-        self.client.workbooks.list.return_value = (WORKBOOK,)
+        self.client.workbooks.list.return_value = [WORKBOOK]
 
         result = self.call(workbook_cmd.List)
 

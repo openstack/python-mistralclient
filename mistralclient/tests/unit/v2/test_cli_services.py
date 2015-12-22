@@ -29,7 +29,7 @@ SERVICE = services.Service(mock, SERVICE_DICT)
 
 class TestCLIServicesV2(base.BaseCommandTest):
     def test_list(self):
-        self.client.services.list.return_value = (SERVICE,)
+        self.client.services.list.return_value = [SERVICE]
         expected = (SERVICE_DICT['name'], SERVICE_DICT['type'],)
 
         result = self.call(service_cmd.List)

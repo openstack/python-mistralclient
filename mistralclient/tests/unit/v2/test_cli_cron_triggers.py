@@ -58,7 +58,7 @@ class TestCLITriggersV2(base.BaseCommandTest):
         )
 
     def test_list(self):
-        self.client.cron_triggers.list.return_value = (TRIGGER,)
+        self.client.cron_triggers.list.return_value = [TRIGGER]
 
         result = self.call(cron_triggers_cmd.List)
 

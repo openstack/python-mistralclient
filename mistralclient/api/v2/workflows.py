@@ -43,17 +43,22 @@ class WorkflowManager(base.ResourceManager):
         return [self.resource_class(self, resource_data)
                 for resource_data in base.extract_json(resp, 'workflows')]
 
-    def update(self, definition, scope='private'):
+    def update(self, definition, scope='private', id=None):
         self._ensure_not_empty(definition=definition)
 
+        url_pre = ('/workflows/%s' % id) if id else '/workflows'
+
         resp = self.client.http_client.put(
-            '/workflows?scope=%s' % scope,
+            '%s?scope=%s' % (url_pre, scope),
             definition,
             headers={'content-type': 'text/plain'}
         )
 
         if resp.status_code != 200:
             self._raise_api_exception(resp)
+
+        if id:
+            return self.resource_class(self, base.extract_json(resp, None))
 
         return [self.resource_class(self, resource_data)
                 for resource_data in base.extract_json(resp, 'workflows')]
@@ -81,15 +86,15 @@ class WorkflowManager(base.ResourceManager):
             response_key='workflows',
         )
 
-    def get(self, name):
-        self._ensure_not_empty(name=name)
+    def get(self, identifier):
+        self._ensure_not_empty(identifier=identifier)
 
-        return self._get('/workflows/%s' % name)
+        return self._get('/workflows/%s' % identifier)
 
-    def delete(self, name):
-        self._ensure_not_empty(name=name)
+    def delete(self, identifier):
+        self._ensure_not_empty(identifier=identifier)
 
-        self._delete('/workflows/%s' % name)
+        self._delete('/workflows/%s' % identifier)
 
     def validate(self, definition):
         self._ensure_not_empty(definition=definition)

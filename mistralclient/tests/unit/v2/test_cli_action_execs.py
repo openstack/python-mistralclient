@@ -93,7 +93,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
         )
 
     def test_list(self):
-        self.client.action_executions.list.return_value = (ACTION_EX,)
+        self.client.action_executions.list.return_value = [ACTION_EX]
 
         result = self.call(action_ex_cmd.List)
 

@@ -68,6 +68,20 @@ class TestWorkflowsV2(base.BaseClientV2Test):
             headers={'content-type': 'text/plain'}
         )
 
+    def test_update_with_id(self):
+        mock = self.mock_http_put(content=WORKFLOW)
+
+        wf = self.workflows.update(WF_DEF, id='123')
+
+        self.assertIsNotNone(wf)
+        self.assertEqual(WF_DEF, wf.definition)
+
+        mock.assert_called_once_with(
+            '/workflows/123?scope=private',
+            WF_DEF,
+            headers={'content-type': 'text/plain'}
+        )
+
     def test_list(self):
         mock = self.mock_http_get(content={'workflows': [WORKFLOW]})
 

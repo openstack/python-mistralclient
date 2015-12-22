@@ -92,7 +92,7 @@ class TestCLIEnvironmentsV2(base.BaseCommandTest):
         self._test_update(yml)
 
     def test_list(self):
-        self.client.environments.list.return_value = (ENVIRONMENT,)
+        self.client.environments.list.return_value = [ENVIRONMENT]
         expected = (ENVIRONMENT_DICT['name'],
                     ENVIRONMENT_DICT['description'],
                     ENVIRONMENT_DICT['scope'],

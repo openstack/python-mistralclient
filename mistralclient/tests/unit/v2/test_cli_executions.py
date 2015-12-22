@@ -139,7 +139,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         )
 
     def test_list(self):
-        self.client.executions.list.return_value = (EXEC, SUB_WF_EXEC)
+        self.client.executions.list.return_value = [EXEC, SUB_WF_EXEC]
 
         result = self.call(execution_cmd.List)
 
@@ -149,7 +149,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         )
 
     def test_list_with_pagination(self):
-        self.client.executions.list.return_value = (EXEC,)
+        self.client.executions.list.return_value = [EXEC]
 
         self.call(execution_cmd.List)
         self.client.executions.list.assert_called_once_with(
