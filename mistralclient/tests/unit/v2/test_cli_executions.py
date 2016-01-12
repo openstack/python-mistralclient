@@ -1,4 +1,5 @@
-# Copyright 2014 Mirantis, Inc.
+# Copyright 2014 - Mirantis, Inc.
+# Copyright 2015 - StackStorm, Inc.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -36,47 +37,95 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
     def test_create_wf_input_string(self):
         self.client.executions.create.return_value = EXECUTION
 
-        result = self.call(execution_cmd.Create,
-                           app_args=['id', '{ "context": true }'])
+        result = self.call(
+            execution_cmd.Create,
+            app_args=['id', '{ "context": true }']
+        )
 
-        self.assertEqual(('123', 'some', '', 'RUNNING', None,
-                          '1', '1'), result[1])
+        self.assertEqual(
+            ('123', 'some', '', 'RUNNING', None, '1', '1'),
+            result[1]
+        )
 
     def test_create_wf_input_file(self):
         self.client.executions.create.return_value = EXECUTION
-        path = pkg.resource_filename('mistralclient',
-                                     'tests/unit/resources/ctx.json')
-        result = self.call(execution_cmd.Create,
-                           app_args=['id', path])
 
-        self.assertEqual(('123', 'some', '', 'RUNNING', None,
-                          '1', '1'), result[1])
+        path = pkg.resource_filename(
+            'mistralclient',
+            'tests/unit/resources/ctx.json'
+        )
+
+        result = self.call(
+            execution_cmd.Create,
+            app_args=['id', path]
+        )
+
+        self.assertEqual(
+            ('123', 'some', '', 'RUNNING', None, '1', '1'),
+            result[1]
+        )
 
     def test_create_with_description(self):
         self.client.executions.create.return_value = EXECUTION
 
-        result = self.call(execution_cmd.Create,
-                           app_args=['id', '{ "context": true }', '-d', ''])
+        result = self.call(
+            execution_cmd.Create,
+            app_args=['id', '{ "context": true }', '-d', '']
+        )
 
-        self.assertEqual(('123', 'some', '', 'RUNNING', None,
-                          '1', '1'), result[1])
+        self.assertEqual(
+            ('123', 'some', '', 'RUNNING', None, '1', '1'),
+            result[1]
+        )
 
-    def test_update(self):
+    def test_update_state(self):
         self.client.executions.update.return_value = EXECUTION
 
-        result = self.call(execution_cmd.Update,
-                           app_args=['id', '-s', 'SUCCESS'])
+        result = self.call(
+            execution_cmd.Update,
+            app_args=['id', '-s', 'SUCCESS']
+        )
 
-        self.assertEqual(('123', 'some', '', 'RUNNING', None,
-                          '1', '1'), result[1])
+        self.assertEqual(
+            ('123', 'some', '', 'RUNNING', None, '1', '1'),
+            result[1]
+        )
+
+    def test_resume_update_env(self):
+        self.client.executions.update.return_value = EXECUTION
+
+        result = self.call(
+            execution_cmd.Update,
+            app_args=['id', '-s', 'RUNNING', '--env', '{"k1": "foobar"}']
+        )
+
+        self.assertEqual(
+            ('123', 'some', '', 'RUNNING', None, '1', '1'),
+            result[1]
+        )
+
+    def test_update_description(self):
+        self.client.executions.update.return_value = EXECUTION
+
+        result = self.call(
+            execution_cmd.Update,
+            app_args=['id', '-d', 'foobar']
+        )
+
+        self.assertEqual(
+            ('123', 'some', '', 'RUNNING', None, '1', '1'),
+            result[1]
+        )
 
     def test_list(self):
         self.client.executions.list.return_value = (EXECUTION,)
 
         result = self.call(execution_cmd.List)
 
-        self.assertEqual([('123', 'some', '', 'RUNNING', None,
-                          '1', '1')], result[1])
+        self.assertEqual(
+            [('123', 'some', '', 'RUNNING', None, '1', '1')],
+            result[1]
+        )
 
     def test_list_with_pagination(self):
         self.client.executions.list.return_value = (EXECUTION,)
@@ -111,8 +160,10 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
 
         result = self.call(execution_cmd.Get, app_args=['id'])
 
-        self.assertEqual(('123', 'some', '', 'RUNNING', None,
-                          '1', '1'), result[1])
+        self.assertEqual(
+            ('123', 'some', '', 'RUNNING', None, '1', '1'),
+            result[1]
+        )
 
     def test_delete(self):
         self.call(execution_cmd.Delete, app_args=['id'])

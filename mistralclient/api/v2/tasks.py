@@ -13,6 +13,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import json
+
 from mistralclient.api import base
 
 
@@ -36,7 +38,7 @@ class TaskManager(base.ResourceManager):
 
         return self._get('/tasks/%s' % id)
 
-    def rerun(self, task_ex_id, reset=True):
+    def rerun(self, task_ex_id, reset=True, env=None):
         url = '/tasks/%s' % task_ex_id
 
         body = {
@@ -44,5 +46,8 @@ class TaskManager(base.ResourceManager):
             'state': 'RUNNING',
             'reset': reset
         }
+
+        if env:
+            body['env'] = json.dumps(env)
 
         return self._update(url, body)

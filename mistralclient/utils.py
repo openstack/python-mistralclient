@@ -1,4 +1,5 @@
 # Copyright 2015 - Huawei Technologies Co. Ltd
+# Copyright 2015 - StackStorm, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -11,6 +12,10 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
+
+import json
+
+import yaml
 
 from mistralclient import exceptions
 
@@ -29,3 +34,20 @@ def do_action_on_many(action, resources, success_msg, error_msg):
 
     if failure_flag:
         raise exceptions.MistralClientException(error_msg)
+
+
+def load_content(content):
+    if content is None or content == '':
+        return dict()
+
+    try:
+        data = yaml.safe_load(content)
+    except Exception:
+        data = json.loads(content)
+
+    return data
+
+
+def load_file(path):
+    with open(path, 'r') as f:
+        return load_content(f.read())

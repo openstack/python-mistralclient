@@ -17,11 +17,13 @@
 
 import json
 import logging
+import os.path
 
 from cliff import command
 from cliff import show
 
 from mistralclient.commands.v2 import base
+from mistralclient import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -163,13 +165,28 @@ class Rerun(show.ShowOne):
                   'executions for with-items task')
         )
 
+        parser.add_argument(
+            '-e',
+            '--env',
+            dest='env',
+            help='Environment variables'
+        )
+
         return parser
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
+
+        env = (
+            utils.load_file(parsed_args.env)
+            if parsed_args.env and os.path.isfile(parsed_args.env)
+            else utils.load_content(parsed_args.env)
+        )
+
         execution = mistral_client.tasks.rerun(
             parsed_args.id,
-            reset=(not parsed_args.resume)
+            reset=(not parsed_args.resume),
+            env=env
         )
 
         return format(execution)

@@ -1,4 +1,5 @@
 # Copyright 2014 - Mirantis, Inc.
+# Copyright 2015 - StackStorm, Inc.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -16,6 +17,7 @@
 
 import json
 import logging
+import os.path
 
 from cliff import command
 from cliff import show
@@ -225,15 +227,22 @@ class Update(show.ShowOne):
             help='Execution identifier'
         )
 
-        group = parser.add_mutually_exclusive_group(required=True)
-        group.add_argument(
+        parser.add_argument(
             '-s',
             '--state',
             dest='state',
             choices=['RUNNING', 'PAUSED', 'SUCCESS', 'ERROR'],
             help='Execution state'
         )
-        group.add_argument(
+
+        parser.add_argument(
+            '-e',
+            '--env',
+            dest='env',
+            help='Environment variables'
+        )
+
+        parser.add_argument(
             '-d',
             '--description',
             dest='description',
@@ -245,10 +254,18 @@ class Update(show.ShowOne):
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
 
+        env = (
+            utils.load_file(parsed_args.env)
+            if parsed_args.env and os.path.isfile(parsed_args.env)
+            else utils.load_content(parsed_args.env)
+        )
+
         execution = mistral_client.executions.update(
             parsed_args.id,
             parsed_args.state,
-            parsed_args.description)
+            description=parsed_args.description,
+            env=env
+        )
 
         return format(execution)
 
