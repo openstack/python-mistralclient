@@ -22,20 +22,41 @@ from mistralclient.api.v2 import executions
 from mistralclient.commands.v2 import executions as execution_cmd
 from mistralclient.tests.unit import base
 
-EXECUTION = executions.Execution(mock, {
-    'id': '123',
-    'workflow_name': 'some',
-    'description': '',
-    'state': 'RUNNING',
-    'state_info': None,
-    'created_at': '1',
-    'updated_at': '1'
-})
+EXEC = executions.Execution(
+    mock,
+    {
+        'id': '123',
+        'workflow_name': 'some',
+        'description': '',
+        'state': 'RUNNING',
+        'state_info': None,
+        'created_at': '1',
+        'updated_at': '1',
+        'task_execution_id': None
+    }
+)
+
+SUB_WF_EXEC = executions.Execution(
+    mock,
+    {
+        'id': '456',
+        'workflow_name': 'some_sub_wf',
+        'description': '',
+        'state': 'RUNNING',
+        'state_info': None,
+        'created_at': '1',
+        'updated_at': '1',
+        'task_execution_id': 'abc'
+    }
+)
+
+EX_RESULT = ('123', 'some', '', '<none>', 'RUNNING', None, '1', '1')
+SUB_WF_EX_RESULT = ('456', 'some_sub_wf', '', 'abc', 'RUNNING', None, '1', '1')
 
 
 class TestCLIExecutionsV2(base.BaseCommandTest):
     def test_create_wf_input_string(self):
-        self.client.executions.create.return_value = EXECUTION
+        self.client.executions.create.return_value = EXEC
 
         result = self.call(
             execution_cmd.Create,
@@ -43,12 +64,12 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            ('123', 'some', '', 'RUNNING', None, '1', '1'),
+            EX_RESULT,
             result[1]
         )
 
     def test_create_wf_input_file(self):
-        self.client.executions.create.return_value = EXECUTION
+        self.client.executions.create.return_value = EXEC
 
         path = pkg.resource_filename(
             'mistralclient',
@@ -61,12 +82,12 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            ('123', 'some', '', 'RUNNING', None, '1', '1'),
+            EX_RESULT,
             result[1]
         )
 
     def test_create_with_description(self):
-        self.client.executions.create.return_value = EXECUTION
+        self.client.executions.create.return_value = EXEC
 
         result = self.call(
             execution_cmd.Create,
@@ -74,12 +95,12 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            ('123', 'some', '', 'RUNNING', None, '1', '1'),
+            EX_RESULT,
             result[1]
         )
 
     def test_update_state(self):
-        self.client.executions.update.return_value = EXECUTION
+        self.client.executions.update.return_value = EXEC
 
         result = self.call(
             execution_cmd.Update,
@@ -87,12 +108,12 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            ('123', 'some', '', 'RUNNING', None, '1', '1'),
+            EX_RESULT,
             result[1]
         )
 
     def test_resume_update_env(self):
-        self.client.executions.update.return_value = EXECUTION
+        self.client.executions.update.return_value = EXEC
 
         result = self.call(
             execution_cmd.Update,
@@ -100,12 +121,12 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            ('123', 'some', '', 'RUNNING', None, '1', '1'),
+            EX_RESULT,
             result[1]
         )
 
     def test_update_description(self):
-        self.client.executions.update.return_value = EXECUTION
+        self.client.executions.update.return_value = EXEC
 
         result = self.call(
             execution_cmd.Update,
@@ -113,22 +134,22 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            ('123', 'some', '', 'RUNNING', None, '1', '1'),
+            EX_RESULT,
             result[1]
         )
 
     def test_list(self):
-        self.client.executions.list.return_value = (EXECUTION,)
+        self.client.executions.list.return_value = (EXEC, SUB_WF_EXEC)
 
         result = self.call(execution_cmd.List)
 
         self.assertEqual(
-            [('123', 'some', '', 'RUNNING', None, '1', '1')],
+            [EX_RESULT, SUB_WF_EX_RESULT],
             result[1]
         )
 
     def test_list_with_pagination(self):
-        self.client.executions.list.return_value = (EXECUTION,)
+        self.client.executions.list.return_value = (EXEC,)
 
         self.call(execution_cmd.List)
         self.client.executions.list.assert_called_once_with(
@@ -156,12 +177,22 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         )
 
     def test_get(self):
-        self.client.executions.get.return_value = EXECUTION
+        self.client.executions.get.return_value = EXEC
 
         result = self.call(execution_cmd.Get, app_args=['id'])
 
         self.assertEqual(
-            ('123', 'some', '', 'RUNNING', None, '1', '1'),
+            EX_RESULT,
+            result[1]
+        )
+
+    def test_get_sub_wf_ex(self):
+        self.client.executions.get.return_value = SUB_WF_EXEC
+
+        result = self.call(execution_cmd.Get, app_args=['id'])
+
+        self.assertEqual(
+            SUB_WF_EX_RESULT,
             result[1]
         )
 
