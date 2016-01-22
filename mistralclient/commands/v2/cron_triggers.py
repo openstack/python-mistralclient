@@ -105,7 +105,7 @@ class Create(show.ShowOne):
         parser = super(Create, self).get_parser(prog_name)
 
         parser.add_argument('name', help='Cron trigger name')
-        parser.add_argument('workflow_name', help='Workflow name')
+        parser.add_argument('workflow_identifier', help='Workflow name or ID')
 
         parser.add_argument(
             'workflow_input',
@@ -157,7 +157,7 @@ class Create(show.ShowOne):
 
         trigger = mistral_client.cron_triggers.create(
             parsed_args.name,
-            parsed_args.workflow_name,
+            parsed_args.workflow_identifier,
             wf_input,
             wf_params,
             parsed_args.pattern,

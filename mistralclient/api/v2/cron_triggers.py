@@ -14,6 +14,8 @@
 
 import json
 
+from oslo_utils import uuidutils
+
 from mistralclient.api import base
 
 
@@ -24,21 +26,25 @@ class CronTrigger(base.Resource):
 class CronTriggerManager(base.ResourceManager):
     resource_class = CronTrigger
 
-    def create(self, name, workflow_name, workflow_input=None,
+    def create(self, name, workflow_identifier, workflow_input=None,
                workflow_params=None, pattern=None,
                first_time=None, count=None):
         self._ensure_not_empty(
             name=name,
-            workflow_name=workflow_name
+            workflow_identifier=workflow_identifier
         )
 
         data = {
             'name': name,
-            'workflow_name': workflow_name,
             'pattern': pattern,
             'first_execution_time': first_time,
             'remaining_executions': count
         }
+
+        if uuidutils.is_uuid_like(workflow_identifier):
+            data.update({'workflow_id': workflow_identifier})
+        else:
+            data.update({'workflow_name': workflow_identifier})
 
         if workflow_input:
             data.update({'workflow_input': json.dumps(workflow_input)})
