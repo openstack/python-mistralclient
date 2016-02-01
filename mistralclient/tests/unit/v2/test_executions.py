@@ -35,6 +35,19 @@ EXEC = {
     }
 }
 
+SUB_WF_EXEC = {
+    'id': "456",
+    'workflow_name': 'my_sub_wf',
+    'task_execution_id': "abc",
+    'description': '',
+    'state': 'RUNNING',
+    'input': {
+        "person": {
+            "first_name": "John",
+            "last_name": "Doe"
+        }
+    }
+}
 
 URL_TEMPLATE = '/executions'
 URL_TEMPLATE_ID = '/executions/%s'
@@ -124,15 +137,22 @@ class TestExecutionsV2(base.BaseClientV2Test):
         )
 
     def test_list(self):
-        mock = self.mock_http_get(content={'executions': [EXEC]})
+        mock = self.mock_http_get(content={'executions': [EXEC, SUB_WF_EXEC]})
 
         execution_list = self.executions.list()
 
-        self.assertEqual(1, len(execution_list))
-        ex = execution_list[0]
+        self.assertEqual(2, len(execution_list))
 
-        self.assertEqual(executions.Execution(self.executions, EXEC).to_dict(),
-                         ex.to_dict())
+        self.assertEqual(
+            executions.Execution(self.executions, EXEC).to_dict(),
+            execution_list[0].to_dict()
+        )
+
+        self.assertEqual(
+            executions.Execution(self.executions, SUB_WF_EXEC).to_dict(),
+            execution_list[1].to_dict()
+        )
+
         mock.assert_called_once_with(URL_TEMPLATE)
 
     def test_list_with_pagination(self):
@@ -164,6 +184,18 @@ class TestExecutionsV2(base.BaseClientV2Test):
         )
 
         mock.assert_called_once_with(URL_TEMPLATE_ID % EXEC['id'])
+
+    def test_get_sub_wf_ex(self):
+        mock = self.mock_http_get(content=SUB_WF_EXEC)
+
+        ex = self.executions.get(SUB_WF_EXEC['id'])
+
+        self.assertEqual(
+            executions.Execution(self.executions, SUB_WF_EXEC).to_dict(),
+            ex.to_dict()
+        )
+
+        mock.assert_called_once_with(URL_TEMPLATE_ID % SUB_WF_EXEC['id'])
 
     def test_delete(self):
         mock = self.mock_http_delete(status_code=204)
