@@ -15,6 +15,7 @@
 
 import json
 
+from oslo_utils import uuidutils
 import six
 
 from mistralclient.api import base
@@ -30,14 +31,18 @@ class Execution(base.Resource):
 class ExecutionManager(base.ResourceManager):
     resource_class = Execution
 
-    def create(self, workflow_name, workflow_input=None, description='',
+    def create(self, workflow_identifier, workflow_input=None, description='',
                **params):
-        self._ensure_not_empty(workflow_name=workflow_name)
+        self._ensure_not_empty(workflow_identifier=workflow_identifier)
 
         data = {
-            'workflow_name': workflow_name,
             'description': description
         }
+
+        if uuidutils.is_uuid_like(workflow_identifier):
+            data.update({'workflow_id': workflow_identifier})
+        else:
+            data.update({'workflow_name': workflow_identifier})
 
         if workflow_input:
             if isinstance(workflow_input, six.string_types):
@@ -49,15 +54,6 @@ class ExecutionManager(base.ResourceManager):
             data.update({'params': json.dumps(params)})
 
         return self._create('/executions', data)
-
-    def create_reverse_workflow(self, workflow_name, workflow_input,
-                                task_name, **params):
-        params.update({'task_name': task_name})
-
-        return self.create(workflow_name, workflow_input, **params)
-
-    def create_direct_workflow(self, workflow_name, workflow_input, **params):
-        return self.create(workflow_name, workflow_input, **params)
 
     def update(self, id, state, description=None, env=None):
         data = {}
