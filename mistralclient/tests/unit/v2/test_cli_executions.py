@@ -26,6 +26,7 @@ EXEC = executions.Execution(
     mock,
     {
         'id': '123',
+        'workflow_id': '123e4567-e89b-12d3-a456-426655440000',
         'workflow_name': 'some',
         'description': '',
         'state': 'RUNNING',
@@ -40,6 +41,7 @@ SUB_WF_EXEC = executions.Execution(
     mock,
     {
         'id': '456',
+        'workflow_id': '123e4567-e89b-12d3-a456-426655440000',
         'workflow_name': 'some_sub_wf',
         'description': '',
         'state': 'RUNNING',
@@ -50,8 +52,28 @@ SUB_WF_EXEC = executions.Execution(
     }
 )
 
-EX_RESULT = ('123', 'some', '', '<none>', 'RUNNING', None, '1', '1')
-SUB_WF_EX_RESULT = ('456', 'some_sub_wf', '', 'abc', 'RUNNING', None, '1', '1')
+EX_RESULT = (
+    '123',
+    '123e4567-e89b-12d3-a456-426655440000',
+    'some',
+    '',
+    '<none>',
+    'RUNNING',
+    None,
+    '1',
+    '1'
+)
+SUB_WF_EX_RESULT = (
+    '456',
+    '123e4567-e89b-12d3-a456-426655440000',
+    'some_sub_wf',
+    '',
+    'abc',
+    'RUNNING',
+    None,
+    '1',
+    '1'
+)
 
 
 class TestCLIExecutionsV2(base.BaseCommandTest):

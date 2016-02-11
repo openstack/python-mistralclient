@@ -50,7 +50,8 @@ class SimpleMistralCLITests(base.MistralCLIAuth):
             self.mistral('execution-list'))
         self.assertTableStruct(
             executions,
-            ['ID', 'Workflow', 'State', 'Created at', 'Updated at']
+            ['ID', 'Workflow name', 'Workflow ID', 'State', 'Created at',
+             'Updated at']
         )
 
     def test_tasks_list(self):
@@ -413,17 +414,19 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
         exec_id = self.get_value_of_field(execution, 'ID')
         self.assertTableStruct(execution, ['Field', 'Value'])
 
-        wf = self.get_value_of_field(execution, 'Workflow')
+        wf_name = self.get_value_of_field(execution, 'Workflow name')
+        wf_id = self.get_value_of_field(execution, 'Workflow ID')
         created_at = self.get_value_of_field(execution, 'Created at')
         description = self.get_value_of_field(execution, 'Description')
 
-        self.assertEqual(self.direct_wf['Name'], wf)
+        self.assertEqual(self.direct_wf['Name'], wf_name)
+        self.assertIsNotNone(wf_id)
         self.assertIsNotNone(created_at)
         self.assertEqual("execution test", description)
 
         execs = self.mistral_admin('execution-list')
         self.assertIn(exec_id, [ex['ID'] for ex in execs])
-        self.assertIn(wf, [ex['Workflow'] for ex in execs])
+        self.assertIn(wf_name, [ex['Workflow name'] for ex in execs])
 
         self.mistral_admin('execution-delete', params=exec_id)
 
@@ -471,10 +474,12 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
             'execution-get', params='{0}'.format(exec_id))
 
         gotten_id = self.get_value_of_field(execution, 'ID')
-        wf = self.get_value_of_field(execution, 'Workflow')
+        wf_name = self.get_value_of_field(execution, 'Workflow name')
+        wf_id = self.get_value_of_field(execution, 'Workflow ID')
 
+        self.assertIsNotNone(wf_id)
         self.assertEqual(exec_id, gotten_id)
-        self.assertEqual(self.direct_wf['Name'], wf)
+        self.assertEqual(self.direct_wf['Name'], wf_name)
 
     def test_execution_get_input(self):
         execution = self.execution_create(self.direct_wf['Name'])

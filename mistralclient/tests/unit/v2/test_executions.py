@@ -24,6 +24,7 @@ from mistralclient.tests.unit.v2 import base
 
 EXEC = {
     'id': "123",
+    'workflow_id': '123e4567-e89b-12d3-a456-426655440000',
     'workflow_name': 'my_wf',
     'description': '',
     'state': 'RUNNING',
@@ -37,6 +38,7 @@ EXEC = {
 
 SUB_WF_EXEC = {
     'id': "456",
+    'workflow_id': '123e4567-e89b-12d3-a456-426655440000',
     'workflow_name': 'my_sub_wf',
     'task_execution_id': "abc",
     'description': '',
@@ -69,12 +71,36 @@ class TestExecutionsV2(base.BaseClientV2Test):
 
         self.assertIsNotNone(ex)
 
-        self.assertEqual(
+        self.assertDictEqual(
             executions.Execution(self.executions, EXEC).to_dict(),
             ex.to_dict()
         )
 
-        mock.assert_called_once_with(URL_TEMPLATE, json.dumps(body))
+        self.assertEqual(URL_TEMPLATE, mock.call_args[0][0])
+        self.assertDictEqual(body, json.loads(mock.call_args[0][1]))
+
+    def test_create_with_workflow_id(self):
+        mock = self.mock_http_post(content=EXEC)
+        body = {
+            'workflow_id': EXEC['workflow_id'],
+            'description': '',
+            'input': json.dumps(EXEC['input']),
+        }
+
+        ex = self.executions.create(
+            EXEC['workflow_id'],
+            EXEC['input']
+        )
+
+        self.assertIsNotNone(ex)
+
+        self.assertDictEqual(
+            executions.Execution(self.executions, EXEC).to_dict(),
+            ex.to_dict()
+        )
+
+        self.assertEqual(URL_TEMPLATE, mock.call_args[0][0])
+        self.assertDictEqual(body, json.loads(mock.call_args[0][1]))
 
     @unittest2.expectedFailure
     def test_create_failure1(self):
@@ -99,15 +125,13 @@ class TestExecutionsV2(base.BaseClientV2Test):
 
         self.assertIsNotNone(ex)
 
-        self.assertEqual(
+        self.assertDictEqual(
             executions.Execution(self.executions, EXEC).to_dict(),
             ex.to_dict()
         )
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_ID % EXEC['id'],
-            json.dumps(body)
-        )
+        self.assertEqual(URL_TEMPLATE_ID % EXEC['id'], mock.call_args[0][0])
+        self.assertDictEqual(body, json.loads(mock.call_args[0][1]))
 
     def test_update_env(self):
         mock = self.mock_http_put(content=EXEC)
@@ -126,15 +150,13 @@ class TestExecutionsV2(base.BaseClientV2Test):
 
         self.assertIsNotNone(ex)
 
-        self.assertEqual(
+        self.assertDictEqual(
             executions.Execution(self.executions, EXEC).to_dict(),
             ex.to_dict()
         )
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_ID % EXEC['id'],
-            json.dumps(body)
-        )
+        self.assertEqual(URL_TEMPLATE_ID % EXEC['id'], mock.call_args[0][0])
+        self.assertDictEqual(body, json.loads(mock.call_args[0][1]))
 
     def test_list(self):
         mock = self.mock_http_get(content={'executions': [EXEC, SUB_WF_EXEC]})
@@ -143,12 +165,12 @@ class TestExecutionsV2(base.BaseClientV2Test):
 
         self.assertEqual(2, len(execution_list))
 
-        self.assertEqual(
+        self.assertDictEqual(
             executions.Execution(self.executions, EXEC).to_dict(),
             execution_list[0].to_dict()
         )
 
-        self.assertEqual(
+        self.assertDictEqual(
             executions.Execution(self.executions, SUB_WF_EXEC).to_dict(),
             execution_list[1].to_dict()
         )
@@ -178,7 +200,7 @@ class TestExecutionsV2(base.BaseClientV2Test):
 
         ex = self.executions.get(EXEC['id'])
 
-        self.assertEqual(
+        self.assertDictEqual(
             executions.Execution(self.executions, EXEC).to_dict(),
             ex.to_dict()
         )
@@ -190,7 +212,7 @@ class TestExecutionsV2(base.BaseClientV2Test):
 
         ex = self.executions.get(SUB_WF_EXEC['id'])
 
-        self.assertEqual(
+        self.assertDictEqual(
             executions.Execution(self.executions, SUB_WF_EXEC).to_dict(),
             ex.to_dict()
         )
