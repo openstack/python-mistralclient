@@ -25,6 +25,7 @@ import mistralclient.commands.v2.actions
 import mistralclient.commands.v2.cron_triggers
 import mistralclient.commands.v2.environments
 import mistralclient.commands.v2.executions
+import mistralclient.commands.v2.members
 import mistralclient.commands.v2.services
 import mistralclient.commands.v2.tasks
 import mistralclient.commands.v2.workbooks
@@ -408,7 +409,12 @@ class MistralShell(app.App):
             mistralclient.commands.v2.cron_triggers.Create,
             'cron-trigger-delete':
             mistralclient.commands.v2.cron_triggers.Delete,
-            'service-list': mistralclient.commands.v2.services.List
+            'service-list': mistralclient.commands.v2.services.List,
+            'member-create': mistralclient.commands.v2.members.Create,
+            'member-delete': mistralclient.commands.v2.members.Delete,
+            'member-update': mistralclient.commands.v2.members.Update,
+            'member-list': mistralclient.commands.v2.members.List,
+            'member-get': mistralclient.commands.v2.members.Get,
         }
 
 
