@@ -43,8 +43,12 @@ def format(member=None, lister=False):
             member.member_id,
             member.status,
             member.created_at,
-            member.updated_at or '<none>'
         )
+
+        if hasattr(member, 'updated_at'):
+            data += (member.updated_at,)
+        else:
+            data += (None,)
     else:
         data = (tuple('<none>' for _ in range(len(columns))),)
 
