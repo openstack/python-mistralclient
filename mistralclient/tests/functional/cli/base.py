@@ -94,6 +94,16 @@ class MistralCLIAuth(base.ClientTestBase):
                 'mistral %s' % mistral_url_op, action, flags, params,
                 fail_ok)
 
+    def get_project_id(self, project='admin'):
+        project_name = credentials(project)['tenant_name']
+
+        admin_clients = self._get_clients()
+        projects = self.parser.listing(
+            admin_clients.openstack('project show', params=project_name)
+        )
+
+        return [o['Value'] for o in projects if o['Field'] == 'id'][0]
+
 
 class MistralCLIAltAuth(base.ClientTestBase):
 
