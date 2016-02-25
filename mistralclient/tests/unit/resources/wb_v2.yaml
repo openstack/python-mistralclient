@@ -1,0 +1,21 @@
+
+---
+version: 2.0
+
+name: wb
+
+workflows:
+  wf1:
+    type: direct
+    input:
+      - param1
+      - param2
+
+    tasks:
+      task1:
+        action: std.http url="localhost:8989"
+        on-success:
+          - test_subsequent
+
+      test_subsequent:
+        action: std.http url="http://some_url" server_id=1

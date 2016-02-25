@@ -11,6 +11,11 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
+
+import pkg_resources as pkg
+from six.moves.urllib import parse
+from six.moves.urllib import request
+
 from mistralclient.api.v2 import workflows
 from mistralclient.tests.unit.v2 import base
 
@@ -54,6 +59,26 @@ class TestWorkflowsV2(base.BaseClientV2Test):
             headers={'content-type': 'text/plain'}
         )
 
+    def test_create_with_file(self):
+        mock = self.mock_http_post(content={'workflows': [WORKFLOW]})
+
+        # The contents of wf_v2.yaml must be identical to WF_DEF
+        path = pkg.resource_filename(
+            'mistralclient',
+            'tests/unit/resources/wf_v2.yaml'
+        )
+
+        wfs = self.workflows.create(path)
+
+        self.assertIsNotNone(wfs)
+        self.assertEqual(WF_DEF, wfs[0].definition)
+
+        mock.assert_called_once_with(
+            URL_TEMPLATE_SCOPE,
+            WF_DEF,
+            headers={'content-type': 'text/plain'}
+        )
+
     def test_update(self):
         mock = self.mock_http_put(content={'workflows': [WORKFLOW]})
 
@@ -78,6 +103,29 @@ class TestWorkflowsV2(base.BaseClientV2Test):
 
         mock.assert_called_once_with(
             '/workflows/123?scope=private',
+            WF_DEF,
+            headers={'content-type': 'text/plain'}
+        )
+
+    def test_update_with_file_uri(self):
+        mock = self.mock_http_put(content={'workflows': [WORKFLOW]})
+
+        # The contents of wf_v2.yaml must be identical to WF_DEF
+        path = pkg.resource_filename(
+            'mistralclient',
+            'tests/unit/resources/wf_v2.yaml'
+        )
+
+        # Convert the file path to file URI
+        uri = parse.urljoin('file:', request.pathname2url(path))
+
+        wfs = self.workflows.update(uri)
+
+        self.assertIsNotNone(wfs)
+        self.assertEqual(WF_DEF, wfs[0].definition)
+
+        mock.assert_called_once_with(
+            URL_TEMPLATE_SCOPE,
             WF_DEF,
             headers={'content-type': 'text/plain'}
         )

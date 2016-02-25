@@ -17,6 +17,7 @@ import json
 import six
 
 from mistralclient.api import base
+from mistralclient import utils
 
 
 class Environment(base.Resource):
@@ -39,6 +40,12 @@ class EnvironmentManager(base.ResourceManager):
     resource_class = Environment
 
     def create(self, **kwargs):
+        # Check to see if the file name or URI is being passed in. If so,
+        # read it's contents first.
+        if 'file' in kwargs:
+            file = kwargs['file']
+            kwargs = utils.load_content(utils.get_contents_if_file(file))
+
         self._ensure_not_empty(name=kwargs.get('name', None),
                                variables=kwargs.get('variables', None))
 
@@ -49,6 +56,12 @@ class EnvironmentManager(base.ResourceManager):
         return self._create('/environments', kwargs)
 
     def update(self, **kwargs):
+        # Check to see if the file name or URI is being passed in. If so,
+        # read it's contents first.
+        if 'file' in kwargs:
+            file = kwargs['file']
+            kwargs = utils.load_content(utils.get_contents_if_file(file))
+
         name = kwargs.get('name', None)
         self._ensure_not_empty(name=name)
 
