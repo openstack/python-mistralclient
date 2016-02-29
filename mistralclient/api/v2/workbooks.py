@@ -14,6 +14,7 @@
 #    limitations under the License.
 
 from mistralclient.api import base
+from mistralclient import utils
 
 
 class Workbook(base.Resource):
@@ -25,6 +26,10 @@ class WorkbookManager(base.ResourceManager):
 
     def create(self, definition):
         self._ensure_not_empty(definition=definition)
+
+        # If the specified definition is actually a file, read in the
+        # definition file
+        definition = utils.get_contents_if_file(definition)
 
         resp = self.client.http_client.post(
             '/workbooks',
@@ -39,6 +44,10 @@ class WorkbookManager(base.ResourceManager):
 
     def update(self, definition):
         self._ensure_not_empty(definition=definition)
+
+        # If the specified definition is actually a file, read in the
+        # definition file
+        definition = utils.get_contents_if_file(definition)
 
         resp = self.client.http_client.put(
             '/workbooks',
@@ -66,6 +75,10 @@ class WorkbookManager(base.ResourceManager):
 
     def validate(self, definition):
         self._ensure_not_empty(definition=definition)
+
+        # If the specified definition is actually a file, read in the
+        # definition file
+        definition = utils.get_contents_if_file(definition)
 
         resp = self.client.http_client.post(
             '/workbooks/validate',

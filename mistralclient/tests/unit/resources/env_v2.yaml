@@ -1,0 +1,7 @@
+---
+
+"name": "env1"
+"description": "Test Environment #1"
+"scope": "private"
+"variables":
+    "server": "localhost"

@@ -16,6 +16,7 @@
 import six
 
 from mistralclient.api import base
+from mistralclient import utils
 
 
 urlparse = six.moves.urllib.parse
@@ -30,6 +31,10 @@ class WorkflowManager(base.ResourceManager):
 
     def create(self, definition, scope='private'):
         self._ensure_not_empty(definition=definition)
+
+        # If the specified definition is actually a file, read in the
+        # definition file
+        definition = utils.get_contents_if_file(definition)
 
         resp = self.client.http_client.post(
             '/workflows?scope=%s' % scope,
@@ -47,6 +52,10 @@ class WorkflowManager(base.ResourceManager):
         self._ensure_not_empty(definition=definition)
 
         url_pre = ('/workflows/%s' % id) if id else '/workflows'
+
+        # If the specified definition is actually a file, read in the
+        # definition file
+        definition = utils.get_contents_if_file(definition)
 
         resp = self.client.http_client.put(
             '%s?scope=%s' % (url_pre, scope),
@@ -98,6 +107,10 @@ class WorkflowManager(base.ResourceManager):
 
     def validate(self, definition):
         self._ensure_not_empty(definition=definition)
+
+        # If the specified definition is actually a file, read in the
+        # definition file
+        definition = utils.get_contents_if_file(definition)
 
         resp = self.client.http_client.post(
             '/workflows/validate',
