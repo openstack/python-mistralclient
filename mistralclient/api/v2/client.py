@@ -62,7 +62,9 @@ class Client(object):
             mistral_url,
             auth_token,
             project_id,
-            user_id
+            user_id,
+            cacert=cacert,
+            insecure=insecure
         )
 
         # Create all resource managers.
