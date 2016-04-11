@@ -6,8 +6,9 @@ name: wb
 workflows:
   wf1:
     type: direct
+
     tasks:
       hello:
         action: std.echo output="Hello"
         publish:
-            result: <% $.hello %>
+          result: <% task(hello).result %>

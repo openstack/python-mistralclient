@@ -8,4 +8,4 @@ wf_single:
     hello:
       action: std.echo output="Hello"
       publish:
-        result: <% $.hello %>
+        result: <% task(hello).result %>
