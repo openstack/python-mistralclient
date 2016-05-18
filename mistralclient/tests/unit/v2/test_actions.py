@@ -16,6 +16,7 @@ import pkg_resources as pkg
 from six.moves.urllib import parse
 from six.moves.urllib import request
 
+from mistralclient.api import base as api_base
 from mistralclient.api.v2 import actions
 from mistralclient.tests.unit.v2 import base
 
@@ -32,6 +33,19 @@ my_action:
     info: <% $.output %>
 """
 
+INVALID_ACTION_DEF = """
+---
+version: 2.0
+
+my_action:
+  base: std.echo
+  unexpected-property: 'this should fail'
+  base-input:
+    output: 'Bye!'
+  output:
+    info: <% $.output %>
+"""
+
 ACTION = {
     'id': '123',
     'name': 'my_action',
@@ -42,6 +56,7 @@ ACTION = {
 URL_TEMPLATE = '/actions'
 URL_TEMPLATE_SCOPE = '/actions?scope=private'
 URL_TEMPLATE_NAME = '/actions/%s'
+URL_TEMPLATE_VALIDATE = '/actions/validate'
 
 
 class TestActionsV2(base.BaseClientV2Test):
@@ -169,3 +184,82 @@ class TestActionsV2(base.BaseClientV2Test):
         self.actions.delete('action')
 
         mock.assert_called_once_with(URL_TEMPLATE_NAME % 'action')
+
+    def test_validate(self):
+        mock = self.mock_http_post(
+            status_code=200,
+            content={'valid': True}
+        )
+
+        result = self.actions.validate(ACTION_DEF)
+
+        self.assertIsNotNone(result)
+        self.assertIn('valid', result)
+        self.assertTrue(result['valid'])
+
+        mock.assert_called_once_with(
+            URL_TEMPLATE_VALIDATE,
+            ACTION_DEF,
+            headers={'content-type': 'text/plain'}
+        )
+
+    def test_validate_with_file(self):
+        mock = self.mock_http_post(
+            status_code=200,
+            content={'valid': True}
+        )
+
+        # The contents of action_v2.yaml must be identical to ACTION_DEF
+        path = pkg.resource_filename(
+            'mistralclient',
+            'tests/unit/resources/action_v2.yaml'
+        )
+
+        result = self.actions.validate(path)
+
+        self.assertIsNotNone(result)
+        self.assertIn('valid', result)
+        self.assertTrue(result['valid'])
+
+        mock.assert_called_once_with(
+            URL_TEMPLATE_VALIDATE,
+            ACTION_DEF,
+            headers={'content-type': 'text/plain'}
+        )
+
+    def test_validate_failed(self):
+        mock_result = {
+            "valid": False,
+            "error": "mocked error message"
+        }
+
+        mock = self.mock_http_post(status_code=200, content=mock_result)
+
+        result = self.actions.validate(INVALID_ACTION_DEF)
+
+        self.assertIsNotNone(result)
+        self.assertIn('valid', result)
+        self.assertFalse(result['valid'])
+        self.assertIn('error', result)
+        self.assertIn("mocked error message", result['error'])
+
+        mock.assert_called_once_with(
+            URL_TEMPLATE_VALIDATE,
+            INVALID_ACTION_DEF,
+            headers={'content-type': 'text/plain'}
+        )
+
+    def test_validate_api_failed(self):
+        mock = self.mock_http_post(status_code=500, content={})
+
+        self.assertRaises(
+            api_base.APIException,
+            self.actions.validate,
+            ACTION_DEF
+        )
+
+        mock.assert_called_once_with(
+            URL_TEMPLATE_VALIDATE,
+            ACTION_DEF,
+            headers={'content-type': 'text/plain'}
+        )

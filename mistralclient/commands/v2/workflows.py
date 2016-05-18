@@ -210,11 +210,7 @@ class Validate(show.ShowOne):
         columns = ('Valid', 'Error')
 
         if result:
-            data = (result.get('valid'),)
-            if not result.get('error'):
-                data += (None,)
-            else:
-                data += (result.get('error'),)
+            data = (result.get('valid'), result.get('error'),)
         else:
             data = (tuple('<none>' for _ in range(len(columns))),)
 

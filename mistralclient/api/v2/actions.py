@@ -97,3 +97,21 @@ class ActionManager(base.ResourceManager):
         self._ensure_not_empty(name=name)
 
         self._delete('/actions/%s' % name)
+
+    def validate(self, definition):
+        self._ensure_not_empty(definition=definition)
+
+        # If the specified definition is actually a file, read in the
+        # definition file
+        definition = utils.get_contents_if_file(definition)
+
+        resp = self.client.http_client.post(
+            '/actions/validate',
+            definition,
+            headers={'content-type': 'text/plain'}
+        )
+
+        if resp.status_code != 200:
+            self._raise_api_exception(resp)
+
+        return base.extract_json(resp, None)

@@ -171,3 +171,22 @@ class TestCLIActionsV2(base.BaseCommandTest):
         self.call(action_cmd.GetDefinition, app_args=['name'])
 
         self.app.stdout.write.assert_called_with(ACTION_DEF)
+
+    @mock.patch('argparse.open', create=True)
+    def test_validate(self, mock_open):
+        self.client.actions.validate.return_value = {'valid': True}
+
+        result = self.call(action_cmd.Validate, app_args=['action.yaml'])
+
+        self.assertEqual((True, None), result[1])
+
+    @mock.patch('argparse.open', create=True)
+    def test_validate_failed(self, mock_open):
+        self.client.actions.validate.return_value = {
+            'valid': False,
+            'error': 'Invalid DSL...'
+        }
+
+        result = self.call(action_cmd.Validate, app_args=['action.yaml'])
+
+        self.assertEqual((False, 'Invalid DSL...'), result[1])

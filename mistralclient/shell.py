@@ -403,6 +403,7 @@ class MistralShell(app.App):
             'action-update': mistralclient.commands.v2.actions.Update,
             'action-get-definition':
             mistralclient.commands.v2.actions.GetDefinition,
+            'action-validate': mistralclient.commands.v2.actions.Validate,
             'cron-trigger-list': mistralclient.commands.v2.cron_triggers.List,
             'cron-trigger-get': mistralclient.commands.v2.cron_triggers.Get,
             'cron-trigger-create':

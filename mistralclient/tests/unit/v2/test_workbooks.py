@@ -177,8 +177,10 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         mock.assert_called_once_with(URL_TEMPLATE_NAME % 'wb')
 
     def test_validate(self):
-        mock = self.mock_http_post(status_code=200,
-                                   content={'valid': True})
+        mock = self.mock_http_post(
+            status_code=200,
+            content={'valid': True}
+        )
 
         result = self.workbooks.validate(WB_DEF)
 
@@ -193,8 +195,10 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         )
 
     def test_validate_with_file(self):
-        mock = self.mock_http_post(status_code=200,
-                                   content={'valid': True})
+        mock = self.mock_http_post(
+            status_code=200,
+            content={'valid': True}
+        )
 
         # The contents of wb_v2.yaml must be identical to WB_DEF
         path = pkg.resource_filename(
@@ -229,8 +233,10 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         self.assertIn('valid', result)
         self.assertFalse(result['valid'])
         self.assertIn('error', result)
-        self.assertIn("Task properties 'action' and 'workflow' "
-                      "can't be specified both", result['error'])
+        self.assertIn(
+            "Task properties 'action' and 'workflow' "
+            "can't be specified both", result['error']
+        )
 
         mock.assert_called_once_with(
             URL_TEMPLATE_VALIDATE,
@@ -241,9 +247,11 @@ class TestWorkbooksV2(base.BaseClientV2Test):
     def test_validate_api_failed(self):
         mock = self.mock_http_post(status_code=500, content={})
 
-        self.assertRaises(api_base.APIException,
-                          self.workbooks.validate,
-                          WB_DEF)
+        self.assertRaises(
+            api_base.APIException,
+            self.workbooks.validate,
+            WB_DEF
+        )
 
         mock.assert_called_once_with(
             URL_TEMPLATE_VALIDATE,

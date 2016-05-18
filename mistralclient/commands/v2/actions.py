@@ -201,3 +201,37 @@ class GetDefinition(command.Command):
         definition = mistral_client.actions.get(parsed_args.name).definition
 
         self.app.stdout.write(definition or "\n")
+
+
+class Validate(show.ShowOne):
+    """Validate action."""
+
+    def _format(self, result=None):
+        columns = ('Valid', 'Error')
+
+        if result:
+            data = (result.get('valid'), result.get('error'))
+        else:
+            data = (tuple('<none>' for _ in range(len(columns))),)
+
+        return columns, data
+
+    def get_parser(self, prog_name):
+        parser = super(Validate, self).get_parser(prog_name)
+
+        parser.add_argument(
+            'definition',
+            type=argparse.FileType('r'),
+            help='action definition file'
+        )
+
+        return parser
+
+    def take_action(self, parsed_args):
+        mistral_client = self.app.client_manager.workflow_engine
+
+        result = mistral_client.actions.validate(
+            parsed_args.definition.read()
+        )
+
+        return self._format(result)
