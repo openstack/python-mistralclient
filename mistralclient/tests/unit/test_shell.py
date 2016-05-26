@@ -109,3 +109,10 @@ class TestShell(base.BaseShellTests):
         self.assertTrue(mock.called)
         params = mock.call_args
         self.assertEqual('http://localhost:35357/v3', params[1]['auth_url'])
+
+    @mock.patch('mistralclient.api.client.client')
+    def test_profile(self, mock):
+        self.shell('--profile=SECRET_HMAC_KEY workbook-list')
+        self.assertTrue(mock.called)
+        params = mock.call_args
+        self.assertEqual('SECRET_HMAC_KEY', params[1]['profile'])

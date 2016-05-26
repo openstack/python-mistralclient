@@ -20,12 +20,15 @@ import uuid
 import mock
 import testtools
 
+import osprofiler.profiler
+
 from mistralclient.api import client
 
 AUTH_HTTP_URL = 'http://localhost:35357/v3'
 AUTH_HTTPS_URL = AUTH_HTTP_URL.replace('http', 'https')
 MISTRAL_HTTP_URL = 'http://localhost:8989/v2'
 MISTRAL_HTTPS_URL = MISTRAL_HTTP_URL.replace('http', 'https')
+PROFILER_HMAC_KEY = 'SECRET_HMAC_KEY'
 
 
 class BaseClientTests(testtools.TestCase):
@@ -175,3 +178,38 @@ class BaseClientTests(testtools.TestCase):
             os.unlink(path)
 
         self.assertTrue(log_warning_mock.called)
+
+    @mock.patch('keystoneclient.v3.client.Client')
+    @mock.patch('mistralclient.api.httpclient.HTTPClient')
+    def test_mistral_profile_enabled(self, mock, keystone_client_mock):
+        keystone_client_instance = keystone_client_mock.return_value
+        keystone_client_instance.auth_token = str(uuid.uuid4())
+        keystone_client_instance.project_id = str(uuid.uuid4())
+        keystone_client_instance.user_id = str(uuid.uuid4())
+
+        expected_args = (
+            MISTRAL_HTTP_URL,
+            keystone_client_instance.auth_token,
+            keystone_client_instance.project_id,
+            keystone_client_instance.user_id
+        )
+
+        expected_kwargs = {
+            'cacert': None,
+            'insecure': False
+        }
+
+        client.client(
+            username='mistral',
+            project_name='mistral',
+            auth_url=AUTH_HTTP_URL,
+            profile=PROFILER_HMAC_KEY
+        )
+
+        self.assertTrue(mock.called)
+        self.assertEqual(mock.call_args[0], expected_args)
+        self.assertDictEqual(mock.call_args[1], expected_kwargs)
+
+        profiler = osprofiler.profiler.get()
+
+        self.assertEqual(profiler.hmac_key, PROFILER_HMAC_KEY)

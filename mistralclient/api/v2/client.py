@@ -15,6 +15,8 @@
 
 import six
 
+import osprofiler.profiler
+
 from mistralclient.api import httpclient
 from mistralclient.api.v2 import action_executions
 from mistralclient.api.v2 import actions
@@ -32,7 +34,8 @@ class Client(object):
     def __init__(self, mistral_url=None, username=None, api_key=None,
                  project_name=None, auth_url=None, project_id=None,
                  endpoint_type='publicURL', service_type='workflowv2',
-                 auth_token=None, user_id=None, cacert=None, insecure=False):
+                 auth_token=None, user_id=None, cacert=None, insecure=False,
+                 profile=None):
 
         if mistral_url and not isinstance(mistral_url, six.string_types):
             raise RuntimeError('Mistral url should be string')
@@ -57,6 +60,9 @@ class Client(object):
 
         if not mistral_url:
             mistral_url = "http://localhost:8989/v2"
+
+        if profile:
+            osprofiler.profiler.init(profile)
 
         self.http_client = httpclient.HTTPClient(
             mistral_url,

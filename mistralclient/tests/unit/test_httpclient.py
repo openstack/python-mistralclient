@@ -19,6 +19,9 @@ import mock
 import requests
 import testtools
 
+from osprofiler import _utils as osprofiler_utils
+import osprofiler.profiler
+
 from mistralclient.api import httpclient
 
 API_BASE_URL = 'http://localhost:8989/v2'
@@ -29,6 +32,8 @@ EXPECTED_URL = API_BASE_URL + API_URL
 AUTH_TOKEN = str(uuid.uuid4())
 PROJECT_ID = str(uuid.uuid4())
 USER_ID = str(uuid.uuid4())
+PROFILER_HMAC_KEY = 'SECRET_HMAC_KEY'
+PROFILER_TRACE_ID = str(uuid.uuid4())
 
 EXPECTED_AUTH_HEADERS = {
     'x-auth-token': AUTH_TOKEN,
@@ -65,6 +70,7 @@ class HTTPClientTest(testtools.TestCase):
 
     def setUp(self):
         super(HTTPClientTest, self).setUp()
+        osprofiler.profiler.init(None)
         self.client = httpclient.HTTPClient(
             API_BASE_URL,
             AUTH_TOKEN,
@@ -94,6 +100,42 @@ class HTTPClientTest(testtools.TestCase):
         headers = {'foo': 'bar'}
 
         self.client.get(API_URL, headers=headers)
+
+        expected_options = copy.deepcopy(EXPECTED_REQ_OPTIONS)
+        expected_options['headers'].update(headers)
+
+        requests.get.assert_called_with(
+            EXPECTED_URL,
+            **expected_options
+        )
+
+    @mock.patch.object(
+        osprofiler.profiler._Profiler,
+        'get_base_id',
+        mock.MagicMock(return_value=PROFILER_TRACE_ID)
+    )
+    @mock.patch.object(
+        osprofiler.profiler._Profiler,
+        'get_id',
+        mock.MagicMock(return_value=PROFILER_TRACE_ID)
+    )
+    @mock.patch.object(
+        requests,
+        'get',
+        mock.MagicMock(return_value=FakeResponse('get', EXPECTED_URL, 200))
+    )
+    def test_get_request_options_with_profile_enabled(self):
+        osprofiler.profiler.init(PROFILER_HMAC_KEY)
+
+        data = {'base_id': PROFILER_TRACE_ID, 'parent_id': PROFILER_TRACE_ID}
+        signed_data = osprofiler_utils.signed_pack(data, PROFILER_HMAC_KEY)
+
+        headers = {
+            'X-Trace-Info': signed_data[0],
+            'X-Trace-HMAC': signed_data[1]
+        }
+
+        self.client.get(API_URL)
 
         expected_options = copy.deepcopy(EXPECTED_REQ_OPTIONS)
         expected_options['headers'].update(headers)

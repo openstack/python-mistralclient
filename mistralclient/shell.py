@@ -142,18 +142,21 @@ class MistralShell(app.App):
         :paramtype extra_kwargs: dict
         """
         argparse_kwargs = argparse_kwargs or {}
+
         parser = argparse.ArgumentParser(
             description=description,
             add_help=False,
             formatter_class=OpenStackHelpFormatter,
             **argparse_kwargs
         )
+
         parser.add_argument(
             '--version',
             action='version',
             version='%(prog)s {0}'.format(version),
             help='Show program\'s version number and exit.'
         )
+
         parser.add_argument(
             '-v', '--verbose',
             action='count',
@@ -161,12 +164,14 @@ class MistralShell(app.App):
             default=self.DEFAULT_VERBOSE_LEVEL,
             help='Increase verbosity of output. Can be repeated.',
         )
+
         parser.add_argument(
             '--log-file',
             action='store',
             default=None,
             help='Specify a file to log output. Disabled by default.',
         )
+
         parser.add_argument(
             '-q', '--quiet',
             action='store_const',
@@ -174,6 +179,7 @@ class MistralShell(app.App):
             const=0,
             help='Suppress output except warnings and errors.',
         )
+
         parser.add_argument(
             '-h', '--help',
             action=HelpAction,
@@ -181,12 +187,14 @@ class MistralShell(app.App):
             default=self,  # tricky
             help="Show this help message and exit.",
         )
+
         parser.add_argument(
             '--debug',
             default=False,
             action='store_true',
             help='Show tracebacks on errors.',
         )
+
         parser.add_argument(
             '--os-mistral-url',
             action='store',
@@ -194,6 +202,7 @@ class MistralShell(app.App):
             default=c.env('OS_MISTRAL_URL'),
             help='Mistral API host (Env: OS_MISTRAL_URL)'
         )
+
         parser.add_argument(
             '--os-mistral-version',
             action='store',
@@ -202,6 +211,7 @@ class MistralShell(app.App):
             help='Mistral API version (default = v2) (Env: '
                  'OS_MISTRAL_VERSION)'
         )
+
         parser.add_argument(
             '--os-mistral-service-type',
             action='store',
@@ -211,6 +221,7 @@ class MistralShell(app.App):
                  'keystone-endpoint) (default = workflowv2) (Env: '
                  'OS_MISTRAL_SERVICE_TYPE)'
         )
+
         parser.add_argument(
             '--os-mistral-endpoint-type',
             action='store',
@@ -220,6 +231,7 @@ class MistralShell(app.App):
                  'keystone-endpoint) (default = publicURL) (Env: '
                  'OS_MISTRAL_ENDPOINT_TYPE)'
         )
+
         parser.add_argument(
             '--os-username',
             action='store',
@@ -227,6 +239,7 @@ class MistralShell(app.App):
             default=c.env('OS_USERNAME', default='admin'),
             help='Authentication username (Env: OS_USERNAME)'
         )
+
         parser.add_argument(
             '--os-password',
             action='store',
@@ -234,6 +247,7 @@ class MistralShell(app.App):
             default=c.env('OS_PASSWORD'),
             help='Authentication password (Env: OS_PASSWORD)'
         )
+
         parser.add_argument(
             '--os-tenant-id',
             action='store',
@@ -241,6 +255,7 @@ class MistralShell(app.App):
             default=c.env('OS_TENANT_ID'),
             help='Authentication tenant identifier (Env: OS_TENANT_ID)'
         )
+
         parser.add_argument(
             '--os-tenant-name',
             action='store',
@@ -248,6 +263,7 @@ class MistralShell(app.App):
             default=c.env('OS_TENANT_NAME', 'Default'),
             help='Authentication tenant name (Env: OS_TENANT_NAME)'
         )
+
         parser.add_argument(
             '--os-auth-token',
             action='store',
@@ -255,6 +271,7 @@ class MistralShell(app.App):
             default=c.env('OS_AUTH_TOKEN'),
             help='Authentication token (Env: OS_AUTH_TOKEN)'
         )
+
         parser.add_argument(
             '--os-auth-url',
             action='store',
@@ -262,6 +279,7 @@ class MistralShell(app.App):
             default=c.env('OS_AUTH_URL'),
             help='Authentication URL (Env: OS_AUTH_URL)'
         )
+
         parser.add_argument(
             '--os-cacert',
             action='store',
@@ -269,6 +287,7 @@ class MistralShell(app.App):
             default=c.env('OS_CACERT'),
             help='Authentication CA Certificate (Env: OS_CACERT)'
         )
+
         parser.add_argument(
             '--insecure',
             action='store_true',
@@ -277,6 +296,20 @@ class MistralShell(app.App):
             help='Disables SSL/TLS certificate verification '
                  '(Env: MISTRALCLIENT_INSECURE)'
         )
+
+        parser.add_argument(
+            '--profile',
+            dest='profile',
+            metavar='HMAC_KEY',
+            help='HMAC key to use for encrypting context data for performance '
+                 'profiling of operation. This key should be one of the '
+                 'values configured for the osprofiler middleware in mistral, '
+                 'it is specified in the profiler section of the mistral '
+                 'configuration (i.e. /etc/mistral/mistral.conf). Without the '
+                 'key, profiling will not be triggered even if osprofiler is '
+                 'enabled on the server side.'
+        )
+
         return parser
 
     def initialize_app(self, argv):
@@ -310,7 +343,8 @@ class MistralShell(app.App):
             service_type=self.options.service_type,
             auth_token=self.options.token,
             cacert=self.options.cacert,
-            insecure=self.options.insecure
+            insecure=self.options.insecure,
+            profile=self.options.profile
         )
 
         # Adding client_manager variable to make mistral client work with

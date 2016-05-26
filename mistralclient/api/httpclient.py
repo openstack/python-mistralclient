@@ -20,6 +20,8 @@ import requests
 
 import logging
 
+import osprofiler.web
+
 
 LOG = logging.getLogger(__name__)
 
@@ -105,5 +107,8 @@ class HTTPClient(object):
         user_id = headers.get('X-User-Id', self.user_id)
         if user_id:
             headers['X-User-Id'] = user_id
+
+        # Add headers for osprofiler.
+        headers.update(osprofiler.web.get_trace_id_headers())
 
         return headers
