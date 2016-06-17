@@ -124,13 +124,13 @@ class Get(command.ShowOne):
     def get_parser(self, prog_name):
         parser = super(Get, self).get_parser(prog_name)
 
-        parser.add_argument('id', help='Execution identifier')
+        parser.add_argument('execution', help='Execution identifier')
 
         return parser
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-        execution = mistral_client.executions.get(parsed_args.id)
+        execution = mistral_client.executions.get(parsed_args.execution)
 
         return format(execution)
 
@@ -202,7 +202,7 @@ class Delete(command.Command):
         parser = super(Delete, self).get_parser(prog_name)
 
         parser.add_argument(
-            'id',
+            'execution',
             nargs='+',
             help='Id of execution identifier(s).'
         )
@@ -214,7 +214,7 @@ class Delete(command.Command):
 
         utils.do_action_on_many(
             lambda s: mistral_client.executions.delete(s),
-            parsed_args.id,
+            parsed_args.execution,
             "Request to delete execution %s has been accepted.",
             "Unable to delete the specified execution(s)."
         )

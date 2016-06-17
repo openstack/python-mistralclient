@@ -69,7 +69,7 @@ class Get(command.ShowOne):
         parser = super(Get, self).get_parser(prog_name)
 
         parser.add_argument(
-            'name',
+            'workbook',
             help='Workbook name'
         )
 
@@ -77,7 +77,7 @@ class Get(command.ShowOne):
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-        workbook = mistral_client.workbooks.get(parsed_args.name)
+        workbook = mistral_client.workbooks.get(parsed_args.workbook)
 
         return format(workbook)
 
@@ -111,7 +111,7 @@ class Delete(command.Command):
     def get_parser(self, prog_name):
         parser = super(Delete, self).get_parser(prog_name)
 
-        parser.add_argument('name', nargs='+', help='Name of workbook(s).')
+        parser.add_argument('workbook', nargs='+', help='Name of workbook(s).')
 
         return parser
 
@@ -119,7 +119,7 @@ class Delete(command.Command):
         mistral_client = self.app.client_manager.workflow_engine
         utils.do_action_on_many(
             lambda s: mistral_client.workbooks.delete(s),
-            parsed_args.name,
+            parsed_args.workbook,
             "Request to delete workbook %s has been accepted.",
             "Unable to delete the specified workbook(s)."
         )
