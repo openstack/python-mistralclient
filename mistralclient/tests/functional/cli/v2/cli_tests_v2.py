@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from tempest_lib import exceptions
+from tempest.lib import exceptions
 
 from mistralclient.tests.functional.cli import base
 from mistralclient.tests.functional.cli.v2 import base_v2

@@ -15,7 +15,7 @@
 import os
 import time
 
-from tempest_lib import exceptions
+from tempest.lib import exceptions
 
 from mistralclient.tests.functional.cli import base
 
