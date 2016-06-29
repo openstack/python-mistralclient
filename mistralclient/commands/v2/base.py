@@ -17,12 +17,12 @@
 import abc
 import textwrap
 
-from cliff import lister
+from osc_lib.command import command
 import six
 
 
 @six.add_metaclass(abc.ABCMeta)
-class MistralLister(lister.Lister):
+class MistralLister(command.Lister):
     @abc.abstractmethod
     def _get_format_function(self):
         raise NotImplementedError

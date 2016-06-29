@@ -17,8 +17,7 @@
 import json
 import logging
 
-from cliff import command
-from cliff import show
+from osc_lib.command import command
 
 from mistralclient.commands.v2 import base
 from mistralclient import utils
@@ -60,7 +59,7 @@ def format(action_ex=None, lister=False):
     return columns, data
 
 
-class Create(show.ShowOne):
+class Create(command.ShowOne):
     """Create new Action execution or just run specific action."""
 
     def produce_output(self, parsed_args, column_names, data):
@@ -156,7 +155,7 @@ class List(base.MistralLister):
         )
 
 
-class Get(show.ShowOne):
+class Get(command.ShowOne):
     """Show specific Action execution."""
 
     def get_parser(self, prog_name):
@@ -174,7 +173,7 @@ class Get(show.ShowOne):
         return format(execution)
 
 
-class Update(show.ShowOne):
+class Update(command.ShowOne):
     """Update specific Action execution."""
 
     def get_parser(self, prog_name):

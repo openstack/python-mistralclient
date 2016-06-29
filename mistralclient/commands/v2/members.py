@@ -13,8 +13,7 @@
 #    under the License.
 #
 
-from cliff import command
-from cliff import show
+from osc_lib.command import command
 
 from mistralclient.commands.v2 import base
 from mistralclient import exceptions
@@ -83,7 +82,7 @@ class List(base.MistralLister):
         )
 
 
-class Get(show.ShowOne):
+class Get(command.ShowOne):
     """Show specific member information."""
 
     def get_parser(self, prog_name):
@@ -118,7 +117,7 @@ class Get(show.ShowOne):
         return format(member)
 
 
-class Create(show.ShowOne):
+class Create(command.ShowOne):
     """Shares a resource to another tenant."""
 
     def get_parser(self, prog_name):
@@ -192,7 +191,7 @@ class Delete(command.Command):
             raise exceptions.MistralClientException(error_msg)
 
 
-class Update(show.ShowOne):
+class Update(command.ShowOne):
     """Update resource sharing status."""
 
     def get_parser(self, prog_name):

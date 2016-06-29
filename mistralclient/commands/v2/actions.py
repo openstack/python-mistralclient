@@ -17,8 +17,7 @@
 import argparse
 import logging
 
-from cliff import command
-from cliff import show
+from osc_lib.command import command
 
 from mistralclient.commands.v2 import base
 from mistralclient import utils
@@ -78,7 +77,7 @@ class List(base.MistralLister):
         return mistral_client.actions.list()
 
 
-class Get(show.ShowOne):
+class Get(command.ShowOne):
     """Show specific action."""
 
     def get_parser(self, prog_name):
@@ -203,7 +202,7 @@ class GetDefinition(command.Command):
         self.app.stdout.write(definition or "\n")
 
 
-class Validate(show.ShowOne):
+class Validate(command.ShowOne):
     """Validate action."""
 
     def _format(self, result=None):

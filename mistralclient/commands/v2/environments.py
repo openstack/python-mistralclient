@@ -16,8 +16,7 @@ import argparse
 import json
 import logging
 
-from cliff import command
-from cliff import show
+from osc_lib.command import command
 
 from mistralclient.commands.v2 import base
 from mistralclient import utils
@@ -99,7 +98,7 @@ class List(base.MistralLister):
         return mistral_client.environments.list()
 
 
-class Get(show.ShowOne):
+class Get(command.ShowOne):
     """Show specific environment."""
 
     def get_parser(self, prog_name):
@@ -119,7 +118,7 @@ class Get(show.ShowOne):
         return format(environment)
 
 
-class Create(show.ShowOne):
+class Create(command.ShowOne):
     """Create new environment."""
 
     def get_parser(self, prog_name):
@@ -163,7 +162,7 @@ class Delete(command.Command):
         )
 
 
-class Update(show.ShowOne):
+class Update(command.ShowOne):
     """Update environment."""
 
     def get_parser(self, prog_name):

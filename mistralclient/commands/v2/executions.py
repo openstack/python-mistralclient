@@ -19,8 +19,7 @@ import json
 import logging
 import os.path
 
-from cliff import command
-from cliff import show
+from osc_lib.command import command
 
 from mistralclient.commands.v2 import base
 from mistralclient import utils
@@ -119,7 +118,7 @@ class List(base.MistralLister):
         )
 
 
-class Get(show.ShowOne):
+class Get(command.ShowOne):
     """Show specific execution."""
 
     def get_parser(self, prog_name):
@@ -136,7 +135,7 @@ class Get(show.ShowOne):
         return format(execution)
 
 
-class Create(show.ShowOne):
+class Create(command.ShowOne):
     """Create new execution."""
 
     def get_parser(self, prog_name):
@@ -221,7 +220,7 @@ class Delete(command.Command):
         )
 
 
-class Update(show.ShowOne):
+class Update(command.ShowOne):
     """Update execution."""
 
     def get_parser(self, prog_name):

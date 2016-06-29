@@ -16,8 +16,7 @@
 import argparse
 import logging
 
-from cliff import command
-from cliff import show
+from osc_lib.command import command
 
 from mistralclient.commands.v2 import base
 from mistralclient import utils
@@ -63,7 +62,7 @@ class List(base.MistralLister):
         return mistral_client.workbooks.list()
 
 
-class Get(show.ShowOne):
+class Get(command.ShowOne):
     """Show specific workbook."""
 
     def get_parser(self, prog_name):
@@ -83,7 +82,7 @@ class Get(show.ShowOne):
         return format(workbook)
 
 
-class Create(show.ShowOne):
+class Create(command.ShowOne):
     """Create new workbook."""
 
     def get_parser(self, prog_name):
@@ -126,7 +125,7 @@ class Delete(command.Command):
         )
 
 
-class Update(show.ShowOne):
+class Update(command.ShowOne):
     """Update workbook."""
 
     def get_parser(self, prog_name):
@@ -166,7 +165,7 @@ class GetDefinition(command.Command):
         self.app.stdout.write(definition or "\n")
 
 
-class Validate(show.ShowOne):
+class Validate(command.ShowOne):
     """Validate workbook."""
 
     def _format(self, result=None):

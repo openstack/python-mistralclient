@@ -33,8 +33,8 @@ import mistralclient.commands.v2.workflows
 from mistralclient.openstack.common import cliutils as c
 
 from cliff import app
-from cliff import command
 from cliff import commandmanager
+from osc_lib.command import command
 
 import argparse
 
