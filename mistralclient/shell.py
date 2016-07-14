@@ -20,6 +20,7 @@ import logging
 import sys
 
 from mistralclient.api import client
+from mistralclient.auth import auth_types
 import mistralclient.commands.v2.action_executions
 import mistralclient.commands.v2.actions
 import mistralclient.commands.v2.cron_triggers
@@ -298,6 +299,33 @@ class MistralShell(app.App):
         )
 
         parser.add_argument(
+            '--auth-type',
+            action='store',
+            dest='auth_type',
+            default=c.env('MISTRAL_AUTH_TYPE', default=auth_types.KEYSTONE),
+            help='Authentication type. Valid options are: %s.'
+                 ' (Env: MISTRAL_AUTH_TYPE)' % auth_types.ALL
+        )
+
+        parser.add_argument(
+            '--openid-client-id',
+            action='store',
+            dest='client_id',
+            default=c.env('OPENID_CLIENT_ID'),
+            help='Client ID (according to OpenID Connect).'
+                 ' (Env: OPENID_CLIENT_ID)'
+        )
+
+        parser.add_argument(
+            '--openid-client-secret',
+            action='store',
+            dest='client_secret',
+            default=c.env('OPENID_CLIENT_SECRET'),
+            help='Client secret (according to OpenID Connect)'
+                 ' (Env: OPENID_CLIENT_SECRET)'
+        )
+
+        parser.add_argument(
             '--profile',
             dest='profile',
             metavar='HMAC_KEY',
@@ -344,11 +372,14 @@ class MistralShell(app.App):
             auth_token=self.options.token,
             cacert=self.options.cacert,
             insecure=self.options.insecure,
-            profile=self.options.profile
+            profile=self.options.profile,
+            auth_type=self.options.auth_type,
+            client_id=self.options.client_id,
+            client_secret=self.options.client_secret,
         )
 
         # Adding client_manager variable to make mistral client work with
-        # unified openstack client.
+        # unified OpenStack client.
         ClientManager = type(
             'ClientManager',
             (object,),
