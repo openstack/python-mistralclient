@@ -282,9 +282,25 @@ class MistralShell(app.App):
         )
 
         parser.add_argument(
+            '--os-cert',
+            action='store',
+            dest='os_cert',
+            default=c.env('OS_CERT'),
+            help='Client Certificate (Env: OS_CERT)'
+        )
+
+        parser.add_argument(
+            '--os-key',
+            action='store',
+            dest='os_key',
+            default=c.env('OS_KEY'),
+            help='Client Key (Env: OS_KEY)'
+        )
+
+        parser.add_argument(
             '--os-cacert',
             action='store',
-            dest='cacert',
+            dest='os_cacert',
             default=c.env('OS_CACERT'),
             help='Authentication CA Certificate (Env: OS_CACERT)'
         )
@@ -360,6 +376,11 @@ class MistralShell(app.App):
         if do_help or ('bash-completion' in argv):
             self.options.auth_url = None
 
+        kwargs = {
+            'cert': self.options.os_cert,
+            'key': self.options.os_key
+        }
+
         self.client = client.client(
             mistral_url=self.options.mistral_url,
             username=self.options.username,
@@ -370,12 +391,13 @@ class MistralShell(app.App):
             endpoint_type=self.options.endpoint_type,
             service_type=self.options.service_type,
             auth_token=self.options.token,
-            cacert=self.options.cacert,
+            cacert=self.options.os_cacert,
             insecure=self.options.insecure,
             profile=self.options.profile,
             auth_type=self.options.auth_type,
             client_id=self.options.client_id,
             client_secret=self.options.client_secret,
+            **kwargs
         )
 
         # Adding client_manager variable to make mistral client work with
