@@ -89,7 +89,7 @@ class Get(command.ShowOne):
         parser = super(Get, self).get_parser(prog_name)
 
         parser.add_argument(
-            'resource_id',
+            'resource',
             help='Resource ID to be shared.'
         )
         parser.add_argument(
@@ -109,7 +109,7 @@ class Get(command.ShowOne):
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
         member = mistral_client.members.get(
-            parsed_args.resource_id,
+            parsed_args.resource,
             parsed_args.resource_type,
             parsed_args.member_id,
         )
@@ -156,7 +156,7 @@ class Delete(command.Command):
         parser = super(Delete, self).get_parser(prog_name)
 
         parser.add_argument(
-            'resource_id',
+            'resource',
             help='Resource ID to be shared.'
         )
         parser.add_argument(
@@ -175,7 +175,7 @@ class Delete(command.Command):
 
         try:
             mistral_client.members.delete(
-                parsed_args.resource_id,
+                parsed_args.resource,
                 parsed_args.resource_type,
                 parsed_args.member_id,
             )

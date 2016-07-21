@@ -105,7 +105,7 @@ class Get(command.ShowOne):
         parser = super(Get, self).get_parser(prog_name)
 
         parser.add_argument(
-            'name',
+            'environment',
             help='Environment name'
         )
 
@@ -113,7 +113,7 @@ class Get(command.ShowOne):
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-        environment = mistral_client.environments.get(parsed_args.name)
+        environment = mistral_client.environments.get(parsed_args.environment)
 
         return format(environment)
 
@@ -147,7 +147,11 @@ class Delete(command.Command):
     def get_parser(self, prog_name):
         parser = super(Delete, self).get_parser(prog_name)
 
-        parser.add_argument('name', nargs='+', help='Name of environment(s).')
+        parser.add_argument(
+            'environment',
+            nargs='+',
+            help='Name of environment(s).'
+        )
 
         return parser
 
@@ -156,7 +160,7 @@ class Delete(command.Command):
 
         utils.do_action_on_many(
             lambda s: mistral_client.environments.delete(s),
-            parsed_args.name,
+            parsed_args.environment,
             "Request to delete environment %s has been accepted.",
             "Unable to delete the specified environment(s)."
         )

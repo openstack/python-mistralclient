@@ -85,13 +85,13 @@ class Get(command.ShowOne):
     def get_parser(self, prog_name):
         parser = super(Get, self).get_parser(prog_name)
 
-        parser.add_argument('id', help='Task identifier')
+        parser.add_argument('task', help='Task identifier')
 
         return parser
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-        execution = mistral_client.tasks.get(parsed_args.id)
+        execution = mistral_client.tasks.get(parsed_args.task)
 
         return format(execution)
 
