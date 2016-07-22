@@ -18,6 +18,7 @@ Then just run:
 
 or
 
+    pip install -r requirements.txt
     python setup.py install
 
 
