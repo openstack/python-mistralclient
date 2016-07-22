@@ -1,5 +1,7 @@
 # Copyright 2014 - Mirantis, Inc.
 # Copyright 2015 - StackStorm, Inc.
+# Copyright 2016 - Brocade Communications Systems, Inc.
+#
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -17,6 +19,8 @@
 
 import mock
 import pkg_resources as pkg
+import six
+import sys
 
 from mistralclient.api.v2 import executions
 from mistralclient.commands.v2 import executions as execution_cmd
@@ -63,6 +67,7 @@ EX_RESULT = (
     '1',
     '1'
 )
+
 SUB_WF_EX_RESULT = (
     '456',
     '123e4567-e89b-12d3-a456-426655440000',
@@ -77,6 +82,24 @@ SUB_WF_EX_RESULT = (
 
 
 class TestCLIExecutionsV2(base.BaseCommandTest):
+
+    stdout = six.moves.StringIO()
+    stderr = six.moves.StringIO()
+
+    def setUp(self):
+        super(TestCLIExecutionsV2, self).setUp()
+
+        # Redirect stdout and stderr so it doesn't pollute the test result.
+        sys.stdout = self.stdout
+        sys.stderr = self.stderr
+
+    def tearDown(self):
+        super(TestCLIExecutionsV2, self).tearDown()
+
+        # Reset to original stdout and stderr.
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+
     def test_create_wf_input_string(self):
         self.client.executions.create.return_value = EXEC
 
@@ -122,17 +145,48 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         )
 
     def test_update_state(self):
-        self.client.executions.update.return_value = EXEC
+        states = ['RUNNING', 'SUCCESS', 'PAUSED', 'ERROR', 'CANCELLED']
 
-        result = self.call(
-            execution_cmd.Update,
-            app_args=['id', '-s', 'SUCCESS']
-        )
+        for state in states:
+            self.client.executions.update.return_value = executions.Execution(
+                mock,
+                {
+                    'id': '123',
+                    'workflow_id': '123e4567-e89b-12d3-a456-426655440000',
+                    'workflow_name': 'some',
+                    'description': '',
+                    'state': state,
+                    'state_info': None,
+                    'created_at': '1',
+                    'updated_at': '1',
+                    'task_execution_id': None
+                }
+            )
 
-        self.assertEqual(
-            EX_RESULT,
-            result[1]
-        )
+            ex_result = list(EX_RESULT)
+            ex_result[5] = state
+            ex_result = tuple(ex_result)
+
+            result = self.call(
+                execution_cmd.Update,
+                app_args=['id', '-s', state]
+            )
+
+            self.assertEqual(
+                ex_result,
+                result[1]
+            )
+
+    def test_update_invalid_state(self):
+        states = ['IDLE', 'WAITING', 'DELAYED']
+
+        for state in states:
+            self.assertRaises(
+                SystemExit,
+                self.call,
+                execution_cmd.Update,
+                app_args=['id', '-s', state]
+            )
 
     def test_resume_update_env(self):
         self.client.executions.update.return_value = EXEC

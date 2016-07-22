@@ -1,5 +1,7 @@
 # Copyright 2014 - Mirantis, Inc.
 # Copyright 2015 - StackStorm, Inc.
+# Copyright 2016 - Brocade Communications Systems, Inc.
+#
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -235,7 +237,7 @@ class Update(command.ShowOne):
             '-s',
             '--state',
             dest='state',
-            choices=['RUNNING', 'PAUSED', 'SUCCESS', 'ERROR'],
+            choices=['RUNNING', 'PAUSED', 'SUCCESS', 'ERROR', 'CANCELLED'],
             help='Execution state'
         )
 
