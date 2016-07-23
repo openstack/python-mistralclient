@@ -32,47 +32,60 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
         super(MistralClientTestBase, cls).setUpClass()
 
         cls.wb_def = os.path.relpath(
-            'functionaltests/resources/v2/wb_v2.yaml', os.getcwd())
+            'functionaltests/resources/v2/wb_v2.yaml', os.getcwd()
+        )
 
         cls.wb_with_tags_def = os.path.relpath(
-            'functionaltests/resources/v2/wb_with_tags_v2.yaml', os.getcwd())
+            'functionaltests/resources/v2/wb_with_tags_v2.yaml', os.getcwd()
+        )
 
         cls.wf_def = os.path.relpath(
-            'functionaltests/resources/v2/wf_v2.yaml', os.getcwd())
+            'functionaltests/resources/v2/wf_v2.yaml', os.getcwd()
+        )
 
         cls.wf_single_def = os.path.relpath(
-            'functionaltests/resources/v2/wf_single_v2.yaml', os.getcwd())
+            'functionaltests/resources/v2/wf_single_v2.yaml', os.getcwd()
+        )
 
         cls.wf_with_delay_def = os.path.relpath(
-            'functionaltests/resources/v2/wf_delay_v2.yaml', os.getcwd())
+            'functionaltests/resources/v2/wf_delay_v2.yaml', os.getcwd()
+        )
 
         cls.act_def = os.path.relpath(
-            'functionaltests/resources/v2/action_v2.yaml', os.getcwd())
+            'functionaltests/resources/v2/action_v2.yaml', os.getcwd()
+        )
 
         cls.act_tag_def = os.path.relpath(
-            'functionaltests/resources/v2/action_v2_tags.yaml', os.getcwd())
+            'functionaltests/resources/v2/action_v2_tags.yaml', os.getcwd()
+        )
 
     def setUp(self):
         super(MistralClientTestBase, self).setUp()
 
-    def get_value_of_field(self, obj, field):
-        return [o['Value'] for o in obj
-                if o['Field'] == "{0}".format(field)][0]
+    def get_field_value(self, obj, field):
+        return [
+            o['Value'] for o in obj
+            if o['Field'] == "{0}".format(field)
+        ][0]
 
     def get_item_info(self, get_from, get_by, value):
         return [i for i in get_from if i[get_by] == value][0]
 
     def mistral_admin(self, cmd, params=""):
         self.clients = self._get_admin_clients()
-        return self.parser.listing(self.mistral(
-            '{0}'.format(cmd), params='{0}'.format(params)))
+
+        return self.parser.listing(
+            self.mistral('{0}'.format(cmd), params='{0}'.format(params))
+        )
 
     def mistral_alt_user(self, cmd, params=""):
         self.clients = self._get_alt_clients()
-        return self.parser.listing(self.mistral_alt(
-            '{0}'.format(cmd), params='{0}'.format(params)))
 
-    def mistral_cli(self, admin, cmd, params):
+        return self.parser.listing(
+            self.mistral_alt('{0}'.format(cmd), params='{0}'.format(params))
+        )
+
+    def mistral_cli(self, admin, cmd, params=''):
         if admin:
             return self.mistral_admin(cmd, params)
         else:
@@ -82,16 +95,24 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
         wb = self.mistral_cli(
             admin,
             'workbook-create',
-            params='{0}'.format(wb_def))
-        wb_name = self.get_value_of_field(wb, "Name")
-        self.addCleanup(self.mistral_cli,
-                        admin,
-                        'workbook-delete',
-                        params=wb_name)
-        self.addCleanup(self.mistral_cli,
-                        admin,
-                        'workflow-delete',
-                        params='wb.wf1')
+            params='{0}'.format(wb_def)
+        )
+
+        wb_name = self.get_field_value(wb, "Name")
+
+        self.addCleanup(
+            self.mistral_cli,
+            admin,
+            'workbook-delete',
+            params=wb_name
+        )
+
+        self.addCleanup(
+            self.mistral_cli,
+            admin,
+            'workflow-delete',
+            params='wb.wf1'
+        )
 
         return wb
 
@@ -156,17 +177,20 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
     def cron_trigger_create(self, name, wf_name, wf_input, pattern=None,
                             count=None, first_time=None, admin=True):
         optional_params = ""
+
         if pattern:
             optional_params += ' --pattern "{}"'.format(pattern)
         if count:
             optional_params += ' --count {}'.format(count)
         if first_time:
             optional_params += ' --first-time "{}"'.format(first_time)
+
         trigger = self.mistral_cli(
             admin,
             'cron-trigger-create',
             params='{} {} {} {}'.format(name, wf_name, wf_input,
                                         optional_params))
+
         self.addCleanup(self.mistral_cli,
                         admin,
                         'cron-trigger-delete',
@@ -176,21 +200,27 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
 
     def execution_create(self, params, admin=True):
         ex = self.mistral_cli(admin, 'execution-create', params=params)
-        exec_id = self.get_value_of_field(ex, 'ID')
-        self.addCleanup(self.mistral_cli,
-                        admin,
-                        'execution-delete',
-                        params=exec_id)
+        exec_id = self.get_field_value(ex, 'ID')
+
+        self.addCleanup(
+            self.mistral_cli,
+            admin,
+            'execution-delete',
+            params=exec_id
+        )
 
         return ex
 
     def environment_create(self, params, admin=True):
         env = self.mistral_cli(admin, 'environment-create', params=params)
-        env_name = self.get_value_of_field(env, 'Name')
-        self.addCleanup(self.mistral_cli,
-                        admin,
-                        'environment-delete',
-                        params=env_name)
+        env_name = self.get_field_value(env, 'Name')
+
+        self.addCleanup(
+            self.mistral_cli,
+            admin,
+            'environment-delete',
+            params=env_name
+        )
 
         return env
 
@@ -198,13 +228,14 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
         f = open(file_name, 'w')
         f.write(file_body)
         f.close()
+
         self.addCleanup(os.remove, file_name)
 
     def wait_execution_success(self, exec_id, timeout=180):
         start_time = time.time()
 
         ex = self.mistral_admin('execution-get', params=exec_id)
-        exec_state = self.get_value_of_field(ex, 'State')
+        exec_state = self.get_field_value(ex, 'State')
 
         expected_states = ['SUCCESS', 'RUNNING']
 
@@ -212,14 +243,16 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
             if time.time() - start_time > timeout:
                 msg = ("Execution exceeds timeout {0} to change state "
                        "to SUCCESS. Execution: {1}".format(timeout, ex))
+
                 raise exceptions.TimeoutException(msg)
 
             ex = self.mistral_admin('execution-get', params=exec_id)
-            exec_state = self.get_value_of_field(ex, 'State')
+            exec_state = self.get_field_value(ex, 'State')
 
             if exec_state not in expected_states:
                 msg = ("Execution state %s is not in expected "
                        "states: %s" % (exec_state, expected_states))
+
                 raise exceptions.TempestException(msg)
 
             time.sleep(2)

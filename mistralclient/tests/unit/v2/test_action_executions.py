@@ -48,8 +48,7 @@ class TestActionExecutions(base.BaseClientV2Test):
             self.action_executions, ACTION_EXEC
         ).to_dict(), action_execution.to_dict())
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE, json.dumps(body))
+        mock.assert_called_once_with(URL_TEMPLATE, json.dumps(body))
 
     def test_update(self):
         mock = self.mock_http_put(content=ACTION_EXEC)
@@ -63,12 +62,21 @@ class TestActionExecutions(base.BaseClientV2Test):
         )
 
         self.assertIsNotNone(action_execution)
-        self.assertEqual(action_executions.ActionExecution(
-            self.action_executions, ACTION_EXEC
-        ).to_dict(), action_execution.to_dict())
+
+        expected = action_executions.ActionExecution(
+            self.action_executions,
+            ACTION_EXEC
+        ).to_dict()
+
+        self.assertEqual(
+            expected,
+            action_execution.to_dict()
+        )
 
         mock.assert_called_once_with(
-            URL_TEMPLATE_ID % ACTION_EXEC['id'], json.dumps(body))
+            URL_TEMPLATE_ID % ACTION_EXEC['id'],
+            json.dumps(body)
+        )
 
     def test_list(self):
         mock = self.mock_http_get(
@@ -80,9 +88,12 @@ class TestActionExecutions(base.BaseClientV2Test):
         self.assertEqual(1, len(action_execution_list))
         action_execution = action_execution_list[0]
 
-        self.assertEqual(action_executions.ActionExecution(
-            self.action_executions, ACTION_EXEC
-        ).to_dict(), action_execution.to_dict())
+        expected = action_executions.ActionExecution(
+            self.action_executions,
+            ACTION_EXEC
+        ).to_dict()
+
+        self.assertEqual(expected, action_execution.to_dict())
 
         mock.assert_called_once_with(URL_TEMPLATE)
 
@@ -91,12 +102,14 @@ class TestActionExecutions(base.BaseClientV2Test):
 
         action_execution = self.action_executions.get(ACTION_EXEC['id'])
 
-        self.assertEqual(action_executions.ActionExecution(
-            self.action_executions, ACTION_EXEC
-        ).to_dict(), action_execution.to_dict())
+        expected = action_executions.ActionExecution(
+            self.action_executions,
+            ACTION_EXEC
+        ).to_dict()
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_ID % ACTION_EXEC['id'])
+        self.assertEqual(expected, action_execution.to_dict())
+
+        mock.assert_called_once_with(URL_TEMPLATE_ID % ACTION_EXEC['id'])
 
     def test_delete(self):
         mock = self.mock_http_delete(status_code=204)
