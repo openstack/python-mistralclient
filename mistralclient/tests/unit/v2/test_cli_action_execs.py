@@ -105,8 +105,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
         result = self.call(action_ex_cmd.List)
 
         self.assertEqual(
-            [('123', 'some', 'thing', 'task1', '1-2-3-4', 'RUNNING',
-              'RUNNING somehow.', True)],
+            [('123', 'some', 'thing', 'task1', '1-2-3-4', 'RUNNING', True)],
             result[1]
         )
 
