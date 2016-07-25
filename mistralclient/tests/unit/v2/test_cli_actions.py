@@ -24,6 +24,7 @@ from mistralclient.tests.unit import base
 
 
 ACTION_DICT = {
+    'id': '1234-4567-7894-7895',
     'name': 'a',
     'is_system': True,
     'input': "param1",
@@ -57,7 +58,8 @@ class TestCLIActionsV2(base.BaseCommandTest):
         result = self.call(action_cmd.Create, app_args=['1.txt'])
 
         self.assertEqual(
-            [('a', True, "param1", 'My cool action', 'test', '1', '1')],
+            [('1234-4567-7894-7895', 'a', True, "param1",
+              'My cool action', 'test', '1', '1')],
             result[1]
         )
 
@@ -71,7 +73,8 @@ class TestCLIActionsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            [('a', True, "param1", 'My cool action', 'test', '1', '1')],
+            [('1234-4567-7894-7895', 'a', True, "param1",
+              'My cool action', 'test', '1', '1')],
             result[1]
         )
 
@@ -96,7 +99,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
         result = self.call(action_cmd.Create, app_args=['1.txt'])
 
         self.assertEqual(
-            [('a', True, cmd_base.cut(long_input),
+            [('1234-4567-7894-7895', 'a', True, cmd_base.cut(long_input),
               'My cool action', 'test', '1', '1')],
             result[1]
         )
@@ -108,7 +111,8 @@ class TestCLIActionsV2(base.BaseCommandTest):
         result = self.call(action_cmd.Update, app_args=['my_action.yaml'])
 
         self.assertEqual(
-            [('a', True, "param1", 'My cool action', 'test', '1', '1')],
+            [('1234-4567-7894-7895', 'a', True, "param1",
+              'My cool action', 'test', '1', '1')],
             result[1]
         )
 
@@ -122,7 +126,8 @@ class TestCLIActionsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            [('a', True, "param1", 'My cool action', 'test', '1', '1')],
+            [('1234-4567-7894-7895', 'a', True, "param1",
+              'My cool action', 'test', '1', '1')],
             result[1]
         )
 
@@ -137,7 +142,8 @@ class TestCLIActionsV2(base.BaseCommandTest):
         result = self.call(action_cmd.List)
 
         self.assertEqual(
-            [('a', True, "param1", 'My cool action', 'test', '1', '1')],
+            [('1234-4567-7894-7895', 'a', True, "param1",
+              'My cool action', 'test', '1', '1')],
             result[1]
         )
 
@@ -147,7 +153,8 @@ class TestCLIActionsV2(base.BaseCommandTest):
         result = self.call(action_cmd.Get, app_args=['name'])
 
         self.assertEqual(
-            ('a', True, "param1", 'My cool action', 'test', '1', '1'),
+            ('1234-4567-7894-7895', 'a', True, "param1",
+             'My cool action', 'test', '1', '1'),
             result[1]
         )
 

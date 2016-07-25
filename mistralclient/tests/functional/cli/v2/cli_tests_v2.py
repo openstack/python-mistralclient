@@ -752,6 +752,36 @@ class ActionCLITests(base_v2.MistralClientTestBase):
         self.assertNotEqual(created_action['Updated at'],
                             updated_action['Updated at'])
 
+    def test_action_update_with_id(self):
+        acts = self.action_create(self.act_def)
+
+        created_action = self.get_item_info(
+            get_from=acts,
+            get_by='Name',
+            value='greeting'
+        )
+
+        action_id = created_action['ID']
+
+        params = '{0} --id {1}'.format(self.act_tag_def, action_id)
+        acts = self.mistral_admin('action-update', params=params)
+
+        updated_action = self.get_item_info(
+            get_from=acts,
+            get_by='ID',
+            value=action_id
+        )
+
+        self.assertEqual(
+            created_action['Created at'].split(".")[0],
+            updated_action['Created at']
+        )
+        self.assertEqual(created_action['Name'], updated_action['Name'])
+        self.assertNotEqual(
+            created_action['Updated at'],
+            updated_action['Updated at']
+        )
+
     def test_action_update_truncate_input(self):
         input_value = "very_long_input_parameter_name_that_should_be_truncated"
         act_def = """
@@ -776,6 +806,15 @@ class ActionCLITests(base_v2.MistralClientTestBase):
         definition = self.mistral_admin(
             'action-get-definition', params='greeting')
         self.assertNotIn('404 Not Found', definition)
+
+    def test_action_get_with_id(self):
+        created = self.action_create(self.act_def)
+        action_name = created[0]['Name']
+        action_id = created[0]['ID']
+
+        fetched = self.mistral_admin('action-get', params=action_id)
+        fetched_action_name = self.get_field_value(fetched, 'Name')
+        self.assertEqual(action_name, fetched_action_name)
 
 
 class EnvironmentCLITests(base_v2.MistralClientTestBase):

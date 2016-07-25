@@ -31,6 +31,7 @@ def format_list(action=None):
 
 def format(action=None, lister=False):
     columns = (
+        'ID',
         'Name',
         'Is system',
         'Input',
@@ -47,6 +48,7 @@ def format(action=None, lister=False):
                 else base.cut(action.description))
 
         data = (
+            action.id,
             action.name,
             action.is_system,
             input,
@@ -137,7 +139,11 @@ class Delete(command.Command):
     def get_parser(self, prog_name):
         parser = super(Delete, self).get_parser(prog_name)
 
-        parser.add_argument('name', nargs='+', help='Name of action(s).')
+        parser.add_argument(
+            'action',
+            nargs='+',
+            help='Name or ID of action(s).'
+        )
 
         return parser
 
@@ -146,7 +152,7 @@ class Delete(command.Command):
 
         utils.do_action_on_many(
             lambda s: mistral_client.actions.delete(s),
-            parsed_args.name,
+            parsed_args.action,
             "Request to delete action %s has been accepted.",
             "Unable to delete the specified action(s)."
         )
@@ -163,6 +169,7 @@ class Update(base.MistralLister):
             type=argparse.FileType('r'),
             help='Action definition file'
         )
+        parser.add_argument('--id', help='Action ID.')
         parser.add_argument(
             '--public',
             action='store_true',
@@ -181,7 +188,8 @@ class Update(base.MistralLister):
 
         return mistral_client.actions.update(
             parsed_args.definition.read(),
-            scope=scope
+            scope=scope,
+            id=parsed_args.id
         )
 
 

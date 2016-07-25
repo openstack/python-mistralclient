@@ -46,15 +46,17 @@ class ActionManager(base.ResourceManager):
         return [self.resource_class(self, resource_data)
                 for resource_data in base.extract_json(resp, 'actions')]
 
-    def update(self, definition, scope='private'):
+    def update(self, definition, scope='private', id=None):
         self._ensure_not_empty(definition=definition)
+
+        url_pre = ('/actions/%s' % id) if id else '/actions'
 
         # If the specified definition is actually a file, read in the
         # definition file
         definition = utils.get_contents_if_file(definition)
 
         resp = self.client.http_client.put(
-            '/actions?scope=%s' % scope,
+            '%s?scope=%s' % (url_pre, scope),
             definition,
             headers={'content-type': 'text/plain'}
         )
@@ -88,15 +90,15 @@ class ActionManager(base.ResourceManager):
             response_key='actions',
         )
 
-    def get(self, name):
-        self._ensure_not_empty(name=name)
+    def get(self, identifier):
+        self._ensure_not_empty(identifier=identifier)
 
-        return self._get('/actions/%s' % name)
+        return self._get('/actions/%s' % identifier)
 
-    def delete(self, name):
-        self._ensure_not_empty(name=name)
+    def delete(self, identifier):
+        self._ensure_not_empty(identifier=identifier)
 
-        self._delete('/actions/%s' % name)
+        self._delete('/actions/%s' % identifier)
 
     def validate(self, definition):
         self._ensure_not_empty(definition=definition)
