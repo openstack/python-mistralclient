@@ -35,14 +35,13 @@ def make_client(instance):
 
     LOG.debug('Instantiating workflow engine client: %s', workflow_client)
 
-    if not instance._url:
-        instance._url = instance.get_endpoint_for_service_type(
-            'workflowv2',
-            interface='publicURL'
-        )
+    mistral_url = instance.get_endpoint_for_service_type(
+        'workflowv2',
+        interface='publicURL'
+    )
 
     client = workflow_client(
-        mistral_url=instance._url,
+        mistral_url=mistral_url,
         auth_token=instance.auth_ref.auth_token,
         project_id=instance.auth_ref.project_id,
         user_id=instance.auth_ref.user_id,
