@@ -42,7 +42,7 @@ class Client(object):
                  endpoint_type='publicURL', service_type='workflowv2',
                  auth_token=None, user_id=None, cacert=None, insecure=False,
                  profile=None, auth_type=auth_types.KEYSTONE, client_id=None,
-                 client_secret=None):
+                 client_secret=None, **kwargs):
 
         if mistral_url and not isinstance(mistral_url, six.string_types):
             raise RuntimeError('Mistral url should be a string.')
@@ -102,7 +102,8 @@ class Client(object):
             project_id,
             user_id,
             cacert=cacert,
-            insecure=insecure
+            insecure=insecure,
+            **kwargs
         )
 
         # Create all resource managers.

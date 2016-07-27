@@ -37,7 +37,7 @@ def log_request(func):
 
 class HTTPClient(object):
     def __init__(self, base_url, token=None, project_id=None, user_id=None,
-                 cacert=None, insecure=False):
+                 cacert=None, insecure=False, **kwargs):
         self.base_url = base_url
         self.token = token
         self.project_id = project_id
@@ -53,8 +53,15 @@ class HTTPClient(object):
                 LOG.warning('Client is set to not verify even though '
                             'cacert is provided.')
 
-            self.ssl_options['verify'] = not insecure
-            self.ssl_options['cert'] = cacert
+            if insecure:
+                self.ssl_options['verify'] = False
+            else:
+                if cacert:
+                    self.ssl_options['verify'] = cacert
+                else:
+                    self.ssl_options['verify'] = True
+
+            self.ssl_options['cert'] = (kwargs.get('cert'), kwargs.get('key'))
 
     @log_request
     def get(self, url, headers=None):

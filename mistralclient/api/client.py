@@ -23,7 +23,7 @@ def client(mistral_url=None, username=None, api_key=None,
            endpoint_type='publicURL', service_type='workflow',
            auth_token=None, user_id=None, cacert=None, insecure=False,
            profile=None, auth_type=auth_types.KEYSTONE, client_id=None,
-           client_secret=None):
+           client_secret=None, **kwargs):
 
         if mistral_url and not isinstance(mistral_url, six.string_types):
             raise RuntimeError('Mistral url should be a string.')
@@ -44,7 +44,8 @@ def client(mistral_url=None, username=None, api_key=None,
             profile=profile,
             auth_type=auth_type,
             client_id=client_id,
-            client_secret=client_secret
+            client_secret=client_secret,
+            **kwargs
         )
 
 
