@@ -93,8 +93,7 @@ class SimpleMistralCLITests(base.MistralCLIAuth):
             self.mistral('action-execution-list'))
         self.assertTableStruct(
             act_execs,
-            ['ID', 'Name', 'Workflow name', 'State',
-             'State info', 'Is accepted']
+            ['ID', 'Name', 'Workflow name', 'State', 'State info', 'Accepted']
         )
 
 
@@ -108,7 +107,7 @@ class WorkbookCLITests(base_v2.MistralClientTestBase):
     def test_workbook_create_delete(self):
         wb = self.mistral_admin(
             'workbook-create', params=self.wb_def)
-        wb_name = self.get_value_of_field(wb, "Name")
+        wb_name = self.get_field_value(wb, "Name")
 
         self.assertTableStruct(wb, ['Field', 'Value'])
 
@@ -126,22 +125,22 @@ class WorkbookCLITests(base_v2.MistralClientTestBase):
     def test_workbook_create_with_tags(self):
         wb = self.workbook_create(self.wb_with_tags_def)
 
-        tags = self.get_value_of_field(wb, 'Tags')
+        tags = self.get_field_value(wb, 'Tags')
         self.assertIn('tag', tags)
 
     def test_workbook_update(self):
         wb = self.workbook_create(self.wb_def)
-        wb_name = self.get_value_of_field(wb, "Name")
+        wb_name = self.get_field_value(wb, "Name")
 
-        init_update_at = self.get_value_of_field(wb, "Updated at")
-        tags = self.get_value_of_field(wb, 'Tags')
+        init_update_at = self.get_field_value(wb, "Updated at")
+        tags = self.get_field_value(wb, 'Tags')
         self.assertNotIn('tag', tags)
 
         wb = self.mistral_admin(
             'workbook-update', params=self.wb_def)
-        update_at = self.get_value_of_field(wb, "Updated at")
-        name = self.get_value_of_field(wb, 'Name')
-        tags = self.get_value_of_field(wb, 'Tags')
+        update_at = self.get_field_value(wb, "Updated at")
+        name = self.get_field_value(wb, 'Name')
+        tags = self.get_field_value(wb, 'Tags')
 
         self.assertEqual(wb_name, name)
         self.assertNotIn('tag', tags)
@@ -151,9 +150,9 @@ class WorkbookCLITests(base_v2.MistralClientTestBase):
             'workbook-update', params=self.wb_with_tags_def)
         self.assertTableStruct(wb, ['Field', 'Value'])
 
-        update_at = self.get_value_of_field(wb, "Updated at")
-        name = self.get_value_of_field(wb, 'Name')
-        tags = self.get_value_of_field(wb, 'Tags')
+        update_at = self.get_field_value(wb, "Updated at")
+        name = self.get_field_value(wb, 'Name')
+        tags = self.get_field_value(wb, 'Tags')
 
         self.assertEqual(wb_name, name)
         self.assertIn('tag', tags)
@@ -161,23 +160,23 @@ class WorkbookCLITests(base_v2.MistralClientTestBase):
 
     def test_workbook_get(self):
         created = self.workbook_create(self.wb_with_tags_def)
-        wb_name = self.get_value_of_field(created, "Name")
+        wb_name = self.get_field_value(created, "Name")
 
         fetched = self.mistral_admin('workbook-get', params=wb_name)
 
-        created_wb_name = self.get_value_of_field(created, 'Name')
-        fetched_wb_name = self.get_value_of_field(fetched, 'Name')
+        created_wb_name = self.get_field_value(created, 'Name')
+        fetched_wb_name = self.get_field_value(fetched, 'Name')
 
         self.assertEqual(created_wb_name, fetched_wb_name)
 
-        created_wb_tag = self.get_value_of_field(created, 'Tags')
-        fetched_wb_tag = self.get_value_of_field(fetched, 'Tags')
+        created_wb_tag = self.get_field_value(created, 'Tags')
+        fetched_wb_tag = self.get_field_value(fetched, 'Tags')
 
         self.assertEqual(created_wb_tag, fetched_wb_tag)
 
     def test_workbook_get_definition(self):
         wb = self.workbook_create(self.wb_def)
-        wb_name = self.get_value_of_field(wb, "Name")
+        wb_name = self.get_field_value(wb, "Name")
 
         definition = self.mistral_admin(
             'workbook-get-definition', params=wb_name)
@@ -186,8 +185,8 @@ class WorkbookCLITests(base_v2.MistralClientTestBase):
     def test_workbook_validate_with_valid_def(self):
         wb = self.mistral_admin(
             'workbook-validate', params=self.wb_def)
-        wb_valid = self.get_value_of_field(wb, 'Valid')
-        wb_error = self.get_value_of_field(wb, 'Error')
+        wb_valid = self.get_field_value(wb, 'Valid')
+        wb_error = self.get_field_value(wb, 'Error')
 
         self.assertEqual('True', wb_valid)
         self.assertEqual('None', wb_error)
@@ -198,8 +197,8 @@ class WorkbookCLITests(base_v2.MistralClientTestBase):
         wb = self.mistral_admin(
             'workbook-validate', params='wb.yaml')
 
-        wb_valid = self.get_value_of_field(wb, 'Valid')
-        wb_error = self.get_value_of_field(wb, 'Error')
+        wb_valid = self.get_field_value(wb, 'Valid')
+        wb_error = self.get_field_value(wb, 'Error')
 
         self.assertEqual('False', wb_valid)
         self.assertNotEqual('None', wb_error)
@@ -347,7 +346,7 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
         wf_name = created[0]['Name']
 
         fetched = self.mistral_admin('workflow-get', params=wf_name)
-        fetched_wf_name = self.get_value_of_field(fetched, 'Name')
+        fetched_wf_name = self.get_field_value(fetched, 'Name')
         self.assertEqual(wf_name, fetched_wf_name)
 
     def test_workflow_get_with_id(self):
@@ -356,7 +355,7 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
         wf_id = created[0]['ID']
 
         fetched = self.mistral_admin('workflow-get', params=wf_id)
-        fetched_wf_name = self.get_value_of_field(fetched, 'Name')
+        fetched_wf_name = self.get_field_value(fetched, 'Name')
         self.assertEqual(wf_name, fetched_wf_name)
 
     def test_workflow_get_definition(self):
@@ -370,8 +369,8 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
     def test_workflow_validate_with_valid_def(self):
         wf = self.mistral_admin(
             'workflow-validate', params=self.wf_def)
-        wf_valid = self.get_value_of_field(wf, 'Valid')
-        wf_error = self.get_value_of_field(wf, 'Error')
+        wf_valid = self.get_field_value(wf, 'Valid')
+        wf_error = self.get_field_value(wf, 'Error')
 
         self.assertEqual('True', wf_valid)
         self.assertEqual('None', wf_error)
@@ -382,8 +381,8 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
         wf = self.mistral_admin(
             'workflow-validate', params='wf.yaml')
 
-        wf_valid = self.get_value_of_field(wf, 'Valid')
-        wf_error = self.get_value_of_field(wf, 'Error')
+        wf_valid = self.get_field_value(wf, 'Valid')
+        wf_error = self.get_field_value(wf, 'Error')
 
         self.assertEqual('False', wf_valid)
         self.assertNotEqual('None', wf_error)
@@ -400,6 +399,7 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
         super(ExecutionCLITests, self).setUp()
 
         wfs = self.workflow_create(self.wf_def)
+
         self.direct_wf = wfs[0]
         self.reverse_wf = wfs[1]
 
@@ -411,13 +411,13 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
             'execution-create',
             params='{0} -d "execution test"'.format(self.direct_wf['Name'])
         )
-        exec_id = self.get_value_of_field(execution, 'ID')
+        exec_id = self.get_field_value(execution, 'ID')
         self.assertTableStruct(execution, ['Field', 'Value'])
 
-        wf_name = self.get_value_of_field(execution, 'Workflow name')
-        wf_id = self.get_value_of_field(execution, 'Workflow ID')
-        created_at = self.get_value_of_field(execution, 'Created at')
-        description = self.get_value_of_field(execution, 'Description')
+        wf_name = self.get_field_value(execution, 'Workflow name')
+        wf_id = self.get_field_value(execution, 'Workflow ID')
+        created_at = self.get_field_value(execution, 'Created at')
+        description = self.get_field_value(execution, 'Description')
 
         self.assertEqual(self.direct_wf['Name'], wf_name)
         self.assertIsNotNone(wf_id)
@@ -433,7 +433,7 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
     def test_execution_create_with_input_and_start_task(self):
         execution = self.execution_create(
             "%s input task_name" % self.reverse_wf['Name'])
-        exec_id = self.get_value_of_field(execution, 'ID')
+        exec_id = self.get_field_value(execution, 'ID')
 
         result = self.wait_execution_success(exec_id)
         self.assertTrue(result)
@@ -441,8 +441,8 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
     def test_execution_update(self):
         execution = self.execution_create(self.direct_wf['Name'])
 
-        exec_id = self.get_value_of_field(execution, 'ID')
-        status = self.get_value_of_field(execution, 'State')
+        exec_id = self.get_field_value(execution, 'ID')
+        status = self.get_field_value(execution, 'State')
 
         self.assertEqual('RUNNING', status)
 
@@ -450,8 +450,8 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
         execution = self.mistral_admin(
             'execution-update', params='{0} -s PAUSED'.format(exec_id))
 
-        updated_exec_id = self.get_value_of_field(execution, 'ID')
-        status = self.get_value_of_field(execution, 'State')
+        updated_exec_id = self.get_field_value(execution, 'ID')
+        status = self.get_field_value(execution, 'State')
 
         self.assertEqual(exec_id, updated_exec_id)
         self.assertEqual('PAUSED', status)
@@ -462,20 +462,22 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
             params='{0} -d "execution update test"'.format(exec_id)
         )
 
-        description = self.get_value_of_field(execution, 'Description')
+        description = self.get_field_value(execution, 'Description')
 
         self.assertEqual("execution update test", description)
 
     def test_execution_get(self):
         execution = self.execution_create(self.direct_wf['Name'])
-        exec_id = self.get_value_of_field(execution, 'ID')
+        exec_id = self.get_field_value(execution, 'ID')
 
         execution = self.mistral_admin(
-            'execution-get', params='{0}'.format(exec_id))
+            'execution-get',
+            params='{0}'.format(exec_id)
+        )
 
-        gotten_id = self.get_value_of_field(execution, 'ID')
-        wf_name = self.get_value_of_field(execution, 'Workflow name')
-        wf_id = self.get_value_of_field(execution, 'Workflow ID')
+        gotten_id = self.get_field_value(execution, 'ID')
+        wf_name = self.get_field_value(execution, 'Workflow name')
+        wf_id = self.get_field_value(execution, 'Workflow ID')
 
         self.assertIsNotNone(wf_id)
         self.assertEqual(exec_id, gotten_id)
@@ -483,87 +485,96 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
 
     def test_execution_get_input(self):
         execution = self.execution_create(self.direct_wf['Name'])
-        exec_id = self.get_value_of_field(execution, 'ID')
+        exec_id = self.get_field_value(execution, 'ID')
 
         ex_input = self.mistral_admin('execution-get-input', params=exec_id)
         self.assertEqual([], ex_input)
 
     def test_execution_get_output(self):
         execution = self.execution_create(self.direct_wf['Name'])
-        exec_id = self.get_value_of_field(execution, 'ID')
+        exec_id = self.get_field_value(execution, 'ID')
 
         ex_output = self.mistral_admin(
-            'execution-get-output', params=exec_id)
+            'execution-get-output',
+            params=exec_id
+        )
 
         self.assertEqual([], ex_output)
 
     def test_executions_list_with_pagination(self):
-
-        execution1 = self.mistral_admin(
+        wf_ex1 = self.mistral_admin(
             'execution-create',
             params='{0} -d "a"'.format(self.direct_wf['Name'])
         )
 
-        execution2 = self.mistral_admin(
+        wf_ex2 = self.mistral_admin(
             'execution-create',
             params='{0} -d "b"'.format(self.direct_wf['Name'])
         )
 
-        executions = self.mistral_cli(
+        wf_execs = self.mistral_cli(True, 'execution-list')
+
+        self.assertEqual(2, len(wf_execs))
+
+        wf_execs = self.mistral_cli(
             True,
             'execution-list',
             params="--limit 1"
         )
 
-        self.assertEqual(1, len(executions))
+        self.assertEqual(1, len(wf_execs))
 
-        exec_id_1 = self.get_value_of_field(execution1, 'ID')
-        exec_id_2 = self.get_value_of_field(execution2, 'ID')
-        executions = self.mistral_cli(
+        wf_ex1_id = self.get_field_value(wf_ex1, 'ID')
+        wf_ex2_id = self.get_field_value(wf_ex2, 'ID')
+
+        wf_execs = self.mistral_cli(
             True,
             'execution-list',
-            params="--marker %s" % exec_id_1
+            params="--marker %s" % wf_ex1_id
         )
-        self.assertNotIn(exec_id_1, [ex['ID'] for ex in executions])
-        self.assertIn(exec_id_2, [ex['ID'] for ex in executions])
 
-        executions = self.mistral_cli(
+        self.assertNotIn(wf_ex1_id, [ex['ID'] for ex in wf_execs])
+        self.assertIn(wf_ex2_id, [ex['ID'] for ex in wf_execs])
+
+        wf_execs = self.mistral_cli(
             True,
             'execution-list',
             params="--sort_keys Description"
         )
 
-        self.assertIn(exec_id_1, [ex['ID'] for ex in executions])
-        self.assertIn(exec_id_2, [ex['ID'] for ex in executions])
+        self.assertIn(wf_ex1_id, [ex['ID'] for ex in wf_execs])
+        self.assertIn(wf_ex2_id, [ex['ID'] for ex in wf_execs])
 
-        ex1_index = -1
-        ex2_index = -1
-        for idx, ex in enumerate(executions):
-            if ex['ID'] == exec_id_1:
-                ex1_index = idx
-            elif ex['ID'] == exec_id_2:
-                ex2_index = idx
+        wf_ex1_index = -1
+        wf_ex2_index = -1
 
-        self.assertTrue(ex1_index < ex2_index)
+        for idx, ex in enumerate(wf_execs):
+            if ex['ID'] == wf_ex1_id:
+                wf_ex1_index = idx
+            elif ex['ID'] == wf_ex2_id:
+                wf_ex2_index = idx
 
-        executions = self.mistral_cli(
+        self.assertTrue(wf_ex1_index < wf_ex2_index)
+
+        wf_execs = self.mistral_cli(
             True,
             'execution-list',
             params="--sort_keys Description --sort_dirs=desc"
         )
 
-        self.assertIn(exec_id_1, [ex['ID'] for ex in executions])
-        self.assertIn(exec_id_2, [ex['ID'] for ex in executions])
+        self.assertIn(wf_ex1_id, [ex['ID'] for ex in wf_execs])
+        self.assertIn(wf_ex2_id, [ex['ID'] for ex in wf_execs])
 
-        ex1_index = -1
-        ex2_index = -1
-        for idx, ex in enumerate(executions):
-            if ex['ID'] == exec_id_1:
-                ex1_index = idx
-            elif ex['ID'] == exec_id_2:
-                ex2_index = idx
+        wf_ex1_index = -1
+        wf_ex2_index = -1
 
-        self.assertTrue(ex1_index > ex2_index)
+        for idx, ex in enumerate(wf_execs):
+            if ex['ID'] == wf_ex1_id:
+                wf_ex1_index = idx
+            elif ex['ID'] == wf_ex2_id:
+                wf_ex2_index = idx
+
+        self.assertTrue(wf_ex1_index > wf_ex2_index)
 
 
 class CronTriggerCLITests(base_v2.MistralClientTestBase):
@@ -586,11 +597,11 @@ class CronTriggerCLITests(base_v2.MistralClientTestBase):
                     ' --first-time "4242-12-25 13:37"' % self.wf_name))
         self.assertTableStruct(trigger, ['Field', 'Value'])
 
-        tr_name = self.get_value_of_field(trigger, 'Name')
-        wf_name = self.get_value_of_field(trigger, 'Workflow')
-        created_at = self.get_value_of_field(trigger, 'Created at')
-        remain = self.get_value_of_field(trigger, 'Remaining executions')
-        next_time = self.get_value_of_field(trigger, 'Next execution time')
+        tr_name = self.get_field_value(trigger, 'Name')
+        wf_name = self.get_field_value(trigger, 'Workflow')
+        created_at = self.get_field_value(trigger, 'Created at')
+        remain = self.get_field_value(trigger, 'Remaining executions')
+        next_time = self.get_field_value(trigger, 'Next execution time')
 
         self.assertEqual('trigger', tr_name)
         self.assertEqual(self.wf_name, wf_name)
@@ -622,16 +633,16 @@ class CronTriggerCLITests(base_v2.MistralClientTestBase):
             'trigger', self.wf_name, '{}', "5 * * * *")
         self.assertTableStruct(trigger, ['Field', 'Value'])
 
-        tr_name = self.get_value_of_field(trigger, 'Name')
+        tr_name = self.get_field_value(trigger, 'Name')
 
         fetched_tr = self.mistral_admin(
             'cron-trigger-get', params='trigger')
 
         self.assertTableStruct(trigger, ['Field', 'Value'])
 
-        tr_name = self.get_value_of_field(fetched_tr, 'Name')
-        wf_name = self.get_value_of_field(fetched_tr, 'Workflow')
-        created_at = self.get_value_of_field(fetched_tr, 'Created at')
+        tr_name = self.get_field_value(fetched_tr, 'Name')
+        wf_name = self.get_field_value(fetched_tr, 'Workflow')
+        created_at = self.get_field_value(fetched_tr, 'Created at')
 
         self.assertEqual('trigger', tr_name)
         self.assertEqual(self.wf_name, wf_name)
@@ -645,6 +656,7 @@ class TaskCLITests(base_v2.MistralClientTestBase):
         super(TaskCLITests, self).setUp()
 
         wfs = self.workflow_create(self.wf_def)
+
         self.direct_wf = wfs[0]
         self.reverse_wf = wfs[1]
 
@@ -652,19 +664,19 @@ class TaskCLITests(base_v2.MistralClientTestBase):
         self.create_file('task_name', '{\n    "task_name": "goodbye"\n}\n')
 
     def test_task_get(self):
-        execution = self.execution_create(self.direct_wf['Name'])
-        exec_id = self.get_value_of_field(execution, 'ID')
+        wf_ex = self.execution_create(self.direct_wf['Name'])
+        wf_ex_id = self.get_field_value(wf_ex, 'ID')
 
-        tasks = self.mistral_admin('task-list')
+        tasks = self.mistral_admin('task-list', params=wf_ex_id)
+
         created_task_id = tasks[-1]['ID']
 
         fetched_task = self.mistral_admin('task-get', params=created_task_id)
-        fetched_task_id = self.get_value_of_field(fetched_task, 'ID')
-        task_execution_id = self.get_value_of_field(fetched_task,
-                                                    'Execution ID')
+        fetched_task_id = self.get_field_value(fetched_task, 'ID')
+        task_execution_id = self.get_field_value(fetched_task, 'Execution ID')
 
         self.assertEqual(created_task_id, fetched_task_id)
-        self.assertEqual(exec_id, task_execution_id)
+        self.assertEqual(wf_ex_id, task_execution_id)
 
 
 class ActionCLITests(base_v2.MistralClientTestBase):
@@ -780,8 +792,8 @@ class EnvironmentCLITests(base_v2.MistralClientTestBase):
 
     def test_environment_create(self):
         env = self.mistral_admin('environment-create', params='env.yaml')
-        env_name = self.get_value_of_field(env, 'Name')
-        env_desc = self.get_value_of_field(env, 'Description')
+        env_name = self.get_field_value(env, 'Name')
+        env_desc = self.get_field_value(env, 'Description')
 
         self.assertTableStruct(env, ['Field', 'Value'])
 
@@ -803,8 +815,8 @@ class EnvironmentCLITests(base_v2.MistralClientTestBase):
         env = self.mistral_admin('environment-create',
                                  params='env_without_des.yaml')
 
-        env_name = self.get_value_of_field(env, 'Name')
-        env_desc = self.get_value_of_field(env, 'Description')
+        env_name = self.get_field_value(env, 'Name')
+        env_desc = self.get_field_value(env, 'Description')
 
         self.assertTableStruct(env, ['Field', 'Value'])
 
@@ -819,10 +831,10 @@ class EnvironmentCLITests(base_v2.MistralClientTestBase):
 
     def test_environment_update(self):
         env = self.environment_create('env.yaml')
-        env_name = self.get_value_of_field(env, 'Name')
-        env_desc = self.get_value_of_field(env, 'Description')
-        env_created_at = self.get_value_of_field(env, 'Created at')
-        env_updated_at = self.get_value_of_field(env, 'Updated at')
+        env_name = self.get_field_value(env, 'Name')
+        env_desc = self.get_field_value(env, 'Description')
+        env_created_at = self.get_field_value(env, 'Created at')
+        env_updated_at = self.get_field_value(env, 'Updated at')
 
         self.assertIsNotNone(env_created_at)
         self.assertEqual('None', env_updated_at)
@@ -836,10 +848,10 @@ class EnvironmentCLITests(base_v2.MistralClientTestBase):
         env = self.mistral_admin('environment-update', params='env_upd.yaml')
         self.assertTableStruct(env, ['Field', 'Value'])
 
-        updated_env_name = self.get_value_of_field(env, 'Name')
-        updated_env_desc = self.get_value_of_field(env, 'Description')
-        updated_env_created_at = self.get_value_of_field(env, 'Created at')
-        updated_env_updated_at = self.get_value_of_field(env, 'Updated at')
+        updated_env_name = self.get_field_value(env, 'Name')
+        updated_env_desc = self.get_field_value(env, 'Description')
+        updated_env_created_at = self.get_field_value(env, 'Created at')
+        updated_env_updated_at = self.get_field_value(env, 'Updated at')
 
         self.assertEqual(env_name, updated_env_name)
         self.assertNotEqual(env_desc, updated_env_desc)
@@ -849,12 +861,12 @@ class EnvironmentCLITests(base_v2.MistralClientTestBase):
 
     def test_environment_get(self):
         env = self.environment_create('env.yaml')
-        env_name = self.get_value_of_field(env, 'Name')
-        env_desc = self.get_value_of_field(env, 'Description')
+        env_name = self.get_field_value(env, 'Name')
+        env_desc = self.get_field_value(env, 'Description')
 
         env = self.mistral_admin('environment-get', params=env_name)
-        fetched_env_name = self.get_value_of_field(env, 'Name')
-        fetched_env_desc = self.get_value_of_field(env, 'Description')
+        fetched_env_name = self.get_field_value(env, 'Name')
+        fetched_env_desc = self.get_field_value(env, 'Description')
 
         self.assertTableStruct(env, ['Field', 'Value'])
         self.assertEqual(env_name, fetched_env_name)
@@ -868,29 +880,34 @@ class ActionExecutionCLITests(base_v2.MistralClientTestBase):
         super(ActionExecutionCLITests, self).setUp()
 
         wfs = self.workflow_create(self.wf_def)
+
         self.direct_wf = wfs[0]
 
         direct_wf_exec = self.execution_create(self.direct_wf['Name'])
-        self.direct_ex_id = self.get_value_of_field(direct_wf_exec, 'ID')
+
+        self.direct_ex_id = self.get_field_value(direct_wf_exec, 'ID')
 
     def test_act_execution_get(self):
         self.wait_execution_success(self.direct_ex_id)
 
-        task = self.mistral_admin(
-            'task-list', params=self.direct_ex_id)[0]
+        task = self.mistral_admin('task-list', params=self.direct_ex_id)[0]
 
         act_ex_from_list = self.mistral_admin(
-            'action-execution-list', params=task['ID'])[0]
+            'action-execution-list',
+            params=task['ID']
+        )[0]
 
         act_ex = self.mistral_admin(
-            'action-execution-get', params=act_ex_from_list['ID'])
+            'action-execution-get',
+            params=act_ex_from_list['ID']
+        )
 
-        wf_name = self.get_value_of_field(act_ex, 'Workflow name')
-        status = self.get_value_of_field(act_ex, 'State')
+        wf_name = self.get_field_value(act_ex, 'Workflow name')
+        status = self.get_field_value(act_ex, 'State')
 
         self.assertEqual(
             act_ex_from_list['ID'],
-            self.get_value_of_field(act_ex, 'ID')
+            self.get_field_value(act_ex, 'ID')
         )
         self.assertEqual(self.direct_wf['Name'], wf_name)
         self.assertEqual('SUCCESS', status)
@@ -901,13 +918,13 @@ class ActionExecutionCLITests(base_v2.MistralClientTestBase):
             params="std.echo '{0}' --save-result".format(
                 '{"output": "Hello!"}')
         )
-        action_ex_id = self.get_value_of_field(action_ex, 'ID')
+        action_ex_id = self.get_field_value(action_ex, 'ID')
 
         self.assertTableStruct(action_ex, ['Field', 'Value'])
 
-        name = self.get_value_of_field(action_ex, 'Name')
-        wf_name = self.get_value_of_field(action_ex, 'Workflow name')
-        task_name = self.get_value_of_field(action_ex, 'Task name')
+        name = self.get_field_value(action_ex, 'Name')
+        wf_name = self.get_field_value(action_ex, 'Workflow name')
+        task_name = self.get_field_value(action_ex, 'Task name')
 
         self.assertEqual('std.echo', name)
         self.assertEqual('None', wf_name)
@@ -1146,7 +1163,7 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
     def test_ex_update_both_state_and_description(self):
         wf = self.workflow_create(self.wf_def)
         execution = self.execution_create(params=wf[0]['Name'])
-        exec_id = self.get_value_of_field(execution, 'ID')
+        exec_id = self.get_field_value(execution, 'ID')
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,
                           'execution-update',
@@ -1374,7 +1391,7 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
     def test_action_execution_update(self):
         wfs = self.workflow_create(self.wf_def)
         direct_wf_exec = self.execution_create(wfs[0]['Name'])
-        direct_ex_id = self.get_value_of_field(direct_wf_exec, 'ID')
+        direct_ex_id = self.get_field_value(direct_wf_exec, 'ID')
 
         self.assertRaises(exceptions.CommandFailed,
                           self.mistral_admin,

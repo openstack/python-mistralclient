@@ -83,7 +83,7 @@ class WorkbookIsolationCLITests(base_v2.MistralClientTestBase):
 
     def test_wb_isolation(self):
         wb = self.workbook_create(self.wb_def)
-        wb_name = self.get_value_of_field(wb, "Name")
+        wb_name = self.get_field_value(wb, "Name")
         wbs = self.mistral_admin("workbook-list")
 
         self.assertIn(wb_name, [w["Name"] for w in wbs])
@@ -94,7 +94,7 @@ class WorkbookIsolationCLITests(base_v2.MistralClientTestBase):
 
     def test_get_wb_from_another_tenant(self):
         wb = self.workbook_create(self.wb_def)
-        name = self.get_value_of_field(wb, "Name")
+        name = self.get_field_value(wb, "Name")
 
         self.assertRaises(
             exceptions.CommandFailed,
@@ -105,7 +105,7 @@ class WorkbookIsolationCLITests(base_v2.MistralClientTestBase):
 
     def test_delete_wb_from_another_tenant(self):
         wb = self.workbook_create(self.wb_def)
-        name = self.get_value_of_field(wb, "Name")
+        name = self.get_field_value(wb, "Name")
 
         self.assertRaises(
             exceptions.CommandFailed,
@@ -166,7 +166,7 @@ class WorkflowIsolationCLITests(base_v2.MistralClientTestBase):
 
         self.assertEqual(
             wf[0]["Name"],
-            self.get_value_of_field(same_wf, "Name")
+            self.get_field_value(same_wf, "Name")
         )
 
     def test_delete_wf_from_another_tenant(self):
@@ -188,13 +188,13 @@ class WorkflowSharingCLITests(base_v2.MistralClientTestBase):
 
     def _update_shared_workflow(self, new_status='accepted'):
         member = self.workflow_member_create(self.wf[0]["ID"])
-        status = self.get_value_of_field(member, 'Status')
+        status = self.get_field_value(member, 'Status')
 
         self.assertEqual('pending', status)
 
         cmd_param = '%s workflow --status %s' % (self.wf[0]["ID"], new_status)
         member = self.mistral_alt_user("member-update", params=cmd_param)
-        status = self.get_value_of_field(member, 'Status')
+        status = self.get_field_value(member, 'Status')
 
         self.assertEqual(new_status, status)
 
@@ -222,7 +222,7 @@ class WorkflowSharingCLITests(base_v2.MistralClientTestBase):
         self._update_shared_workflow(new_status='accepted')
 
         execution = self.execution_create(self.wf[0]["ID"], admin=False)
-        wf_name = self.get_value_of_field(execution, 'Workflow name')
+        wf_name = self.get_field_value(execution, 'Workflow name')
 
         self.assertEqual(self.wf[0]["Name"], wf_name)
 
@@ -236,7 +236,7 @@ class WorkflowSharingCLITests(base_v2.MistralClientTestBase):
             "5 * * * *",
             admin=False
         )
-        wf_name = self.get_value_of_field(trigger, 'Workflow')
+        wf_name = self.get_field_value(trigger, 'Workflow')
 
         self.assertEqual(self.wf[0]["Name"], wf_name)
 
@@ -311,7 +311,7 @@ class ActionIsolationCLITests(base_v2.MistralClientTestBase):
 
         self.assertEqual(
             act[0]["Name"],
-            self.get_value_of_field(same_act, "Name")
+            self.get_field_value(same_act, "Name")
         )
 
 
@@ -372,7 +372,7 @@ class ExecutionIsolationCLITests(base_v2.MistralClientTestBase):
     def test_execution_isolation(self):
         wf = self.workflow_create(self.wf_def)
         ex = self.execution_create(wf[0]["Name"])
-        exec_id = self.get_value_of_field(ex, "ID")
+        exec_id = self.get_field_value(ex, "ID")
 
         execs = self.mistral_admin("execution-list")
         self.assertIn(exec_id, [e["ID"] for e in execs])
@@ -383,7 +383,7 @@ class ExecutionIsolationCLITests(base_v2.MistralClientTestBase):
     def test_get_execution_from_another_tenant(self):
         wf = self.workflow_create(self.wf_def)
         ex = self.execution_create(wf[0]["Name"])
-        exec_id = self.get_value_of_field(ex, "ID")
+        exec_id = self.get_field_value(ex, "ID")
 
         self.assertRaises(
             exceptions.CommandFailed,
@@ -426,7 +426,7 @@ class EnvironmentIsolationCLITests(base_v2.MistralClientTestBase):
 
     def test_environment_isolation(self):
         env = self.environment_create(self.env_file)
-        env_name = self.get_value_of_field(env, "Name")
+        env_name = self.get_field_value(env, "Name")
         envs = self.mistral_admin("environment-list")
 
         self.assertIn(env_name, [en["Name"] for en in envs])
@@ -437,7 +437,7 @@ class EnvironmentIsolationCLITests(base_v2.MistralClientTestBase):
 
     def test_get_env_from_another_tenant(self):
         env = self.environment_create(self.env_file)
-        env_name = self.get_value_of_field(env, "Name")
+        env_name = self.get_field_value(env, "Name")
 
         self.assertRaises(
             exceptions.CommandFailed,
@@ -448,7 +448,7 @@ class EnvironmentIsolationCLITests(base_v2.MistralClientTestBase):
 
     def test_delete_env_from_another_tenant(self):
         env = self.environment_create(self.env_file)
-        env_name = self.get_value_of_field(env, "Name")
+        env_name = self.get_field_value(env, "Name")
 
         self.assertRaises(
             exceptions.CommandFailed,
@@ -463,7 +463,7 @@ class ActionExecutionIsolationCLITests(base_v2.MistralClientTestBase):
     def test_action_execution_isolation(self):
         wf = self.workflow_create(self.wf_def)
         wf_exec = self.execution_create(wf[0]["Name"])
-        direct_ex_id = self.get_value_of_field(wf_exec, 'ID')
+        direct_ex_id = self.get_field_value(wf_exec, 'ID')
 
         self.wait_execution_success(direct_ex_id)
 
@@ -478,7 +478,7 @@ class ActionExecutionIsolationCLITests(base_v2.MistralClientTestBase):
     def test_get_action_execution_from_another_tenant(self):
         wf = self.workflow_create(self.wf_def)
         ex = self.execution_create(wf[0]["Name"])
-        exec_id = self.get_value_of_field(ex, "ID")
+        exec_id = self.get_field_value(ex, "ID")
 
         self.assertRaises(
             exceptions.CommandFailed,

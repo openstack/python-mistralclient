@@ -27,6 +27,7 @@ ACTION_EX_DICT = {
     'name': 'some',
     'workflow_name': 'thing',
     'task_name': 'task1',
+    'task_execution_id': "1-2-3-4",
     'state': 'RUNNING',
     'state_info': 'RUNNING somehow.',
     'accepted': True
@@ -37,15 +38,18 @@ ACTION_EX_INPUT = {"param1": "val1", "param2": 2}
 
 ACTION_EX_WITH_OUTPUT_DICT = ACTION_EX_DICT.copy()
 ACTION_EX_WITH_OUTPUT_DICT.update({'output': json.dumps(ACTION_EX_RESULT)})
+
 ACTION_EX_WITH_INPUT_DICT = ACTION_EX_DICT.copy()
 ACTION_EX_WITH_INPUT_DICT.update({'input': json.dumps(ACTION_EX_INPUT)})
 
 ACTION_EX = action_ex.ActionExecution(mock, ACTION_EX_DICT)
 ACTION_EX_WITH_OUTPUT = action_ex.ActionExecution(
-    mock, ACTION_EX_WITH_OUTPUT_DICT
+    mock,
+    ACTION_EX_WITH_OUTPUT_DICT
 )
 ACTION_EX_WITH_INPUT = action_ex.ActionExecution(
-    mock, ACTION_EX_WITH_INPUT_DICT
+    mock,
+    ACTION_EX_WITH_INPUT_DICT
 )
 
 
@@ -76,7 +80,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            ('123', 'some', 'thing', 'task1', 'RUNNING',
+            ('123', 'some', 'thing', 'task1', '1-2-3-4', 'RUNNING',
              'RUNNING somehow.', True),
             result[1]
         )
@@ -84,12 +88,15 @@ class TestCLIActionExecutions(base.BaseCommandTest):
     def test_update(self):
         self.client.action_executions.update.return_value = ACTION_EX
 
-        result = self.call(action_ex_cmd.Update,
-                           app_args=['id', '--state', 'ERROR'])
+        result = self.call(
+            action_ex_cmd.Update,
+            app_args=['id', '--state', 'ERROR']
+        )
 
         self.assertEqual(
-            ('123', 'some', 'thing', 'task1', 'RUNNING',
-             'RUNNING somehow.', True), result[1]
+            ('123', 'some', 'thing', 'task1', '1-2-3-4', 'RUNNING',
+             'RUNNING somehow.', True),
+            result[1]
         )
 
     def test_list(self):
@@ -98,7 +105,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
         result = self.call(action_ex_cmd.List)
 
         self.assertEqual(
-            [('123', 'some', 'thing', 'task1', 'RUNNING',
+            [('123', 'some', 'thing', 'task1', '1-2-3-4', 'RUNNING',
               'RUNNING somehow.', True)],
             result[1]
         )
@@ -109,7 +116,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
         result = self.call(action_ex_cmd.Get, app_args=['id'])
 
         self.assertEqual(
-            ('123', 'some', 'thing', 'task1', 'RUNNING',
+            ('123', 'some', 'thing', 'task1', '1-2-3-4', 'RUNNING',
              'RUNNING somehow.', True), result[1]
         )
 
