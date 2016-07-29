@@ -26,10 +26,33 @@ LOG = logging.getLogger(__name__)
 
 
 def format_list(action_ex=None):
-    return format(action_ex, lister=True)
+    columns = (
+        'ID',
+        'Name',
+        'Workflow name',
+        'Task name',
+        'Task ID',
+        'State',
+        'Accepted',
+    )
+
+    if action_ex:
+        data = (
+            action_ex.id,
+            action_ex.name,
+            action_ex.workflow_name,
+            action_ex.task_name if hasattr(action_ex, 'task_name') else None,
+            action_ex.task_execution_id,
+            action_ex.state,
+            action_ex.accepted,
+        )
+    else:
+        data = (tuple('<none>' for _ in range(len(columns))),)
+
+    return columns, data
 
 
-def format(action_ex=None, lister=False):
+def format(action_ex=None):
     columns = (
         'ID',
         'Name',
@@ -42,11 +65,6 @@ def format(action_ex=None, lister=False):
     )
 
     if action_ex:
-        state_info = (
-            action_ex.state_info if not lister
-            else base.cut(action_ex.state_info)
-        )
-
         data = (
             action_ex.id,
             action_ex.name,
@@ -54,7 +72,7 @@ def format(action_ex=None, lister=False):
             action_ex.task_name if hasattr(action_ex, 'task_name') else None,
             action_ex.task_execution_id,
             action_ex.state,
-            state_info,
+            action_ex.state_info,
             action_ex.accepted,
         )
     else:

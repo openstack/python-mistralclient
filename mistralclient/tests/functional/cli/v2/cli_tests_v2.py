@@ -93,7 +93,7 @@ class SimpleMistralCLITests(base.MistralCLIAuth):
             self.mistral('action-execution-list'))
         self.assertTableStruct(
             act_execs,
-            ['ID', 'Name', 'Workflow name', 'State', 'State info', 'Accepted']
+            ['ID', 'Name', 'Workflow name', 'State', 'Accepted']
         )
 
 
