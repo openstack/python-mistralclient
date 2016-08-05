@@ -342,6 +342,78 @@ class MistralShell(app.App):
         )
 
         parser.add_argument(
+            '--os-target-username',
+            action='store',
+            dest='target_username',
+            default=c.env('OS_TARGET_USERNAME', default='admin'),
+            help='Authentication username for target cloud'
+                 ' (Env: OS_TARGET_USERNAME)'
+        )
+
+        parser.add_argument(
+            '--os-target-password',
+            action='store',
+            dest='target_password',
+            default=c.env('OS_TARGET_PASSWORD'),
+            help='Authentication password for target cloud'
+                 ' (Env: OS_TARGET_PASSWORD)'
+        )
+
+        parser.add_argument(
+            '--os-target-tenant-id',
+            action='store',
+            dest='target_tenant_id',
+            default=c.env('OS_TARGET_TENANT_ID'),
+            help='Authentication tenant identifier for target cloud'
+                 ' (Env: OS_TARGET_TENANT_ID)'
+        )
+
+        parser.add_argument(
+            '--os-target-tenant-name',
+            action='store',
+            dest='target_tenant_name',
+            default=c.env('OS_TARGET_TENANT_NAME', 'Default'),
+            help='Authentication tenant name for target cloud'
+                 ' (Env: OS_TARGET_TENANT_NAME)'
+        )
+
+        parser.add_argument(
+            '--os-target-auth-token',
+            action='store',
+            dest='target_token',
+            default=c.env('OS_TARGET_AUTH_TOKEN'),
+            help='Authentication token for target cloud'
+                 ' (Env: OS_TARGET_AUTH_TOKEN)'
+        )
+
+        parser.add_argument(
+            '--os-target-auth-url',
+            action='store',
+            dest='target_auth_url',
+            default=c.env('OS_TARGET_AUTH_URL'),
+            help='Authentication URL for target cloud'
+                 ' (Env: OS_TARGET_AUTH_URL)'
+        )
+
+        parser.add_argument(
+            '--os-target_cacert',
+            action='store',
+            dest='target_cacert',
+            default=c.env('OS_TARGET_CACERT'),
+            help='Authentication CA Certificate for target cloud'
+                 ' (Env: OS_TARGET_CACERT)'
+        )
+
+        parser.add_argument(
+            '--target_insecure',
+            action='store_true',
+            dest='target_insecure',
+            default=c.env('TARGET_MISTRALCLIENT_INSECURE', default=False),
+            help='Disables SSL/TLS certificate verification for target cloud '
+                 '(Env: TARGET_MISTRALCLIENT_INSECURE)'
+        )
+
+        parser.add_argument(
             '--profile',
             dest='profile',
             metavar='HMAC_KEY',
@@ -397,6 +469,14 @@ class MistralShell(app.App):
             auth_type=self.options.auth_type,
             client_id=self.options.client_id,
             client_secret=self.options.client_secret,
+            target_username=self.options.target_username,
+            target_api_key=self.options.target_password,
+            target_project_name=self.options.target_tenant_name,
+            target_auth_url=self.options.target_auth_url,
+            target_project_id=self.options.target_tenant_id,
+            target_auth_token=self.options.target_token,
+            target_cacert=self.options.target_cacert,
+            target_insecure=self.options.target_insecure,
             **kwargs
         )
 

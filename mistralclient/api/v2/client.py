@@ -42,7 +42,11 @@ class Client(object):
                  endpoint_type='publicURL', service_type='workflowv2',
                  auth_token=None, user_id=None, cacert=None, insecure=False,
                  profile=None, auth_type=auth_types.KEYSTONE, client_id=None,
-                 client_secret=None, **kwargs):
+                 client_secret=None, target_username=None, target_api_key=None,
+                 target_project_name=None, target_auth_url=None,
+                 target_project_id=None, target_auth_token=None,
+                 target_user_id=None, target_cacert=None,
+                 target_insecure=False, **kwargs):
 
         if mistral_url and not isinstance(mistral_url, six.string_types):
             raise RuntimeError('Mistral url should be a string.')
@@ -96,6 +100,22 @@ class Client(object):
         if profile:
             osprofiler.profiler.init(profile)
 
+        if target_auth_url:
+            keystone.authenticate(
+                mistral_url,
+                target_username,
+                target_api_key,
+                target_project_name,
+                target_auth_url,
+                target_project_id,
+                endpoint_type,
+                service_type,
+                target_auth_token,
+                target_user_id,
+                target_cacert,
+                target_insecure
+            )
+
         self.http_client = httpclient.HTTPClient(
             mistral_url,
             auth_token,
@@ -103,6 +123,8 @@ class Client(object):
             user_id,
             cacert=cacert,
             insecure=insecure,
+            target_token=target_auth_token,
+            target_auth_uri=target_auth_url,
             **kwargs
         )
 
