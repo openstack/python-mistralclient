@@ -31,6 +31,7 @@ import mistralclient.commands.v2.services
 import mistralclient.commands.v2.tasks
 import mistralclient.commands.v2.workbooks
 import mistralclient.commands.v2.workflows
+from mistralclient import exceptions as exe
 from mistralclient.openstack.common import cliutils as c
 
 from cliff import app
@@ -237,7 +238,7 @@ class MistralShell(app.App):
             '--os-username',
             action='store',
             dest='username',
-            default=c.env('OS_USERNAME', default='admin'),
+            default=c.env('OS_USERNAME'),
             help='Authentication username (Env: OS_USERNAME)'
         )
 
@@ -375,6 +376,19 @@ class MistralShell(app.App):
         # bash-completion should not require authentification.
         if do_help or ('bash-completion' in argv):
             self.options.auth_url = None
+
+        if self.options.auth_url and not self.options.token:
+            if not self.options.username:
+                raise exe.IllegalArgumentException(
+                    ("You must provide a username "
+                     "via --os-username env[OS_USERNAME]")
+                )
+
+            if not self.options.password:
+                raise exe.IllegalArgumentException(
+                    ("You must provide a password "
+                     "via --os-password env[OS_PASSWORD]")
+                )
 
         kwargs = {
             'cert': self.options.os_cert,

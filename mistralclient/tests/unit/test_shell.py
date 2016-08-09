@@ -84,7 +84,12 @@ class TestShell(base.BaseShellTests):
 
     @mock.patch('mistralclient.api.client.client')
     def test_auth_url(self, mock):
-        self.shell('--os-auth-url=https://127.0.0.1:35357/v3 workbook-list')
+        self.shell(
+            '--os-auth-url=https://127.0.0.1:35357/v3 '
+            '--os-username=admin '
+            '--os-password=1234 '
+            'workbook-list'
+        )
         self.assertTrue(mock.called)
         params = mock.call_args
         self.assertEqual('https://127.0.0.1:35357/v3', params[1]['auth_url'])
@@ -105,7 +110,10 @@ class TestShell(base.BaseShellTests):
 
     @mock.patch('mistralclient.api.client.client')
     def test_default_auth_url_with_os_auth_token(self, mock):
-        self.shell('--os-auth-token=abcd1234 workbook-list')
+        self.shell(
+            '--os-auth-token=abcd1234 '
+            'workbook-list'
+        )
         self.assertTrue(mock.called)
         params = mock.call_args
         self.assertEqual('http://localhost:35357/v3', params[1]['auth_url'])
