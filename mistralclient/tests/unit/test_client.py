@@ -50,7 +50,9 @@ class BaseClientTests(testtools.TestCase):
 
         expected_kwargs = {
             'cacert': None,
-            'insecure': False
+            'insecure': False,
+            'target_auth_uri': None,
+            'target_token': None
         }
 
         client.client(
@@ -80,7 +82,9 @@ class BaseClientTests(testtools.TestCase):
 
         expected_kwargs = {
             'cacert': None,
-            'insecure': True
+            'insecure': True,
+            'target_auth_uri': None,
+            'target_token': None
         }
 
         client.client(
@@ -115,7 +119,9 @@ class BaseClientTests(testtools.TestCase):
 
         expected_kwargs = {
             'cacert': path,
-            'insecure': False
+            'insecure': False,
+            'target_auth_uri': None,
+            'target_token': None
         }
 
         try:
@@ -196,7 +202,9 @@ class BaseClientTests(testtools.TestCase):
 
         expected_kwargs = {
             'cacert': None,
-            'insecure': False
+            'insecure': False,
+            'target_auth_uri': None,
+            'target_token': None
         }
 
         client.client(

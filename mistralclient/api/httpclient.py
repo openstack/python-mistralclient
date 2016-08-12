@@ -37,11 +37,14 @@ def log_request(func):
 
 class HTTPClient(object):
     def __init__(self, base_url, token=None, project_id=None, user_id=None,
-                 cacert=None, insecure=False, **kwargs):
+                 cacert=None, insecure=False, target_token=None,
+                 target_auth_uri=None, **kwargs):
         self.base_url = base_url
         self.token = token
         self.project_id = project_id
         self.user_id = user_id
+        self.target_token = target_token
+        self.target_auth_uri = target_auth_uri
         self.ssl_options = {}
 
         if self.base_url.startswith('https'):
@@ -114,6 +117,15 @@ class HTTPClient(object):
         user_id = headers.get('X-User-Id', self.user_id)
         if user_id:
             headers['X-User-Id'] = user_id
+
+        target_token = headers.get('X-Target-Auth-Token', self.target_token)
+        if target_token:
+            headers['X-Target-Auth-Token'] = target_token
+
+        target_auth_uri = headers.get('X-Target-Auth-Uri',
+                                      self.target_auth_uri)
+        if target_auth_uri:
+            headers['X-Target-Auth-Uri'] = target_auth_uri
 
         # Add headers for osprofiler.
         headers.update(osprofiler.web.get_trace_id_headers())

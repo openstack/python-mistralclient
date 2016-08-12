@@ -92,24 +92,6 @@ class HTTPClientTest(testtools.TestCase):
         )
 
     @mock.patch.object(
-        requests,
-        'get',
-        mock.MagicMock(return_value=FakeResponse('get', EXPECTED_URL, 200))
-    )
-    def test_get_request_options_with_headers_for_get(self):
-        headers = {'foo': 'bar'}
-
-        self.client.get(API_URL, headers=headers)
-
-        expected_options = copy.deepcopy(EXPECTED_REQ_OPTIONS)
-        expected_options['headers'].update(headers)
-
-        requests.get.assert_called_with(
-            EXPECTED_URL,
-            **expected_options
-        )
-
-    @mock.patch.object(
         osprofiler.profiler._Profiler,
         'get_base_id',
         mock.MagicMock(return_value=PROFILER_TRACE_ID)
@@ -139,6 +121,35 @@ class HTTPClientTest(testtools.TestCase):
 
         expected_options = copy.deepcopy(EXPECTED_REQ_OPTIONS)
         expected_options['headers'].update(headers)
+
+        requests.get.assert_called_with(
+            EXPECTED_URL,
+            **expected_options
+        )
+
+    @mock.patch.object(
+        requests,
+        'get',
+        mock.MagicMock(return_value=FakeResponse('get', EXPECTED_URL, 200))
+    )
+    def test_get_request_options_with_headers_for_get(self):
+        target_auth_uri = str(uuid.uuid4())
+        target_token = str(uuid.uuid4())
+
+        target_client = httpclient.HTTPClient(
+            API_BASE_URL,
+            AUTH_TOKEN,
+            PROJECT_ID,
+            USER_ID,
+            target_auth_uri=target_auth_uri,
+            target_token=target_token
+        )
+
+        target_client.get(API_URL)
+
+        expected_options = copy.deepcopy(EXPECTED_REQ_OPTIONS)
+        expected_options["headers"]["X-Target-Auth-Uri"] = target_auth_uri
+        expected_options["headers"]["X-Target-Auth-Token"] = target_token
 
         requests.get.assert_called_with(
             EXPECTED_URL,
