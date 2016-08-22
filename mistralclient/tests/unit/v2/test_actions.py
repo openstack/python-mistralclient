@@ -94,6 +94,20 @@ class TestActionsV2(base.BaseClientV2Test):
             headers={'content-type': 'text/plain'}
         )
 
+    def test_update_with_id(self):
+        mock = self.mock_http_put(content={'actions': [ACTION]})
+
+        actions = self.actions.update(ACTION_DEF, id=123)
+
+        self.assertIsNotNone(actions)
+        self.assertEqual(ACTION_DEF, actions[0].definition)
+
+        mock.assert_called_once_with(
+            '/actions/123?scope=private',
+            ACTION_DEF,
+            headers={'content-type': 'text/plain'}
+        )
+
     def test_update(self):
         mock = self.mock_http_put(content={'actions': [ACTION]})
 
