@@ -11,7 +11,7 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-from collections import OrderedDict
+import collections
 import copy
 import json
 
@@ -61,7 +61,7 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
 
         # Convert the file path to file URI
         uri = parse.urljoin('file:', request.pathname2url(path))
-        data = OrderedDict(
+        data = collections.OrderedDict(
             utils.load_content(
                 utils.get_contents_if_file(uri)
             )
@@ -97,7 +97,7 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
             'mistralclient',
             'tests/unit/resources/env_v2.json'
         )
-        data = OrderedDict(
+        data = collections.OrderedDict(
             utils.load_content(
                 utils.get_contents_if_file(path)
             )
