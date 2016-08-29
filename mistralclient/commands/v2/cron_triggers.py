@@ -15,14 +15,11 @@
 #
 
 import json
-import logging
 
 from osc_lib.command import command
 
 from mistralclient.commands.v2 import base
 from mistralclient import utils
-
-LOG = logging.getLogger(__name__)
 
 
 def format_list(trigger=None):

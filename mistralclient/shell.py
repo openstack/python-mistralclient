@@ -40,8 +40,6 @@ from osc_lib.command import command
 
 import argparse
 
-LOG = logging.getLogger(__name__)
-
 
 class OpenStackHelpFormatter(argparse.HelpFormatter):
     def __init__(self, prog, indent_increment=2, max_help_position=32,

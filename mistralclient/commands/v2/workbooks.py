@@ -14,15 +14,11 @@
 #    limitations under the License.
 
 import argparse
-import logging
 
 from osc_lib.command import command
 
 from mistralclient.commands.v2 import base
 from mistralclient import utils
-
-
-LOG = logging.getLogger(__name__)
 
 
 def format(workbook=None):

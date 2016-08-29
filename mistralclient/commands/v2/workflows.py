@@ -14,16 +14,12 @@
 #    limitations under the License.
 
 import argparse
-import logging
 
 from cliff import command
 from cliff import show
 
 from mistralclient.commands.v2 import base
 from mistralclient import utils
-
-
-LOG = logging.getLogger(__name__)
 
 
 def format_list(workflow=None):

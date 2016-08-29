@@ -14,9 +14,6 @@
 
 import copy
 import json
-import logging
-
-LOG = logging.getLogger(__name__)
 
 
 class Resource(object):
