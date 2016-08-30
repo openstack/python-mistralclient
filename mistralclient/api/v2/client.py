@@ -15,7 +15,7 @@
 
 import six
 
-import osprofiler.profiler
+from oslo_utils import importutils
 
 from mistralclient.api import httpclient
 from mistralclient.api.v2 import action_executions
@@ -32,6 +32,7 @@ from mistralclient.auth import auth_types
 from mistralclient.auth import keycloak
 from mistralclient.auth import keystone
 
+osprofiler_profiler = importutils.try_import("osprofiler.profiler")
 
 _DEFAULT_MISTRAL_URL = "http://localhost:8989/v2"
 
@@ -98,7 +99,7 @@ class Client(object):
             mistral_url = _DEFAULT_MISTRAL_URL
 
         if profile:
-            osprofiler.profiler.init(profile)
+            osprofiler_profiler.init(profile)
 
         if target_auth_url:
             keystone.authenticate(

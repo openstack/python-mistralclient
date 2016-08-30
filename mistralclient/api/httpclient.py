@@ -16,11 +16,12 @@
 import copy
 import os
 
+from oslo_utils import importutils
 import requests
 
 import logging
 
-import osprofiler.web
+osprofiler_web = importutils.try_import("osprofiler.web")
 
 
 LOG = logging.getLogger(__name__)
@@ -128,6 +129,6 @@ class HTTPClient(object):
             headers['X-Target-Auth-Uri'] = target_auth_uri
 
         # Add headers for osprofiler.
-        headers.update(osprofiler.web.get_trace_id_headers())
+        headers.update(osprofiler_web.get_trace_id_headers())
 
         return headers
