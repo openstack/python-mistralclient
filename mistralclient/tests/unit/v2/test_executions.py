@@ -15,8 +15,7 @@
 
 import json
 
-import unittest2
-
+from mistralclient.api import base as api_base
 from mistralclient.api.v2 import executions
 from mistralclient.tests.unit.v2 import base
 
@@ -102,18 +101,9 @@ class TestExecutionsV2(base.BaseClientV2Test):
         self.assertEqual(URL_TEMPLATE, mock.call_args[0][0])
         self.assertDictEqual(body, json.loads(mock.call_args[0][1]))
 
-    @unittest2.expectedFailure
     def test_create_failure1(self):
         self.mock_http_post(content=EXEC)
-        self.executions.create("")
-
-    @unittest2.expectedFailure
-    def test_create_failure2(self):
-        self.mock_http_post(content=EXEC)
-        self.executions.create(
-            EXEC['workflow_name'],
-            list('343', 'sdfsd')
-        )
+        self.assertRaises(api_base.APIException, self.executions.create, '')
 
     def test_update(self):
         mock = self.mock_http_put(content=EXEC)

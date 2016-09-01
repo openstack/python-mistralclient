@@ -15,13 +15,13 @@
 import os
 import sys
 
+from oslotest import base
 import six
-import testtools
 
 from mistralclient import shell
 
 
-class BaseShellTests(testtools.TestCase):
+class BaseShellTests(base.BaseTestCase):
 
     def shell(self, argstr):
         orig = (sys.stdout, sys.stderr)

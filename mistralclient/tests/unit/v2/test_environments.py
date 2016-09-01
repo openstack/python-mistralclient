@@ -83,10 +83,11 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
         data = copy.deepcopy(ENVIRONMENT)
         data.pop('name')
 
-        with self.assertRaises(api_base.APIException) as cm:
-            self.environments.create(**data)
+        e = self.assertRaises(api_base.APIException,
+                              self.environments.create,
+                              **data)
 
-        self.assertEqual(400, cm.exception.error_code)
+        self.assertEqual(400, e.error_code)
 
     def test_update(self):
         data = copy.deepcopy(ENVIRONMENT)
@@ -128,10 +129,11 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
         data = copy.deepcopy(ENVIRONMENT)
         data.pop('name')
 
-        with self.assertRaises(api_base.APIException) as cm:
-            self.environments.update(**data)
+        e = self.assertRaises(api_base.APIException,
+                              self.environments.update,
+                              **data)
 
-        self.assertEqual(400, cm.exception.error_code)
+        self.assertEqual(400, e.error_code)
 
     def test_list(self):
         mock = self.mock_http_get(content={'environments': [ENVIRONMENT]})
