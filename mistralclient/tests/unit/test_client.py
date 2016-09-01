@@ -32,6 +32,39 @@ PROFILER_HMAC_KEY = 'SECRET_HMAC_KEY'
 
 
 class BaseClientTests(testtools.TestCase):
+    @mock.patch('keystoneclient.v3.client.Client')
+    def test_mistral_url_from_catalog(self, keystone_client_mock):
+        keystone_client_instance = keystone_client_mock.return_value
+        keystone_client_instance.auth_token = str(uuid.uuid4())
+        keystone_client_instance.project_id = str(uuid.uuid4())
+        keystone_client_instance.user_id = str(uuid.uuid4())
+
+        get_endpoints = mock.Mock()
+        get_endpoints.return_value = {
+            'workflowv2': [
+                {
+                    'url': 'http://mistral_host:8989/v2',
+                    'interface': 'public',
+                    'region': None,
+                    'region_id': None,
+                    'id': '446eca511e8d45acae0924aea42a4c9f'
+                }
+            ]
+        }
+
+        keystone_client_instance.service_catalog.get_endpoints = get_endpoints
+
+        mistralclient = client.client(
+            username='mistral',
+            project_name='mistral',
+            auth_url=AUTH_HTTP_URL,
+            service_type='workflowv2'
+        )
+
+        self.assertEqual(
+            'http://mistral_host:8989/v2',
+            mistralclient.http_client.base_url
+        )
 
     @mock.patch('keystoneclient.v3.client.Client')
     @mock.patch('mistralclient.api.httpclient.HTTPClient')

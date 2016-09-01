@@ -58,8 +58,7 @@ def authenticate(mistral_url=None, username=None,
 
         if service_type in catalog:
             service = catalog.get(service_type)
-            mistral_url = service[0].get(
-                endpoint_type) if service else None
+            mistral_url = service[0].get('url') if service else None
 
     return mistral_url, token, project_id, user_id
 
