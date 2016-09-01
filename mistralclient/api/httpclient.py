@@ -128,7 +128,8 @@ class HTTPClient(object):
         if target_auth_uri:
             headers['X-Target-Auth-Uri'] = target_auth_uri
 
-        # Add headers for osprofiler.
-        headers.update(osprofiler_web.get_trace_id_headers())
+        if osprofiler_web:
+            # Add headers for osprofiler.
+            headers.update(osprofiler_web.get_trace_id_headers())
 
         return headers
