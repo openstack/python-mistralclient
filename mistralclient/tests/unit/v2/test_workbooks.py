@@ -70,21 +70,24 @@ URL_TEMPLATE_VALIDATE = '/workbooks/validate'
 
 class TestWorkbooksV2(base.BaseClientV2Test):
     def test_create(self):
-        mock = self.mock_http_post(content=WORKBOOK)
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE,
+                                json=WORKBOOK,
+                                status_code=201)
 
         wb = self.workbooks.create(WB_DEF)
 
         self.assertIsNotNone(wb)
         self.assertEqual(WB_DEF, wb.definition)
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE,
-            WB_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual(WB_DEF, last_request.text)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_create_with_file_uri(self):
-        mock = self.mock_http_post(content=WORKBOOK)
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE,
+                                json=WORKBOOK,
+                                status_code=201)
 
         # The contents of wb_v2.yaml must be identical to WB_DEF
         path = pkg.resource_filename(
@@ -100,28 +103,26 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         self.assertIsNotNone(wb)
         self.assertEqual(WB_DEF, wb.definition)
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE,
-            WB_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual(WB_DEF, last_request.text)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_update(self):
-        mock = self.mock_http_put(content=WORKBOOK)
+        self.requests_mock.put(self.TEST_URL + URL_TEMPLATE, json=WORKBOOK)
 
         wb = self.workbooks.update(WB_DEF)
 
         self.assertIsNotNone(wb)
         self.assertEqual(WB_DEF, wb.definition)
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE,
-            WB_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual(WB_DEF, last_request.text)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_update_with_file(self):
-        mock = self.mock_http_put(content=WORKBOOK)
+        self.requests_mock.put(self.TEST_URL + URL_TEMPLATE, json=WORKBOOK)
 
         # The contents of wb_v2.yaml must be identical to WB_DEF
         path = pkg.resource_filename(
@@ -134,14 +135,14 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         self.assertIsNotNone(wb)
         self.assertEqual(WB_DEF, wb.definition)
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE,
-            WB_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual(WB_DEF, last_request.text)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_list(self):
-        mock = self.mock_http_get(content={'workbooks': [WORKBOOK]})
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE,
+                               json={'workbooks': [WORKBOOK]})
 
         workbook_list = self.workbooks.list()
 
@@ -154,10 +155,9 @@ class TestWorkbooksV2(base.BaseClientV2Test):
             wb.to_dict()
         )
 
-        mock.assert_called_once_with(URL_TEMPLATE)
-
     def test_get(self):
-        mock = self.mock_http_get(content=WORKBOOK)
+        url = self.TEST_URL + URL_TEMPLATE_NAME % 'wb'
+        self.requests_mock.get(url, json=WORKBOOK)
 
         wb = self.workbooks.get('wb')
 
@@ -167,20 +167,15 @@ class TestWorkbooksV2(base.BaseClientV2Test):
             wb.to_dict()
         )
 
-        mock.assert_called_once_with(URL_TEMPLATE_NAME % 'wb')
-
     def test_delete(self):
-        mock = self.mock_http_delete(status_code=204)
+        url = self.TEST_URL + URL_TEMPLATE_NAME % 'wb'
+        self.requests_mock.delete(url, status_code=204)
 
         self.workbooks.delete('wb')
 
-        mock.assert_called_once_with(URL_TEMPLATE_NAME % 'wb')
-
     def test_validate(self):
-        mock = self.mock_http_post(
-            status_code=200,
-            content={'valid': True}
-        )
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE_VALIDATE,
+                                json={'valid': True})
 
         result = self.workbooks.validate(WB_DEF)
 
@@ -188,17 +183,14 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         self.assertIn('valid', result)
         self.assertTrue(result['valid'])
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_VALIDATE,
-            WB_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual(WB_DEF, last_request.text)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_validate_with_file(self):
-        mock = self.mock_http_post(
-            status_code=200,
-            content={'valid': True}
-        )
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE_VALIDATE,
+                                json={'valid': True})
 
         # The contents of wb_v2.yaml must be identical to WB_DEF
         path = pkg.resource_filename(
@@ -212,11 +204,10 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         self.assertIn('valid', result)
         self.assertTrue(result['valid'])
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_VALIDATE,
-            WB_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual(WB_DEF, last_request.text)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_validate_failed(self):
         mock_result = {
@@ -225,7 +216,8 @@ class TestWorkbooksV2(base.BaseClientV2Test):
                      "can't be specified both"
         }
 
-        mock = self.mock_http_post(status_code=200, content=mock_result)
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE_VALIDATE,
+                                json=mock_result)
 
         result = self.workbooks.validate(INVALID_WB_DEF)
 
@@ -238,14 +230,14 @@ class TestWorkbooksV2(base.BaseClientV2Test):
             "can't be specified both", result['error']
         )
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_VALIDATE,
-            INVALID_WB_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual(INVALID_WB_DEF, last_request.text)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_validate_api_failed(self):
-        mock = self.mock_http_post(status_code=500, content={})
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE_VALIDATE,
+                                status_code=500)
 
         self.assertRaises(
             api_base.APIException,
@@ -253,8 +245,7 @@ class TestWorkbooksV2(base.BaseClientV2Test):
             WB_DEF
         )
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_VALIDATE,
-            WB_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual(WB_DEF, last_request.text)
+        self.assertEqual('text/plain', last_request.headers['content-type'])

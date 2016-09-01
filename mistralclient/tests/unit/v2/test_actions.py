@@ -61,21 +61,23 @@ URL_TEMPLATE_VALIDATE = '/actions/validate'
 
 class TestActionsV2(base.BaseClientV2Test):
     def test_create(self):
-        mock = self.mock_http_post(content={'actions': [ACTION]})
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE,
+                                json={'actions': [ACTION]},
+                                status_code=201)
 
         actions = self.actions.create(ACTION_DEF)
 
         self.assertIsNotNone(actions)
         self.assertEqual(ACTION_DEF, actions[0].definition)
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_SCOPE,
-            ACTION_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+        self.assertEqual('text/plain', last_request.headers['content-type'])
+        self.assertEqual(ACTION_DEF, last_request.text)
 
     def test_create_with_file(self):
-        mock = self.mock_http_post(content={'actions': [ACTION]})
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE,
+                                json={'actions': [ACTION]},
+                                status_code=201)
 
         # The contents of action_v2.yaml must be identical to ACTION_DEF
         path = pkg.resource_filename(
@@ -88,42 +90,43 @@ class TestActionsV2(base.BaseClientV2Test):
         self.assertIsNotNone(actions)
         self.assertEqual(ACTION_DEF, actions[0].definition)
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_SCOPE,
-            ACTION_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+        self.assertEqual('text/plain', last_request.headers['content-type'])
+        self.assertEqual(ACTION_DEF, last_request.text)
 
     def test_update_with_id(self):
-        mock = self.mock_http_put(content={'actions': [ACTION]})
+        self.requests_mock.put(self.TEST_URL + URL_TEMPLATE_NAME % 123,
+                               json={'actions': [ACTION]})
 
         actions = self.actions.update(ACTION_DEF, id=123)
 
         self.assertIsNotNone(actions)
         self.assertEqual(ACTION_DEF, actions[0].definition)
 
-        mock.assert_called_once_with(
-            '/actions/123?scope=private',
-            ACTION_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual('scope=private', last_request.query)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
+        self.assertEqual(ACTION_DEF, last_request.text)
 
     def test_update(self):
-        mock = self.mock_http_put(content={'actions': [ACTION]})
+        self.requests_mock.put(self.TEST_URL + URL_TEMPLATE,
+                               json={'actions': [ACTION]})
 
         actions = self.actions.update(ACTION_DEF)
 
         self.assertIsNotNone(actions)
         self.assertEqual(ACTION_DEF, actions[0].definition)
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_SCOPE,
-            ACTION_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual('scope=private', last_request.query)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
+        self.assertEqual(ACTION_DEF, last_request.text)
 
     def test_update_with_file_uri(self):
-        mock = self.mock_http_put(content={'actions': [ACTION]})
+        self.requests_mock.put(self.TEST_URL + URL_TEMPLATE,
+                               json={'actions': [ACTION]})
 
         # The contents of action_v2.yaml must be identical to ACTION_DEF
         path = pkg.resource_filename(
@@ -139,14 +142,14 @@ class TestActionsV2(base.BaseClientV2Test):
         self.assertIsNotNone(actions)
         self.assertEqual(ACTION_DEF, actions[0].definition)
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_SCOPE,
-            ACTION_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+        self.assertEqual('scope=private', last_request.query)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
+        self.assertEqual(ACTION_DEF, last_request.text)
 
     def test_list(self):
-        mock = self.mock_http_get(content={'actions': [ACTION]})
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE,
+                               json={'actions': [ACTION]})
 
         action_list = self.actions.list()
 
@@ -159,12 +162,10 @@ class TestActionsV2(base.BaseClientV2Test):
             action.to_dict()
         )
 
-        mock.assert_called_once_with(URL_TEMPLATE)
-
     def test_list_with_pagination(self):
-        mock = self.mock_http_get(
-            content={'actions': [ACTION], 'next': '/actions?fake'}
-        )
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE,
+                               json={'actions': [ACTION],
+                                     'next': '/actions?fake'})
 
         action_list = self.actions.list(
             limit=1,
@@ -174,13 +175,16 @@ class TestActionsV2(base.BaseClientV2Test):
 
         self.assertEqual(1, len(action_list))
 
+        last_request = self.requests_mock.last_request
+
         # The url param order is unpredictable.
-        self.assertIn('limit=1', mock.call_args[0][0])
-        self.assertIn('sort_keys=created_at', mock.call_args[0][0])
-        self.assertIn('sort_dirs=asc', mock.call_args[0][0])
+        self.assertEqual(['1'], last_request.qs['limit'])
+        self.assertEqual(['created_at'], last_request.qs['sort_keys'])
+        self.assertEqual(['asc'], last_request.qs['sort_dirs'])
 
     def test_get(self):
-        mock = self.mock_http_get(content=ACTION)
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE_NAME % 'action',
+                               json=ACTION)
 
         action = self.actions.get('action')
 
@@ -190,20 +194,17 @@ class TestActionsV2(base.BaseClientV2Test):
             action.to_dict()
         )
 
-        mock.assert_called_once_with(URL_TEMPLATE_NAME % 'action')
-
     def test_delete(self):
-        mock = self.mock_http_delete(status_code=204)
+        url = self.TEST_URL + URL_TEMPLATE_NAME % 'action'
+        m = self.requests_mock.delete(url, status_code=204)
 
         self.actions.delete('action')
 
-        mock.assert_called_once_with(URL_TEMPLATE_NAME % 'action')
+        self.assertEqual(1, m.call_count)
 
     def test_validate(self):
-        mock = self.mock_http_post(
-            status_code=200,
-            content={'valid': True}
-        )
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE_VALIDATE,
+                                json={'valid': True})
 
         result = self.actions.validate(ACTION_DEF)
 
@@ -211,17 +212,13 @@ class TestActionsV2(base.BaseClientV2Test):
         self.assertIn('valid', result)
         self.assertTrue(result['valid'])
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_VALIDATE,
-            ACTION_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+        self.assertEqual(ACTION_DEF, last_request.text)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_validate_with_file(self):
-        mock = self.mock_http_post(
-            status_code=200,
-            content={'valid': True}
-        )
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE_VALIDATE,
+                                json={'valid': True})
 
         # The contents of action_v2.yaml must be identical to ACTION_DEF
         path = pkg.resource_filename(
@@ -235,19 +232,14 @@ class TestActionsV2(base.BaseClientV2Test):
         self.assertIn('valid', result)
         self.assertTrue(result['valid'])
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_VALIDATE,
-            ACTION_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+        self.assertEqual(ACTION_DEF, last_request.text)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_validate_failed(self):
-        mock_result = {
-            "valid": False,
-            "error": "mocked error message"
-        }
-
-        mock = self.mock_http_post(status_code=200, content=mock_result)
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE_VALIDATE,
+                                json={"valid": False,
+                                      "error": "mocked error message"})
 
         result = self.actions.validate(INVALID_ACTION_DEF)
 
@@ -257,14 +249,13 @@ class TestActionsV2(base.BaseClientV2Test):
         self.assertIn('error', result)
         self.assertIn("mocked error message", result['error'])
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_VALIDATE,
-            INVALID_ACTION_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+        self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_validate_api_failed(self):
-        mock = self.mock_http_post(status_code=500, content={})
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE_VALIDATE,
+                                status_code=500,
+                                json={})
 
         self.assertRaises(
             api_base.APIException,
@@ -272,8 +263,7 @@ class TestActionsV2(base.BaseClientV2Test):
             ACTION_DEF
         )
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_VALIDATE,
-            ACTION_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual('text/plain', last_request.headers['content-type'])
+        self.assertEqual(ACTION_DEF, last_request.text)
