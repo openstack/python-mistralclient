@@ -54,7 +54,7 @@ class BaseClientTests(base.BaseTestCase):
 
         self.assertEqual(
             'http://mistral_host:8989/v2',
-            mistralclient.http_client.base_url
+            mistralclient.actions.http_client.base_url
         )
 
     @mock.patch('keystoneclient.v3.client.Client')
@@ -77,7 +77,7 @@ class BaseClientTests(base.BaseTestCase):
 
         self.assertEqual(
             'http://mistral_host:8989/v2',
-            mistralclient.http_client.base_url
+            mistralclient.actions.http_client.base_url
         )
 
     @mock.patch('keystoneclient.v3.client.Client')

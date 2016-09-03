@@ -31,7 +31,7 @@ class WorkbookManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        resp = self.client.http_client.post(
+        resp = self.http_client.post(
             '/workbooks',
             definition,
             headers={'content-type': 'text/plain'}
@@ -49,7 +49,7 @@ class WorkbookManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        resp = self.client.http_client.put(
+        resp = self.http_client.put(
             '/workbooks',
             definition,
             headers={'content-type': 'text/plain'}
@@ -80,7 +80,7 @@ class WorkbookManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        resp = self.client.http_client.post(
+        resp = self.http_client.post(
             '/workbooks/validate',
             definition,
             headers={'content-type': 'text/plain'}
