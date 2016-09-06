@@ -74,8 +74,11 @@ class ResourceManager(object):
     def _ensure_not_empty(self, **kwargs):
         for name, value in kwargs.items():
             if value is None or (isinstance(value, str) and len(value) == 0):
-                raise APIException('%s is missing field "%s"' %
-                                   (self.resource_class.__name__, name))
+                raise APIException(
+                    400,
+                    '%s is missing field "%s"' %
+                    (self.resource_class.__name__, name)
+                )
 
     def _copy_if_defined(self, data, **kwargs):
         for name, value in kwargs.items():

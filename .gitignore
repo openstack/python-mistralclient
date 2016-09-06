@@ -29,6 +29,7 @@ pip-log.txt
 nosetests.xml
 functional_creds.conf
 AUTHORS
+ChangeLog
 
 # Translations
 *.mo

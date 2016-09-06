@@ -19,6 +19,7 @@ import pkg_resources as pkg
 from six.moves.urllib import parse
 from six.moves.urllib import request
 
+from mistralclient.api import base as api_base
 from mistralclient.api.v2 import environments
 from mistralclient.tests.unit.v2 import base
 from mistralclient import utils
@@ -78,6 +79,15 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
 
         mock.assert_called_once_with(URL_TEMPLATE, json.dumps(expected_data))
 
+    def test_create_without_name(self):
+        data = copy.deepcopy(ENVIRONMENT)
+        data.pop('name')
+
+        with self.assertRaises(api_base.APIException) as cm:
+            self.environments.create(**data)
+
+        self.assertEqual(400, cm.exception.error_code)
+
     def test_update(self):
         data = copy.deepcopy(ENVIRONMENT)
 
@@ -113,6 +123,15 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
         expected_data['variables'] = json.dumps(expected_data['variables'])
 
         mock.assert_called_once_with(URL_TEMPLATE, json.dumps(expected_data))
+
+    def test_update_without_name(self):
+        data = copy.deepcopy(ENVIRONMENT)
+        data.pop('name')
+
+        with self.assertRaises(api_base.APIException) as cm:
+            self.environments.update(**data)
+
+        self.assertEqual(400, cm.exception.error_code)
 
     def test_list(self):
         mock = self.mock_http_get(content={'environments': [ENVIRONMENT]})
