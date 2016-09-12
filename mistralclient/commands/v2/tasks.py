@@ -38,7 +38,9 @@ def format(task=None, lister=False):
         'Workflow name',
         'Execution ID',
         'State',
-        'State info'
+        'State info',
+        'Created at',
+        'Updated at'
     )
 
     if task:
@@ -51,7 +53,9 @@ def format(task=None, lister=False):
             task.workflow_name,
             task.workflow_execution_id,
             task.state,
-            state_info
+            state_info,
+            task.created_at,
+            task.updated_at or '<none>'
         )
     else:
         data = (tuple('<none>' for _ in range(len(columns))),)
@@ -69,6 +73,7 @@ class List(base.MistralLister):
             'workflow_execution',
             nargs='?',
             help='Workflow execution ID associated with list of Tasks.')
+
         return parser
 
     def _get_format_function(self):
@@ -76,6 +81,7 @@ class List(base.MistralLister):
 
     def _get_resources(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
+
         return mistral_client.tasks.list(parsed_args.workflow_execution)
 
 

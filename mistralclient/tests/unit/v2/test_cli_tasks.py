@@ -29,7 +29,9 @@ TASK_DICT = {
     'workflow_name': 'thing',
     'workflow_execution_id': '321',
     'state': 'RUNNING',
-    'state_info': None
+    'state_info': None,
+    'created_at': '1',
+    'updated_at': '1',
 }
 
 TASK_RESULT = {"test": "is", "passed": "successfully"}
@@ -44,7 +46,9 @@ TASK = tasks.Task(mock, TASK_DICT)
 TASK_WITH_RESULT = tasks.Task(mock, TASK_WITH_RESULT_DICT)
 TASK_WITH_PUBLISHED = tasks.Task(mock, TASK_WITH_PUBLISHED_DICT)
 
-EXPECTED_TASK_RESULT = ('123', 'some', 'thing', '321', 'RUNNING', None)
+EXPECTED_TASK_RESULT = (
+    '123', 'some', 'thing', '321', 'RUNNING', None, '1', '1'
+)
 
 
 class TestCLITasksV2(base.BaseCommandTest):
