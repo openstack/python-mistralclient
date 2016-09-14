@@ -18,7 +18,7 @@ import tempfile
 import uuid
 
 import mock
-import testtools
+from oslotest import base
 
 import osprofiler.profiler
 
@@ -32,7 +32,8 @@ MISTRAL_HTTPS_URL = MISTRAL_HTTP_URL.replace('http', 'https')
 PROFILER_HMAC_KEY = 'SECRET_HMAC_KEY'
 
 
-class BaseClientTests(testtools.TestCase):
+class BaseClientTests(base.BaseTestCase):
+
     @mock.patch('keystoneclient.v2_0.client.Client')
     def test_mistral_url_from_catalog_v2(self, keystone_client_mock):
         keystone_client_instance = keystone_client_mock.return_value

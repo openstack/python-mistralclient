@@ -16,8 +16,8 @@ import copy
 import uuid
 
 import mock
+from oslotest import base
 import requests
-import testtools
 
 from osprofiler import _utils as osprofiler_utils
 import osprofiler.profiler
@@ -66,7 +66,7 @@ class FakeResponse(object):
         self.status_code = status_code
 
 
-class HTTPClientTest(testtools.TestCase):
+class HTTPClientTest(base.BaseTestCase):
 
     def setUp(self):
         super(HTTPClientTest, self).setUp()

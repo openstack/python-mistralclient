@@ -15,7 +15,7 @@
 import json
 
 import mock
-import unittest2
+from oslotest import base
 
 
 class FakeResponse(object):
@@ -30,7 +30,7 @@ class FakeResponse(object):
         return json.loads(self.content)
 
 
-class BaseClientTest(unittest2.TestCase):
+class BaseClientTest(base.BaseTestCase):
     _client = None
 
     def mock_http_get(self, content, status_code=200):
@@ -67,8 +67,9 @@ class BaseClientTest(unittest2.TestCase):
         return self._client.http_client.delete
 
 
-class BaseCommandTest(unittest2.TestCase):
+class BaseCommandTest(base.BaseTestCase):
     def setUp(self):
+        super(BaseCommandTest, self).setUp()
         self.app = mock.Mock()
         self.client = self.app.client_manager.workflow_engine
 
