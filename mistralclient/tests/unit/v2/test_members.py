@@ -13,7 +13,6 @@
 #    limitations under the License.
 
 import copy
-import json
 
 from mistralclient.tests.unit.v2 import base
 
@@ -34,7 +33,9 @@ WORKFLOW_MEMBER_URL = '/workflows/%s/members/%s' % (
 
 class TestWorkflowMembers(base.BaseClientV2Test):
     def test_create(self):
-        mock = self.mock_http_post(content=MEMBER)
+        self.requests_mock.post(self.TEST_URL + WORKFLOW_MEMBERS_URL,
+                                json=MEMBER,
+                                status_code=201)
 
         mb = self.members.create(
             MEMBER['resource_id'],
@@ -44,16 +45,15 @@ class TestWorkflowMembers(base.BaseClientV2Test):
 
         self.assertIsNotNone(mb)
 
-        mock.assert_called_once_with(
-            WORKFLOW_MEMBERS_URL,
-            json.dumps({'member_id': MEMBER['member_id']})
-        )
+        self.assertDictEqual({'member_id': MEMBER['member_id']},
+                             self.requests_mock.last_request.json())
 
     def test_update(self):
         updated_member = copy.copy(MEMBER)
         updated_member['status'] = 'accepted'
 
-        mock = self.mock_http_put(content=updated_member)
+        self.requests_mock.put(self.TEST_URL + WORKFLOW_MEMBER_URL,
+                               json=updated_member)
 
         mb = self.members.update(
             MEMBER['resource_id'],
@@ -63,22 +63,20 @@ class TestWorkflowMembers(base.BaseClientV2Test):
 
         self.assertIsNotNone(mb)
 
-        mock.assert_called_once_with(
-            WORKFLOW_MEMBER_URL,
-            json.dumps({"status": "accepted"})
-        )
+        self.assertDictEqual({"status": "accepted"},
+                             self.requests_mock.last_request.json())
 
     def test_list(self):
-        mock = self.mock_http_get(content={'members': [MEMBER]})
+        self.requests_mock.get(self.TEST_URL + WORKFLOW_MEMBERS_URL,
+                               json={'members': [MEMBER]})
 
         mbs = self.members.list(MEMBER['resource_id'], MEMBER['resource_type'])
 
         self.assertEqual(1, len(mbs))
 
-        mock.assert_called_once_with(WORKFLOW_MEMBERS_URL)
-
     def test_get(self):
-        mock = self.mock_http_get(content=MEMBER)
+        self.requests_mock.get(self.TEST_URL + WORKFLOW_MEMBER_URL,
+                               json=MEMBER)
 
         mb = self.members.get(
             MEMBER['resource_id'],
@@ -88,15 +86,11 @@ class TestWorkflowMembers(base.BaseClientV2Test):
 
         self.assertIsNotNone(mb)
 
-        mock.assert_called_once_with(WORKFLOW_MEMBER_URL)
-
     def test_delete(self):
-        mock = self.mock_http_delete(status_code=204)
-
+        self.requests_mock.delete(self.TEST_URL + WORKFLOW_MEMBER_URL,
+                                  status_code=204)
         self.members.delete(
             MEMBER['resource_id'],
             MEMBER['resource_type'],
             MEMBER['member_id']
         )
-
-        mock.assert_called_once_with(WORKFLOW_MEMBER_URL)

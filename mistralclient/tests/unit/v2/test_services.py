@@ -26,7 +26,8 @@ URL_TEMPLATE = '/services'
 
 class TestServicesV2(base.BaseClientV2Test):
     def test_list(self):
-        mock = self.mock_http_get(content={'services': [SERVICE]})
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE,
+                               json={'services': [SERVICE]})
 
         service_list = self.services.list()
 
@@ -38,5 +39,3 @@ class TestServicesV2(base.BaseClientV2Test):
             services.Service(self.services, SERVICE).to_dict(),
             srv.to_dict()
         )
-
-        mock.assert_called_once_with(URL_TEMPLATE)

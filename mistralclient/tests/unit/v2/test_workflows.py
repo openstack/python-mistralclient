@@ -46,21 +46,24 @@ URL_TEMPLATE_NAME = '/workflows/%s'
 
 class TestWorkflowsV2(base.BaseClientV2Test):
     def test_create(self):
-        mock = self.mock_http_post(content={'workflows': [WORKFLOW]})
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE_SCOPE,
+                                json={'workflows': [WORKFLOW]},
+                                status_code=201)
 
         wfs = self.workflows.create(WF_DEF)
 
         self.assertIsNotNone(wfs)
         self.assertEqual(WF_DEF, wfs[0].definition)
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_SCOPE,
-            WF_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual(WF_DEF, last_request.text)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_create_with_file(self):
-        mock = self.mock_http_post(content={'workflows': [WORKFLOW]})
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE_SCOPE,
+                                json={'workflows': [WORKFLOW]},
+                                status_code=201)
 
         # The contents of wf_v2.yaml must be identical to WF_DEF
         path = pkg.resource_filename(
@@ -73,42 +76,43 @@ class TestWorkflowsV2(base.BaseClientV2Test):
         self.assertIsNotNone(wfs)
         self.assertEqual(WF_DEF, wfs[0].definition)
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_SCOPE,
-            WF_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual(WF_DEF, last_request.text)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_update(self):
-        mock = self.mock_http_put(content={'workflows': [WORKFLOW]})
+        self.requests_mock.put(self.TEST_URL + URL_TEMPLATE_SCOPE,
+                               json={'workflows': [WORKFLOW]})
 
         wfs = self.workflows.update(WF_DEF)
 
         self.assertIsNotNone(wfs)
         self.assertEqual(WF_DEF, wfs[0].definition)
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_SCOPE,
-            WF_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual(WF_DEF, last_request.text)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_update_with_id(self):
-        mock = self.mock_http_put(content=WORKFLOW)
+        self.requests_mock.put(self.TEST_URL + URL_TEMPLATE_NAME % '123',
+                               json=WORKFLOW)
 
         wf = self.workflows.update(WF_DEF, id='123')
 
         self.assertIsNotNone(wf)
         self.assertEqual(WF_DEF, wf.definition)
 
-        mock.assert_called_once_with(
-            '/workflows/123?scope=private',
-            WF_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual('scope=private', last_request.query)
+        self.assertEqual(WF_DEF, last_request.text)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_update_with_file_uri(self):
-        mock = self.mock_http_put(content={'workflows': [WORKFLOW]})
+        self.requests_mock.put(self.TEST_URL + URL_TEMPLATE_SCOPE,
+                               json={'workflows': [WORKFLOW]})
 
         # The contents of wf_v2.yaml must be identical to WF_DEF
         path = pkg.resource_filename(
@@ -124,14 +128,14 @@ class TestWorkflowsV2(base.BaseClientV2Test):
         self.assertIsNotNone(wfs)
         self.assertEqual(WF_DEF, wfs[0].definition)
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_SCOPE,
-            WF_DEF,
-            headers={'content-type': 'text/plain'}
-        )
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual(WF_DEF, last_request.text)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_list(self):
-        mock = self.mock_http_get(content={'workflows': [WORKFLOW]})
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE,
+                               json={'workflows': [WORKFLOW]})
 
         workflows_list = self.workflows.list()
 
@@ -144,12 +148,10 @@ class TestWorkflowsV2(base.BaseClientV2Test):
             wf.to_dict()
         )
 
-        mock.assert_called_once_with(URL_TEMPLATE)
-
     def test_list_with_pagination(self):
-        mock = self.mock_http_get(
-            content={'workflows': [WORKFLOW], 'next': '/workflows?fake'}
-        )
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE,
+                               json={'workflows': [WORKFLOW],
+                                     'next': '/workflows?fake'})
 
         workflows_list = self.workflows.list(
             limit=1,
@@ -159,13 +161,16 @@ class TestWorkflowsV2(base.BaseClientV2Test):
 
         self.assertEqual(1, len(workflows_list))
 
+        last_request = self.requests_mock.last_request
+
         # The url param order is unpredictable.
-        self.assertIn('limit=1', mock.call_args[0][0])
-        self.assertIn('sort_keys=created_at', mock.call_args[0][0])
-        self.assertIn('sort_dirs=asc', mock.call_args[0][0])
+        self.assertEqual(['1'], last_request.qs['limit'])
+        self.assertEqual(['created_at'], last_request.qs['sort_keys'])
+        self.assertEqual(['asc'], last_request.qs['sort_dirs'])
 
     def test_get(self):
-        mock = self.mock_http_get(content=WORKFLOW)
+        url = self.TEST_URL + URL_TEMPLATE_NAME % 'wf'
+        self.requests_mock.get(url, json=WORKFLOW)
 
         wf = self.workflows.get('wf')
 
@@ -175,11 +180,8 @@ class TestWorkflowsV2(base.BaseClientV2Test):
             wf.to_dict()
         )
 
-        mock.assert_called_once_with(URL_TEMPLATE_NAME % 'wf')
-
     def test_delete(self):
-        mock = self.mock_http_delete(status_code=204)
+        url = self.TEST_URL + URL_TEMPLATE_NAME % 'wf'
+        self.requests_mock.delete(url, status_code=204)
 
         self.workflows.delete('wf')
-
-        mock.assert_called_once_with(URL_TEMPLATE_NAME % 'wf')

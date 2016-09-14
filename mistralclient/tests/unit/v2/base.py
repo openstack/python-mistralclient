@@ -18,11 +18,14 @@ from mistralclient.tests.unit import base
 
 
 class BaseClientV2Test(base.BaseClientTest):
+
+    TEST_URL = 'http://mistral.example.com'
+
     def setUp(self):
         super(BaseClientV2Test, self).setUp()
 
         self._client = client.Client(project_name="test",
-                                     mistral_url="test")
+                                     mistral_url=self.TEST_URL)
         self.workbooks = self._client.workbooks
         self.executions = self._client.executions
         self.tasks = self._client.tasks

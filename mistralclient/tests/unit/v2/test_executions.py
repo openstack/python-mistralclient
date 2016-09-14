@@ -56,7 +56,10 @@ URL_TEMPLATE_ID = '/executions/%s'
 
 class TestExecutionsV2(base.BaseClientV2Test):
     def test_create(self):
-        mock = self.mock_http_post(content=EXEC)
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE,
+                                json=EXEC,
+                                status_code=201)
+
         body = {
             'workflow_name': EXEC['workflow_name'],
             'description': '',
@@ -75,11 +78,13 @@ class TestExecutionsV2(base.BaseClientV2Test):
             ex.to_dict()
         )
 
-        self.assertEqual(URL_TEMPLATE, mock.call_args[0][0])
-        self.assertDictEqual(body, json.loads(mock.call_args[0][1]))
+        self.assertDictEqual(body, self.requests_mock.last_request.json())
 
     def test_create_with_workflow_id(self):
-        mock = self.mock_http_post(content=EXEC)
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE,
+                                json=EXEC,
+                                status_code=201)
+
         body = {
             'workflow_id': EXEC['workflow_id'],
             'description': '',
@@ -98,15 +103,17 @@ class TestExecutionsV2(base.BaseClientV2Test):
             ex.to_dict()
         )
 
-        self.assertEqual(URL_TEMPLATE, mock.call_args[0][0])
-        self.assertDictEqual(body, json.loads(mock.call_args[0][1]))
+        self.assertDictEqual(body, self.requests_mock.last_request.json())
 
     def test_create_failure1(self):
-        self.mock_http_post(content=EXEC)
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE,
+                                json=EXEC,
+                                status_code=201)
         self.assertRaises(api_base.APIException, self.executions.create, '')
 
     def test_update(self):
-        mock = self.mock_http_put(content=EXEC)
+        url = self.TEST_URL + URL_TEMPLATE_ID % EXEC['id']
+        self.requests_mock.put(url, json=EXEC)
         body = {
             'state': EXEC['state']
         }
@@ -120,11 +127,11 @@ class TestExecutionsV2(base.BaseClientV2Test):
             ex.to_dict()
         )
 
-        self.assertEqual(URL_TEMPLATE_ID % EXEC['id'], mock.call_args[0][0])
-        self.assertDictEqual(body, json.loads(mock.call_args[0][1]))
+        self.assertDictEqual(body, self.requests_mock.last_request.json())
 
     def test_update_env(self):
-        mock = self.mock_http_put(content=EXEC)
+        url = self.TEST_URL + URL_TEMPLATE_ID % EXEC['id']
+        self.requests_mock.put(url, json=EXEC)
         body = {
             'state': EXEC['state'],
             'params': {
@@ -145,11 +152,11 @@ class TestExecutionsV2(base.BaseClientV2Test):
             ex.to_dict()
         )
 
-        self.assertEqual(URL_TEMPLATE_ID % EXEC['id'], mock.call_args[0][0])
-        self.assertDictEqual(body, json.loads(mock.call_args[0][1]))
+        self.assertDictEqual(body, self.requests_mock.last_request.json())
 
     def test_list(self):
-        mock = self.mock_http_get(content={'executions': [EXEC, SUB_WF_EXEC]})
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE,
+                               json={'executions': [EXEC, SUB_WF_EXEC]})
 
         execution_list = self.executions.list()
 
@@ -165,12 +172,10 @@ class TestExecutionsV2(base.BaseClientV2Test):
             execution_list[1].to_dict()
         )
 
-        mock.assert_called_once_with(URL_TEMPLATE)
-
     def test_list_with_pagination(self):
-        mock = self.mock_http_get(
-            content={'executions': [EXEC], 'next': '/executions?fake'}
-        )
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE,
+                               json={'executions': [EXEC],
+                                     'next': '/executions?fake'})
 
         execution_list = self.executions.list(
             limit=1,
@@ -180,13 +185,16 @@ class TestExecutionsV2(base.BaseClientV2Test):
 
         self.assertEqual(1, len(execution_list))
 
+        last_request = self.requests_mock.last_request
+
         # The url param order is unpredictable.
-        self.assertIn('limit=1', mock.call_args[0][0])
-        self.assertIn('sort_keys=created_at', mock.call_args[0][0])
-        self.assertIn('sort_dirs=asc', mock.call_args[0][0])
+        self.assertEqual(['1'], last_request.qs['limit'])
+        self.assertEqual(['created_at'], last_request.qs['sort_keys'])
+        self.assertEqual(['asc'], last_request.qs['sort_dirs'])
 
     def test_get(self):
-        mock = self.mock_http_get(content=EXEC)
+        url = self.TEST_URL + URL_TEMPLATE_ID % EXEC['id']
+        self.requests_mock.get(url, json=EXEC)
 
         ex = self.executions.get(EXEC['id'])
 
@@ -195,10 +203,9 @@ class TestExecutionsV2(base.BaseClientV2Test):
             ex.to_dict()
         )
 
-        mock.assert_called_once_with(URL_TEMPLATE_ID % EXEC['id'])
-
     def test_get_sub_wf_ex(self):
-        mock = self.mock_http_get(content=SUB_WF_EXEC)
+        url = self.TEST_URL + URL_TEMPLATE_ID % SUB_WF_EXEC['id']
+        self.requests_mock.get(url, json=SUB_WF_EXEC)
 
         ex = self.executions.get(SUB_WF_EXEC['id'])
 
@@ -207,11 +214,8 @@ class TestExecutionsV2(base.BaseClientV2Test):
             ex.to_dict()
         )
 
-        mock.assert_called_once_with(URL_TEMPLATE_ID % SUB_WF_EXEC['id'])
-
     def test_delete(self):
-        mock = self.mock_http_delete(status_code=204)
+        url = self.TEST_URL + URL_TEMPLATE_ID % EXEC['id']
+        self.requests_mock.delete(url, status_code=204)
 
         self.executions.delete(EXEC['id'])
-
-        mock.assert_called_once_with(URL_TEMPLATE_ID % EXEC['id'])

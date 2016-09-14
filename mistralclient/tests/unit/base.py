@@ -12,59 +12,17 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import json
-
 import mock
 from oslotest import base
-
-
-class FakeResponse(object):
-    """Fake response for testing Mistral Client."""
-
-    def __init__(self, status_code, content=None):
-        self.status_code = status_code
-        self.content = content
-        self.headers = {}
-
-    def json(self):
-        return json.loads(self.content)
+from requests_mock.contrib import fixture
 
 
 class BaseClientTest(base.BaseTestCase):
     _client = None
 
-    def mock_http_get(self, content, status_code=200):
-        if isinstance(content, dict):
-            content = json.dumps(content)
-
-        self._client.http_client.get = mock.MagicMock(
-            return_value=FakeResponse(status_code, content))
-
-        return self._client.http_client.get
-
-    def mock_http_post(self, content, status_code=201):
-        if isinstance(content, dict):
-            content = json.dumps(content)
-
-        self._client.http_client.post = mock.MagicMock(
-            return_value=FakeResponse(status_code, content))
-
-        return self._client.http_client.post
-
-    def mock_http_put(self, content, status_code=200):
-        if isinstance(content, dict):
-            content = json.dumps(content)
-
-        self._client.http_client.put = mock.MagicMock(
-            return_value=FakeResponse(status_code, content))
-
-        return self._client.http_client.put
-
-    def mock_http_delete(self, status_code=204):
-        self._client.http_client.delete = mock.MagicMock(
-            return_value=FakeResponse(status_code))
-
-        return self._client.http_client.delete
+    def setUp(self):
+        super(BaseClientTest, self).setUp()
+        self.requests_mock = self.useFixture(fixture.Fixture())
 
 
 class BaseCommandTest(base.BaseTestCase):

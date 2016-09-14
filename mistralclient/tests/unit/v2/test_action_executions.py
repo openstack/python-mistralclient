@@ -12,8 +12,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import json
-
 from mistralclient.api.v2 import action_executions
 from mistralclient.tests.unit.v2 import base
 
@@ -33,7 +31,10 @@ URL_TEMPLATE_ID = '/action_executions/%s'
 
 class TestActionExecutions(base.BaseClientV2Test):
     def test_create(self):
-        mock = self.mock_http_post(content=ACTION_EXEC)
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE,
+                                json=ACTION_EXEC,
+                                status_code=201)
+
         body = {
             'name': ACTION_EXEC['name']
         }
@@ -48,10 +49,12 @@ class TestActionExecutions(base.BaseClientV2Test):
             self.action_executions, ACTION_EXEC
         ).to_dict(), action_execution.to_dict())
 
-        mock.assert_called_once_with(URL_TEMPLATE, json.dumps(body))
+        self.assertEqual(body, self.requests_mock.last_request.json())
 
     def test_update(self):
-        mock = self.mock_http_put(content=ACTION_EXEC)
+        url = self.TEST_URL + URL_TEMPLATE_ID % ACTION_EXEC['id']
+        self.requests_mock.put(url, json=ACTION_EXEC)
+
         body = {
             'state': ACTION_EXEC['state']
         }
@@ -73,15 +76,11 @@ class TestActionExecutions(base.BaseClientV2Test):
             action_execution.to_dict()
         )
 
-        mock.assert_called_once_with(
-            URL_TEMPLATE_ID % ACTION_EXEC['id'],
-            json.dumps(body)
-        )
+        self.assertEqual(body, self.requests_mock.last_request.json())
 
     def test_list(self):
-        mock = self.mock_http_get(
-            content={'action_executions': [ACTION_EXEC]}
-        )
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE,
+                               json={'action_executions': [ACTION_EXEC]})
 
         action_execution_list = self.action_executions.list()
 
@@ -95,10 +94,9 @@ class TestActionExecutions(base.BaseClientV2Test):
 
         self.assertEqual(expected, action_execution.to_dict())
 
-        mock.assert_called_once_with(URL_TEMPLATE)
-
     def test_get(self):
-        mock = self.mock_http_get(content=ACTION_EXEC)
+        url = self.TEST_URL + URL_TEMPLATE_ID % ACTION_EXEC['id']
+        self.requests_mock.get(url, json=ACTION_EXEC)
 
         action_execution = self.action_executions.get(ACTION_EXEC['id'])
 
@@ -109,11 +107,8 @@ class TestActionExecutions(base.BaseClientV2Test):
 
         self.assertEqual(expected, action_execution.to_dict())
 
-        mock.assert_called_once_with(URL_TEMPLATE_ID % ACTION_EXEC['id'])
-
     def test_delete(self):
-        mock = self.mock_http_delete(status_code=204)
+        url = self.TEST_URL + URL_TEMPLATE_ID % ACTION_EXEC['id']
+        self.requests_mock.delete(url, status_code=204)
 
         self.action_executions.delete(ACTION_EXEC['id'])
-
-        mock.assert_called_once_with(URL_TEMPLATE_ID % ACTION_EXEC['id'])

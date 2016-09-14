@@ -43,7 +43,9 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
     def test_create(self):
         data = copy.deepcopy(ENVIRONMENT)
 
-        mock = self.mock_http_post(content=data)
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE,
+                                status_code=201,
+                                json=data)
         env = self.environments.create(**data)
 
         self.assertIsNotNone(env)
@@ -51,7 +53,7 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
         expected_data = copy.deepcopy(data)
         expected_data['variables'] = json.dumps(expected_data['variables'])
 
-        mock.assert_called_once_with(URL_TEMPLATE, json.dumps(expected_data))
+        self.assertEqual(expected_data, self.requests_mock.last_request.json())
 
     def test_create_with_json_file_uri(self):
         # The contents of env_v2.json must be equivalent to ENVIRONMENT
@@ -68,7 +70,9 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
             )
         )
 
-        mock = self.mock_http_post(content=data)
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE,
+                                status_code=201,
+                                json=data)
         file_input = {'file': uri}
         env = self.environments.create(**file_input)
 
@@ -77,7 +81,7 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
         expected_data = copy.deepcopy(data)
         expected_data['variables'] = json.dumps(expected_data['variables'])
 
-        mock.assert_called_once_with(URL_TEMPLATE, json.dumps(expected_data))
+        self.assertEqual(expected_data, self.requests_mock.last_request.json())
 
     def test_create_without_name(self):
         data = copy.deepcopy(ENVIRONMENT)
@@ -92,7 +96,7 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
     def test_update(self):
         data = copy.deepcopy(ENVIRONMENT)
 
-        mock = self.mock_http_put(content=data)
+        self.requests_mock.put(self.TEST_URL + URL_TEMPLATE, json=data)
         env = self.environments.update(**data)
 
         self.assertIsNotNone(env)
@@ -100,7 +104,7 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
         expected_data = copy.deepcopy(data)
         expected_data['variables'] = json.dumps(expected_data['variables'])
 
-        mock.assert_called_once_with(URL_TEMPLATE, json.dumps(expected_data))
+        self.assertEqual(expected_data, self.requests_mock.last_request.json())
 
     def test_update_with_yaml_file(self):
         # The contents of env_v2.json must be equivalent to ENVIRONMENT
@@ -113,8 +117,8 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
                 utils.get_contents_if_file(path)
             )
         )
+        self.requests_mock.put(self.TEST_URL + URL_TEMPLATE, json=data)
 
-        mock = self.mock_http_put(content=data)
         file_input = {'file': path}
         env = self.environments.update(**file_input)
 
@@ -123,7 +127,7 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
         expected_data = copy.deepcopy(data)
         expected_data['variables'] = json.dumps(expected_data['variables'])
 
-        mock.assert_called_once_with(URL_TEMPLATE, json.dumps(expected_data))
+        self.assertEqual(expected_data, self.requests_mock.last_request.json())
 
     def test_update_without_name(self):
         data = copy.deepcopy(ENVIRONMENT)
@@ -136,7 +140,8 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
         self.assertEqual(400, e.error_code)
 
     def test_list(self):
-        mock = self.mock_http_get(content={'environments': [ENVIRONMENT]})
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE,
+                               json={'environments': [ENVIRONMENT]})
 
         environment_list = self.environments.list()
 
@@ -149,10 +154,9 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
             env.to_dict()
         )
 
-        mock.assert_called_once_with(URL_TEMPLATE)
-
     def test_get(self):
-        mock = self.mock_http_get(content=ENVIRONMENT)
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE_NAME % 'env',
+                               json=ENVIRONMENT)
 
         env = self.environments.get('env')
 
@@ -162,11 +166,8 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
             env.to_dict()
         )
 
-        mock.assert_called_once_with(URL_TEMPLATE_NAME % 'env')
-
     def test_delete(self):
-        mock = self.mock_http_delete(status_code=204)
+        self.requests_mock.delete(self.TEST_URL + URL_TEMPLATE_NAME % 'env',
+                                  status_code=204)
 
         self.environments.delete('env')
-
-        mock.assert_called_once_with(URL_TEMPLATE_NAME % 'env')
