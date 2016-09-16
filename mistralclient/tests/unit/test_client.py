@@ -92,16 +92,15 @@ class BaseClientTests(base.BaseTestCase):
 
         expected_args = (
             MISTRAL_HTTP_URL,
-            keystone_client_instance.auth_token,
-            keystone_client_instance.project_id,
-            keystone_client_instance.user_id
         )
 
         expected_kwargs = {
-            'cacert': None,
-            'insecure': False,
-            'target_auth_uri': None,
-            'target_token': None
+            'username': 'mistral',
+            'project_name': 'mistral',
+            'auth_url': AUTH_HTTP_URL_v3,
+            'auth_token': keystone_client_instance.auth_token,
+            'project_id': keystone_client_instance.project_id,
+            'user_id': keystone_client_instance.user_id
         }
 
         client.client(
@@ -111,8 +110,8 @@ class BaseClientTests(base.BaseTestCase):
         )
 
         self.assertTrue(mocked.called)
-        self.assertEqual(mocked.call_args[0], expected_args)
-        self.assertDictEqual(mocked.call_args[1], expected_kwargs)
+        self.assertEqual(expected_args, mocked.call_args[0])
+        self.assertDictEqual(expected_kwargs, mocked.call_args[1])
 
     @mock.patch('keystoneclient.v3.client.Client')
     @mock.patch('mistralclient.api.httpclient.HTTPClient')
@@ -126,16 +125,18 @@ class BaseClientTests(base.BaseTestCase):
 
         expected_args = (
             MISTRAL_HTTPS_URL,
-            keystone_client_instance.auth_token,
-            keystone_client_instance.project_id,
-            keystone_client_instance.user_id
         )
 
         expected_kwargs = {
+            'mistral_url': MISTRAL_HTTPS_URL,
+            'username': 'mistral',
+            'project_name': 'mistral',
+            'auth_url': AUTH_HTTP_URL_v3,
             'cacert': None,
             'insecure': True,
-            'target_auth_uri': None,
-            'target_token': None
+            'auth_token': keystone_client_instance.auth_token,
+            'project_id': keystone_client_instance.project_id,
+            'user_id': keystone_client_instance.user_id
         }
 
         client.client(
@@ -148,8 +149,8 @@ class BaseClientTests(base.BaseTestCase):
         )
 
         self.assertTrue(mocked.called)
-        self.assertEqual(mocked.call_args[0], expected_args)
-        self.assertDictEqual(mocked.call_args[1], expected_kwargs)
+        self.assertEqual(expected_args, mocked.call_args[0])
+        self.assertDictEqual(expected_kwargs, mocked.call_args[1])
 
     @mock.patch('keystoneclient.v3.client.Client')
     @mock.patch('mistralclient.api.httpclient.HTTPClient')
@@ -163,16 +164,18 @@ class BaseClientTests(base.BaseTestCase):
 
         expected_args = (
             MISTRAL_HTTPS_URL,
-            keystone_client_instance.auth_token,
-            keystone_client_instance.project_id,
-            keystone_client_instance.user_id
         )
 
         expected_kwargs = {
+            'mistral_url': MISTRAL_HTTPS_URL,
+            'username': 'mistral',
+            'project_name': 'mistral',
+            'auth_url': AUTH_HTTP_URL_v3,
             'cacert': path,
             'insecure': False,
-            'target_auth_uri': None,
-            'target_token': None
+            'auth_token': keystone_client_instance.auth_token,
+            'project_id': keystone_client_instance.project_id,
+            'user_id': keystone_client_instance.user_id
         }
 
         try:
@@ -189,8 +192,8 @@ class BaseClientTests(base.BaseTestCase):
             os.unlink(path)
 
         self.assertTrue(mock.called)
-        self.assertEqual(mock.call_args[0], expected_args)
-        self.assertDictEqual(mock.call_args[1], expected_kwargs)
+        self.assertEqual(expected_args, mock.call_args[0])
+        self.assertDictEqual(expected_kwargs, mock.call_args[1])
 
     @mock.patch('keystoneclient.v3.client.Client')
     def test_mistral_url_https_bad_cacert(self, keystone_client_mock):
@@ -248,16 +251,16 @@ class BaseClientTests(base.BaseTestCase):
 
         expected_args = (
             MISTRAL_HTTP_URL,
-            keystone_client_instance.auth_token,
-            keystone_client_instance.project_id,
-            keystone_client_instance.user_id
         )
 
         expected_kwargs = {
-            'cacert': None,
-            'insecure': False,
-            'target_auth_uri': None,
-            'target_token': None
+            'username': 'mistral',
+            'project_name': 'mistral',
+            'auth_url': AUTH_HTTP_URL_v3,
+            'profile': PROFILER_HMAC_KEY,
+            'auth_token': keystone_client_instance.auth_token,
+            'project_id': keystone_client_instance.project_id,
+            'user_id': keystone_client_instance.user_id
         }
 
         client.client(
@@ -268,8 +271,8 @@ class BaseClientTests(base.BaseTestCase):
         )
 
         self.assertTrue(mocked.called)
-        self.assertEqual(mocked.call_args[0], expected_args)
-        self.assertDictEqual(mocked.call_args[1], expected_kwargs)
+        self.assertEqual(expected_args, mocked.call_args[0])
+        self.assertDictEqual(expected_kwargs, mocked.call_args[1])
 
         profiler = osprofiler.profiler.get()
 
