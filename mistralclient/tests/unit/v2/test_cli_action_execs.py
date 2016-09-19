@@ -30,7 +30,9 @@ ACTION_EX_DICT = {
     'task_execution_id': "1-2-3-4",
     'state': 'RUNNING',
     'state_info': 'RUNNING somehow.',
-    'accepted': True
+    'accepted': True,
+    'created_at': '1',
+    'updated_at': '1',
 }
 
 ACTION_EX_RESULT = {"test": "is", "passed": "successfully"}
@@ -81,7 +83,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
 
         self.assertEqual(
             ('123', 'some', 'thing', 'task1', '1-2-3-4', 'RUNNING',
-             'RUNNING somehow.', True),
+             'RUNNING somehow.', True, '1', '1'),
             result[1]
         )
 
@@ -95,7 +97,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
 
         self.assertEqual(
             ('123', 'some', 'thing', 'task1', '1-2-3-4', 'RUNNING',
-             'RUNNING somehow.', True),
+             'RUNNING somehow.', True, '1', '1'),
             result[1]
         )
 
@@ -105,7 +107,8 @@ class TestCLIActionExecutions(base.BaseCommandTest):
         result = self.call(action_ex_cmd.List)
 
         self.assertEqual(
-            [('123', 'some', 'thing', 'task1', '1-2-3-4', 'RUNNING', True)],
+            [('123', 'some', 'thing', 'task1', '1-2-3-4', 'RUNNING', True,
+              '1', '1')],
             result[1]
         )
 
@@ -116,7 +119,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
 
         self.assertEqual(
             ('123', 'some', 'thing', 'task1', '1-2-3-4', 'RUNNING',
-             'RUNNING somehow.', True), result[1]
+             'RUNNING somehow.', True, '1', '1'), result[1]
         )
 
     def test_get_output(self):

@@ -34,6 +34,8 @@ def format_list(action_ex=None):
         'Task ID',
         'State',
         'Accepted',
+        'Created at',
+        'Updated at'
     )
 
     if action_ex:
@@ -45,6 +47,8 @@ def format_list(action_ex=None):
             action_ex.task_execution_id,
             action_ex.state,
             action_ex.accepted,
+            action_ex.created_at,
+            action_ex.updated_at or '<none>'
         )
     else:
         data = (tuple('<none>' for _ in range(len(columns))),)
@@ -62,6 +66,8 @@ def format(action_ex=None):
         'State',
         'State info',
         'Accepted',
+        'Created at',
+        'Updated at',
     )
 
     if action_ex:
@@ -74,6 +80,8 @@ def format(action_ex=None):
             action_ex.state,
             action_ex.state_info,
             action_ex.accepted,
+            action_ex.created_at,
+            action_ex.updated_at or '<none>'
         )
     else:
         data = (tuple('<none>' for _ in range(len(columns))),)
