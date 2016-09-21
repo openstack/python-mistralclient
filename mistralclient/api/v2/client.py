@@ -117,7 +117,7 @@ class Client(object):
                 target_insecure
             )
 
-        self.http_client = httpclient.HTTPClient(
+        http_client = httpclient.HTTPClient(
             mistral_url,
             auth_token,
             project_id,
@@ -130,13 +130,14 @@ class Client(object):
         )
 
         # Create all resource managers.
-        self.workbooks = workbooks.WorkbookManager(self)
-        self.executions = executions.ExecutionManager(self)
-        self.tasks = tasks.TaskManager(self)
-        self.actions = actions.ActionManager(self)
-        self.workflows = workflows.WorkflowManager(self)
-        self.cron_triggers = cron_triggers.CronTriggerManager(self)
-        self.environments = environments.EnvironmentManager(self)
-        self.action_executions = action_executions.ActionExecutionManager(self)
-        self.services = services.ServiceManager(self)
-        self.members = members.MemberManager(self)
+        self.workbooks = workbooks.WorkbookManager(http_client)
+        self.executions = executions.ExecutionManager(http_client)
+        self.tasks = tasks.TaskManager(http_client)
+        self.actions = actions.ActionManager(http_client)
+        self.workflows = workflows.WorkflowManager(http_client)
+        self.cron_triggers = cron_triggers.CronTriggerManager(http_client)
+        self.environments = environments.EnvironmentManager(http_client)
+        self.action_executions = action_executions.ActionExecutionManager(
+            http_client)
+        self.services = services.ServiceManager(http_client)
+        self.members = members.MemberManager(http_client)

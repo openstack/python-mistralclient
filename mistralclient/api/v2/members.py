@@ -40,7 +40,7 @@ class MemberManager(base.ResourceManager):
     def update(self, resource_id, resource_type, member_id='',
                status='accepted'):
         if not member_id:
-            member_id = self.client.http_client.project_id
+            member_id = self.http_client.project_id
 
         url = '/%ss/%s/members/%s' % (resource_type, resource_id, member_id)
 
@@ -58,7 +58,7 @@ class MemberManager(base.ResourceManager):
         )
 
         if not member_id:
-            member_id = self.client.http_client.project_id
+            member_id = self.http_client.project_id
 
         url = '/%ss/%s/members/%s' % (resource_type, resource_id, member_id)
 

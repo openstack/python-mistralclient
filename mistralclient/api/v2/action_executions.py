@@ -35,7 +35,7 @@ class ActionExecutionManager(base.ResourceManager):
         if params:
             data['params'] = json.dumps(params)
 
-        resp = self.client.http_client.post(
+        resp = self.http_client.post(
             '/action_executions',
             json.dumps(data)
         )

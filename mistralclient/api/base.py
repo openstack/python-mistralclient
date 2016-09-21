@@ -65,8 +65,8 @@ def extract_json(response, response_key):
 class ResourceManager(object):
     resource_class = None
 
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, http_client):
+        self.http_client = http_client
 
     def find(self, **kwargs):
         return [i for i in self.list() if _check_items(i, kwargs.items())]
@@ -89,7 +89,7 @@ class ResourceManager(object):
         if dump_json:
             data = json.dumps(data)
 
-        resp = self.client.http_client.post(url, data)
+        resp = self.http_client.post(url, data)
 
         if resp.status_code != 201:
             self._raise_api_exception(resp)
@@ -100,7 +100,7 @@ class ResourceManager(object):
         if dump_json:
             data = json.dumps(data)
 
-        resp = self.client.http_client.put(url, data)
+        resp = self.http_client.put(url, data)
 
         if resp.status_code != 200:
             self._raise_api_exception(resp)
@@ -108,7 +108,7 @@ class ResourceManager(object):
         return self.resource_class(self, extract_json(resp, response_key))
 
     def _list(self, url, response_key=None):
-        resp = self.client.http_client.get(url)
+        resp = self.http_client.get(url)
 
         if resp.status_code != 200:
             self._raise_api_exception(resp)
@@ -117,7 +117,7 @@ class ResourceManager(object):
                 for resource_data in extract_json(resp, response_key)]
 
     def _get(self, url, response_key=None):
-        resp = self.client.http_client.get(url)
+        resp = self.http_client.get(url)
 
         if resp.status_code == 200:
             return self.resource_class(self, extract_json(resp, response_key))
@@ -125,7 +125,7 @@ class ResourceManager(object):
             self._raise_api_exception(resp)
 
     def _delete(self, url):
-        resp = self.client.http_client.delete(url)
+        resp = self.http_client.delete(url)
 
         if resp.status_code != 204:
             self._raise_api_exception(resp)

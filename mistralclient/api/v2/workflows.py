@@ -36,7 +36,7 @@ class WorkflowManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        resp = self.client.http_client.post(
+        resp = self.http_client.post(
             '/workflows?scope=%s' % scope,
             definition,
             headers={'content-type': 'text/plain'}
@@ -57,7 +57,7 @@ class WorkflowManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        resp = self.client.http_client.put(
+        resp = self.http_client.put(
             '%s?scope=%s' % (url_pre, scope),
             definition,
             headers={'content-type': 'text/plain'}
@@ -112,7 +112,7 @@ class WorkflowManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        resp = self.client.http_client.post(
+        resp = self.http_client.post(
             '/workflows/validate',
             definition,
             headers={'content-type': 'text/plain'}
