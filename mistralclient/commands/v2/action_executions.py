@@ -122,6 +122,12 @@ class Create(command.ShowOne):
             help='Save the result into DB.'
         )
         parser.add_argument(
+            '--run-sync',
+            dest='run_sync',
+            action='store_true',
+            help='Run the action synchronously.'
+        )
+        parser.add_argument(
             '-t',
             '--target',
             dest='target',
@@ -135,6 +141,9 @@ class Create(command.ShowOne):
 
         if parsed_args.save_result:
             params['save_result'] = parsed_args.save_result
+
+        if parsed_args.run_sync:
+            params['run_sync'] = parsed_args.run_sync
 
         if parsed_args.target:
             params['target'] = parsed_args.target
@@ -154,7 +163,7 @@ class Create(command.ShowOne):
             **params
         )
 
-        if parsed_args.save_result:
+        if not parsed_args.run_sync and parsed_args.save_result:
             return format(action_ex)
         else:
             self.app.stdout.write("%s\n" % action_ex.output)
