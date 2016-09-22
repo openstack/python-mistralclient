@@ -85,6 +85,38 @@ class TestCLIActionExecutions(base.BaseCommandTest):
             result[1]
         )
 
+    def test_create_run_sync(self):
+        (self.client.action_executions.create.
+            return_value) = ACTION_EX_WITH_OUTPUT
+
+        self.call(
+            action_ex_cmd.Create,
+            app_args=[
+                'some', '{"output": "Hello!"}', '--run-sync'
+            ]
+        )
+
+        self.assertDictEqual(
+            ACTION_EX_RESULT,
+            json.loads(self.app.stdout.write.call_args[0][0])
+        )
+
+    def test_create_run_sync_and_save_result(self):
+        (self.client.action_executions.create.
+            return_value) = ACTION_EX_WITH_OUTPUT
+
+        self.call(
+            action_ex_cmd.Create,
+            app_args=[
+                'some', '{"output": "Hello!"}', '--save-result', '--run-sync'
+            ]
+        )
+
+        self.assertDictEqual(
+            ACTION_EX_RESULT,
+            json.loads(self.app.stdout.write.call_args[0][0])
+        )
+
     def test_update(self):
         self.client.action_executions.update.return_value = ACTION_EX
 
