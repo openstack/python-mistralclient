@@ -317,7 +317,7 @@ class MistralShell(app.App):
             '--auth-type',
             action='store',
             dest='auth_type',
-            default=c.env('MISTRAL_AUTH_TYPE', default=auth_types.KEYSTONE),
+            default=c.env('MISTRAL_AUTH_TYPE', default='keystone'),
             help='Authentication type. Valid options are: %s.'
                  ' (Env: MISTRAL_AUTH_TYPE)' % auth_types.ALL
         )

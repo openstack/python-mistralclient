@@ -12,15 +12,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from stevedore import extension
+
 # Valid authentication types.
-
-# Standard Keystone authentication.
-KEYSTONE = 'keystone'
-
-# Authentication using OpenID Connect protocol but specific to KeyCloak
-# server regarding multi-tenancy support. KeyCloak has a notion of realm
-# used as an analog of Keystone project/tenant.
-KEYCLOAK_OIDC = 'keycloak-oidc'
-
-
-ALL = [KEYSTONE, KEYCLOAK_OIDC]
+ALL = extension.ExtensionManager(
+    namespace='mistralclient.auth',
+    invoke_on_load=False
+).names()

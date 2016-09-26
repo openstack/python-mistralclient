@@ -16,119 +16,147 @@ import logging
 import pprint
 import requests
 
+from mistralclient import auth
+
 
 LOG = logging.getLogger(__name__)
 
 
-def authenticate(auth_url, client_id, client_secret, realm_name,
-                 username=None, password=None, access_token=None,
-                 cacert=None, insecure=False):
-    """Performs authentication using Keycloak OpenID Protocol.
+class KeycloakAuthHandler(auth.AuthHandler):
 
-    :param auth_url: Base authentication url of KeyCloak server (e.g.
-        "https://my.keycloak:8443/auth"
-    :param client_id: Client ID (according to OpenID Connect protocol).
-    :param client_secret: Client secret (according to OpenID Connect protocol).
-    :param realm_name: KeyCloak realm name.
-    :param username: User name (Optional, if None then access_token must be
-        provided).
-    :param password: Password (Optional).
-    :param access_token: Access token. If passed, username and password are
-        not used and this method just validates the token and refreshes it,
-        if needed. (Optional, if None then username must be provided)
-    :param cacert: SSL certificate file (Optional).
-    :param insecure: If True, SSL certificate is not verified (Optional).
+    def authenticate(self, req):
+        """Performs authentication using Keycloak OpenID Protocol.
 
-    """
-    if not auth_url:
-        raise ValueError('Base authentication url is not provided.')
+        :param req: Request dict containing list of parameters required
+            for Keycloak authentication.
 
-    if not client_id:
-        raise ValueError('Client ID is not provided.')
+            auth_url: Base authentication url of KeyCloak server (e.g.
+                "https://my.keycloak:8443/auth"
+            client_id: Client ID (according to OpenID Connect protocol).
+            client_secret: Client secret (according to OpenID Connect
+                protocol).
+            realm_name: KeyCloak realm name.
+            username: User name (Optional, if None then access_token must be
+                provided).
+            password: Password (Optional).
+            access_token: Access token. If passed, username and password are
+                not used and this method just validates the token and refreshes
+                it if needed (Optional, if None then username must be
+                provided).
+            cacert: SSL certificate file (Optional).
+            insecure: If True, SSL certificate is not verified (Optional).
 
-    if not client_secret:
-        raise ValueError('Client secret is not provided.')
+        """
+        if not isinstance(req, dict):
+            raise TypeError('The input "req" is not typeof dict.')
 
-    if not realm_name:
-        raise ValueError('Project(realm) name is not provided.')
+        auth_url = req.get('auth_url')
+        client_id = req.get('client_id')
+        client_secret = req.get('client_secret')
+        realm_name = req.get('realm_name')
+        username = req.get('username')
+        password = req.get('password')
+        access_token = req.get('access_token')
+        cacert = req.get('cacert')
+        insecure = req.get('insecure', False)
 
-    if username and access_token:
-        raise ValueError(
-            "User name and access token can't be provided at the same time."
+        if not auth_url:
+            raise ValueError('Base authentication url is not provided.')
+
+        if not client_id:
+            raise ValueError('Client ID is not provided.')
+
+        if not client_secret:
+            raise ValueError('Client secret is not provided.')
+
+        if not realm_name:
+            raise ValueError('Project(realm) name is not provided.')
+
+        if username and access_token:
+            raise ValueError(
+                "User name and access token can't be "
+                "provided at the same time."
+            )
+
+        if not username and not access_token:
+            raise ValueError(
+                'Either user name or access token must be provided.'
+            )
+
+        if access_token:
+            response = self._authenticate_with_token(
+                auth_url,
+                client_id,
+                client_secret,
+                access_token,
+                cacert,
+                insecure
+            )
+        else:
+            response = self._authenticate_with_password(
+                auth_url,
+                client_id,
+                client_secret,
+                realm_name,
+                username,
+                password,
+                cacert,
+                insecure
+            )
+
+        response['project_id'] = realm_name
+
+        return response
+
+    def _authenticate_with_token(auth_url, client_id, client_secret,
+                                 auth_token, cacert=None, insecure=None):
+        # TODO(rakhmerov): Implement.
+        raise NotImplementedError
+
+    def _authenticate_with_password(auth_url, client_id, client_secret,
+                                    realm_name, username, password,
+                                    cacert=None, insecure=None):
+        access_token_endpoint = (
+            "%s/realms/%s/protocol/openid-connect/token" %
+            (auth_url, realm_name)
         )
 
-    if access_token:
-        return _authenticate_with_token(
-            auth_url,
-            client_id,
-            client_secret,
-            access_token,
-            cacert,
-            insecure
+        client_auth = (client_id, client_secret)
+
+        body = {
+            'grant_type': 'password',
+            'username': username,
+            'password': password,
+            'scope': 'profile'
+        }
+
+        resp = requests.post(
+            access_token_endpoint,
+            auth=client_auth,
+            data=body,
+            verify=not insecure
         )
 
-    if not username:
-        raise ValueError('Either user name or access token must be provided.')
+        try:
+            resp.raise_for_status()
+        except Exception as e:
+            raise Exception("Failed to get access token:\n %s" % str(e))
 
-    return _authenticate_with_password(
-        auth_url,
-        client_id,
-        client_secret,
-        realm_name,
-        username,
-        password,
-        cacert,
-        insecure
-    )
+        LOG.debug(
+            "HTTP response from OIDC provider: %s" %
+            pprint.pformat(resp.json())
+        )
 
-
-def _authenticate_with_token(auth_url, client_id, client_secret, auth_token,
-                             cacert=None, insecure=None):
-    # TODO(rakhmerov): Implement.
-    raise NotImplementedError
-
-
-def _authenticate_with_password(auth_url, client_id, client_secret,
-                                realm_name, username, password,
-                                cacert=None, insecure=None):
-    access_token_endpoint = (
-        "%s/realms/%s/protocol/openid-connect/token" % (auth_url, realm_name)
-    )
-
-    client_auth = (client_id, client_secret)
-
-    body = {
-        'grant_type': 'password',
-        'username': username,
-        'password': password,
-        'scope': 'profile'
-    }
-
-    resp = requests.post(
-        access_token_endpoint,
-        auth=client_auth,
-        data=body,
-        verify=not insecure
-    )
-
-    try:
-        resp.raise_for_status()
-    except Exception as e:
-        raise Exception("Failed to get access token:\n %s" % str(e))
-
-    LOG.debug(
-        "HTTP response from OIDC provider: %s" % pprint.pformat(resp.json())
-    )
-
-    return resp.json()['access_token']
+        return resp.json()['access_token']
 
 
 # An example of using KeyCloak OpenID authentication.
-
 if __name__ == '__main__':
     print("Using username/password to get access token from KeyCloak...")
 
-    a_token = authenticate(
+    auth_handler = KeycloakAuthHandler()
+
+    a_token = auth_handler.authenticate(
         "https://my.keycloak:8443/auth",
         client_id="mistral_client",
         client_secret="4a080907-921b-409a-b793-c431609c3a47",

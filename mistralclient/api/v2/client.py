@@ -13,6 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import copy
 import six
 
 from oslo_utils import importutils
@@ -28,9 +29,8 @@ from mistralclient.api.v2 import services
 from mistralclient.api.v2 import tasks
 from mistralclient.api.v2 import workbooks
 from mistralclient.api.v2 import workflows
-from mistralclient.auth import auth_types
-from mistralclient.auth import keycloak
-from mistralclient.auth import keystone
+from mistralclient import auth
+
 
 osprofiler_profiler = importutils.try_import("osprofiler.profiler")
 
@@ -38,62 +38,25 @@ _DEFAULT_MISTRAL_URL = "http://localhost:8989/v2"
 
 
 class Client(object):
-    def __init__(self, mistral_url=None, username=None, api_key=None,
-                 project_name=None, auth_url=None, project_id=None,
-                 endpoint_type='publicURL', service_type='workflowv2',
-                 auth_token=None, user_id=None, cacert=None, insecure=False,
-                 profile=None, auth_type=auth_types.KEYSTONE, client_id=None,
-                 client_secret=None, target_username=None, target_api_key=None,
-                 target_project_name=None, target_auth_url=None,
-                 target_project_id=None, target_auth_token=None,
-                 target_user_id=None, target_cacert=None,
-                 target_insecure=False, **kwargs):
+    def __init__(self, auth_type='keystone', **kwargs):
+        req = copy.deepcopy(kwargs)
+        mistral_url = req.get('mistral_url')
+        auth_url = req.get('auth_url')
+        auth_token = req.get('auth_token')
+        project_id = req.get('project_id')
+        user_id = req.get('user_id')
+        profile = req.get('profile')
 
         if mistral_url and not isinstance(mistral_url, six.string_types):
             raise RuntimeError('Mistral url should be a string.')
 
-        if auth_url:
-            if auth_type == auth_types.KEYSTONE:
-                (mistral_url, auth_token, project_id, user_id) = (
-                    keystone.authenticate(
-                        mistral_url,
-                        username,
-                        api_key,
-                        project_name,
-                        auth_url,
-                        project_id,
-                        endpoint_type,
-                        service_type,
-                        auth_token,
-                        user_id,
-                        cacert,
-                        insecure
-                    )
-                )
-            elif auth_type == auth_types.KEYCLOAK_OIDC:
-                auth_token = keycloak.authenticate(
-                    auth_url,
-                    client_id,
-                    client_secret,
-                    project_name,
-                    username,
-                    api_key,
-                    auth_token,
-                    cacert,
-                    insecure
-                )
-
-                # In case of KeyCloak OpenID Connect we can treat project
-                # name and id in the same way because KeyCloak realm is
-                # essentially a different OpenID Connect Issuer which in
-                # KeyCloak is represented just as a URL path component
-                # (see http://openid.net/specs/openid-connect-core-1_0.html).
-                project_id = project_name
-            else:
-                raise RuntimeError(
-                    'Invalid authentication type [value=%s, valid_values=%s]'
-                    % (auth_type, auth_types.ALL)
-                )
+        if auth_url and not auth_token:
+            auth_handler = auth.get_auth_handler(auth_type)
+            auth_response = auth_handler.authenticate(req) or {}
+            mistral_url = auth_response.get('mistral_url') or mistral_url
+            req['auth_token'] = auth_response.get('token')
+            req['project_id'] = auth_response.get('project_id') or project_id
+            req['user_id'] = auth_response.get('user_id') or user_id
 
         if not mistral_url:
             mistral_url = _DEFAULT_MISTRAL_URL
@@ -101,33 +64,7 @@ class Client(object):
         if profile:
             osprofiler_profiler.init(profile)
 
-        if target_auth_url:
-            keystone.authenticate(
-                mistral_url,
-                target_username,
-                target_api_key,
-                target_project_name,
-                target_auth_url,
-                target_project_id,
-                endpoint_type,
-                service_type,
-                target_auth_token,
-                target_user_id,
-                target_cacert,
-                target_insecure
-            )
-
-        http_client = httpclient.HTTPClient(
-            mistral_url,
-            auth_token,
-            project_id,
-            user_id,
-            cacert=cacert,
-            insecure=insecure,
-            target_token=target_auth_token,
-            target_auth_uri=target_auth_url,
-            **kwargs
-        )
+        http_client = httpclient.HTTPClient(mistral_url, **req)
 
         # Create all resource managers.
         self.workbooks = workbooks.WorkbookManager(http_client)

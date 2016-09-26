@@ -37,31 +37,31 @@ def log_request(func):
 
 
 class HTTPClient(object):
-    def __init__(self, base_url, token=None, project_id=None, user_id=None,
-                 cacert=None, insecure=False, target_token=None,
-                 target_auth_uri=None, **kwargs):
+    def __init__(self, base_url, **kwargs):
         self.base_url = base_url
-        self.token = token
-        self.project_id = project_id
-        self.user_id = user_id
-        self.target_token = target_token
-        self.target_auth_uri = target_auth_uri
+        self.auth_token = kwargs.get('auth_token', None)
+        self.project_id = kwargs.get('project_id', None)
+        self.user_id = kwargs.get('user_id', None)
+        self.target_auth_token = kwargs.get('target_auth_token', None)
+        self.target_auth_url = kwargs.get('target_auth_url', None)
+        self.cacert = kwargs.get('cacert', None)
+        self.insecure = kwargs.get('insecure', False)
         self.ssl_options = {}
 
         if self.base_url.startswith('https'):
-            if cacert and not os.path.exists(cacert):
+            if self.cacert and not os.path.exists(self.cacert):
                 raise ValueError('Unable to locate cacert file '
-                                 'at %s.' % cacert)
+                                 'at %s.' % self.cacert)
 
-            if cacert and insecure:
+            if self.cacert and self.insecure:
                 LOG.warning('Client is set to not verify even though '
                             'cacert is provided.')
 
-            if insecure:
+            if self.insecure:
                 self.ssl_options['verify'] = False
             else:
-                if cacert:
-                    self.ssl_options['verify'] = cacert
+                if self.cacert:
+                    self.ssl_options['verify'] = self.cacert
                 else:
                     self.ssl_options['verify'] = True
 
@@ -107,9 +107,9 @@ class HTTPClient(object):
         if not headers:
             headers = {}
 
-        token = headers.get('x-auth-token', self.token)
-        if token:
-            headers['x-auth-token'] = token
+        auth_token = headers.get('x-auth-token', self.auth_token)
+        if auth_token:
+            headers['x-auth-token'] = auth_token
 
         project_id = headers.get('X-Project-Id', self.project_id)
         if project_id:
@@ -119,14 +119,18 @@ class HTTPClient(object):
         if user_id:
             headers['X-User-Id'] = user_id
 
-        target_token = headers.get('X-Target-Auth-Token', self.target_token)
-        if target_token:
-            headers['X-Target-Auth-Token'] = target_token
+        target_auth_token = headers.get(
+            'X-Target-Auth-Token',
+            self.target_auth_token
+        )
 
-        target_auth_uri = headers.get('X-Target-Auth-Uri',
-                                      self.target_auth_uri)
-        if target_auth_uri:
-            headers['X-Target-Auth-Uri'] = target_auth_uri
+        if target_auth_token:
+            headers['X-Target-Auth-Token'] = target_auth_token
+
+        target_auth_url = headers.get('X-Target-Auth-Uri',
+                                      self.target_auth_url)
+        if target_auth_url:
+            headers['X-Target-Auth-Uri'] = target_auth_url
 
         if osprofiler_web:
             # Add headers for osprofiler.
