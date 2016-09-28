@@ -13,6 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import base64
 import copy
 import os
 
@@ -21,8 +22,21 @@ import requests
 
 import logging
 
-osprofiler_web = importutils.try_import("osprofiler.web")
 
+AUTH_TOKEN = 'auth_token'
+CACERT = 'cacert'
+CERT_FILE = 'cert'
+CERT_KEY = 'key'
+INSECURE = 'insecure'
+PROJECT_ID = 'project_id'
+TARGET_AUTH_TOKEN = 'target_auth_token'
+TARGET_AUTH_URI = 'target_auth_url'
+TARGET_PROJECT_ID = 'target_project_id'
+TARGET_USER_ID = 'target_user_id'
+TARGET_SERVICE_CATALOG = 'target_service_catalog'
+USER_ID = 'user_id'
+
+osprofiler_web = importutils.try_import("osprofiler.web")
 
 LOG = logging.getLogger(__name__)
 
@@ -39,13 +53,16 @@ def log_request(func):
 class HTTPClient(object):
     def __init__(self, base_url, **kwargs):
         self.base_url = base_url
-        self.auth_token = kwargs.get('auth_token', None)
-        self.project_id = kwargs.get('project_id', None)
-        self.user_id = kwargs.get('user_id', None)
-        self.target_auth_token = kwargs.get('target_auth_token', None)
-        self.target_auth_url = kwargs.get('target_auth_url', None)
-        self.cacert = kwargs.get('cacert', None)
-        self.insecure = kwargs.get('insecure', False)
+        self.auth_token = kwargs.get(AUTH_TOKEN)
+        self.project_id = kwargs.get(PROJECT_ID)
+        self.user_id = kwargs.get(USER_ID)
+        self.target_auth_token = kwargs.get(TARGET_AUTH_TOKEN)
+        self.target_auth_uri = kwargs.get(TARGET_AUTH_URI)
+        self.target_user_id = kwargs.get(TARGET_USER_ID)
+        self.target_project_id = kwargs.get(TARGET_PROJECT_ID)
+        self.target_service_catalog = kwargs.get(TARGET_SERVICE_CATALOG)
+        self.cacert = kwargs.get(CACERT)
+        self.insecure = kwargs.get(INSECURE, False)
         self.ssl_options = {}
 
         if self.base_url.startswith('https'):
@@ -65,7 +82,10 @@ class HTTPClient(object):
                 else:
                     self.ssl_options['verify'] = True
 
-            self.ssl_options['cert'] = (kwargs.get('cert'), kwargs.get('key'))
+            self.ssl_options['cert'] = (
+                kwargs.get(CERT_FILE),
+                kwargs.get(CERT_KEY)
+            )
 
     @log_request
     def get(self, url, headers=None):
@@ -107,30 +127,31 @@ class HTTPClient(object):
         if not headers:
             headers = {}
 
-        auth_token = headers.get('x-auth-token', self.auth_token)
-        if auth_token:
-            headers['x-auth-token'] = auth_token
+        if self.auth_token:
+            headers['x-auth-token'] = self.auth_token
 
-        project_id = headers.get('X-Project-Id', self.project_id)
-        if project_id:
-            headers['X-Project-Id'] = project_id
+        if self.project_id:
+            headers['X-Project-Id'] = self.project_id
 
-        user_id = headers.get('X-User-Id', self.user_id)
-        if user_id:
-            headers['X-User-Id'] = user_id
+        if self.user_id:
+            headers['X-User-Id'] = self.user_id
 
-        target_auth_token = headers.get(
-            'X-Target-Auth-Token',
-            self.target_auth_token
-        )
+        if self.target_auth_token:
+            headers['X-Target-Auth-Token'] = self.target_auth_token
 
-        if target_auth_token:
-            headers['X-Target-Auth-Token'] = target_auth_token
+        if self.target_auth_uri:
+            headers['X-Target-Auth-Uri'] = self.target_auth_uri
 
-        target_auth_url = headers.get('X-Target-Auth-Uri',
-                                      self.target_auth_url)
-        if target_auth_url:
-            headers['X-Target-Auth-Uri'] = target_auth_url
+        if self.target_project_id:
+            headers['X-Target-Project-Id'] = self.target_project_id
+
+        if self.target_user_id:
+            headers['X-Target-User-Id'] = self.target_user_id
+
+        if self.target_service_catalog:
+            headers['X-Target-Service-Catalog'] = base64.b64encode(
+                self.target_service_catalog.encode('utf-8')
+            )
 
         if osprofiler_web:
             # Add headers for osprofiler.

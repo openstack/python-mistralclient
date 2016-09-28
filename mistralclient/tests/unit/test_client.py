@@ -118,6 +118,44 @@ class BaseClientTests(base.BaseTestCase):
 
     @mock.patch('keystoneclient.v3.client.Client')
     @mock.patch('mistralclient.api.httpclient.HTTPClient')
+    def test_target_parameters_processed(
+        self,
+        http_client_mock,
+        keystone_client_mock
+    ):
+        keystone_client_instance = self.setup_keystone_mock(
+            keystone_client_mock
+        )
+
+        url_for = mock.Mock(return_value='http://mistral_host:8989/v2')
+        keystone_client_instance.service_catalog.url_for = url_for
+
+        client.client(
+            target_username='tmistral',
+            target_project_name='tmistralp',
+            target_auth_url=AUTH_HTTP_URL_v3
+        )
+
+        self.assertTrue(http_client_mock.called)
+        mistral_url_for_http = http_client_mock.call_args[0][0]
+        kwargs = http_client_mock.call_args[1]
+        self.assertEqual(MISTRAL_HTTP_URL, mistral_url_for_http)
+
+        expected_values = {
+            'target_project_id': keystone_client_instance.project_id,
+            'target_auth_token': keystone_client_instance.auth_token,
+            'target_user_id': keystone_client_instance.user_id,
+            'target_auth_url': AUTH_HTTP_URL_v3,
+            'target_project_name': 'tmistralp',
+            'target_username': 'tmistral',
+            'target_service_catalog': '"{}"'
+        }
+
+        for key in expected_values:
+            self.assertEqual(expected_values[key], kwargs[key])
+
+    @mock.patch('keystoneclient.v3.client.Client')
+    @mock.patch('mistralclient.api.httpclient.HTTPClient')
     def test_mistral_url_https_insecure(self, http_client_mock,
                                         keystone_client_mock):
         keystone_client_instance = self.setup_keystone_mock(  # noqa
