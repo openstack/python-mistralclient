@@ -41,22 +41,17 @@ class Client(object):
     def __init__(self, auth_type='keystone', **kwargs):
         req = copy.deepcopy(kwargs)
         mistral_url = req.get('mistral_url')
-        auth_url = req.get('auth_url')
-        auth_token = req.get('auth_token')
-        project_id = req.get('project_id')
-        user_id = req.get('user_id')
         profile = req.get('profile')
 
         if mistral_url and not isinstance(mistral_url, six.string_types):
             raise RuntimeError('Mistral url should be a string.')
 
-        if auth_url and not auth_token:
-            auth_handler = auth.get_auth_handler(auth_type)
-            auth_response = auth_handler.authenticate(req) or {}
-            mistral_url = auth_response.get('mistral_url') or mistral_url
-            req['auth_token'] = auth_response.get('token')
-            req['project_id'] = auth_response.get('project_id') or project_id
-            req['user_id'] = auth_response.get('user_id') or user_id
+        auth_handler = auth.get_auth_handler(auth_type)
+        auth_response = auth_handler.authenticate(req) or {}
+
+        req.update(auth_response)
+
+        mistral_url = auth_response.get('mistral_url') or mistral_url
 
         if not mistral_url:
             mistral_url = _DEFAULT_MISTRAL_URL

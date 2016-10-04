@@ -12,6 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import base64
 import copy
 import uuid
 
@@ -135,6 +136,9 @@ class HTTPClientTest(base.BaseTestCase):
     def test_get_request_options_with_headers_for_get(self):
         target_auth_url = str(uuid.uuid4())
         target_auth_token = str(uuid.uuid4())
+        target_user_id = 'target_user'
+        target_project_id = 'target_project'
+        target_service_catalog = 'this should be there'
 
         target_client = httpclient.HTTPClient(
             API_BASE_URL,
@@ -142,7 +146,10 @@ class HTTPClientTest(base.BaseTestCase):
             project_id=PROJECT_ID,
             user_id=USER_ID,
             target_auth_url=target_auth_url,
-            target_auth_token=target_auth_token
+            target_auth_token=target_auth_token,
+            target_project_id=target_project_id,
+            target_user_id=target_user_id,
+            target_service_catalog=target_service_catalog
         )
 
         target_client.get(API_URL)
@@ -150,6 +157,10 @@ class HTTPClientTest(base.BaseTestCase):
         expected_options = copy.deepcopy(EXPECTED_REQ_OPTIONS)
         expected_options["headers"]["X-Target-Auth-Uri"] = target_auth_url
         expected_options["headers"]["X-Target-Auth-Token"] = target_auth_token
+        expected_options["headers"]["X-Target-User-Id"] = target_user_id
+        expected_options["headers"]["X-Target-Project-Id"] = target_project_id
+        catalog = base64.b64encode(target_service_catalog.encode('utf-8'))
+        expected_options["headers"]["X-Target-Service-Catalog"] = catalog
 
         requests.get.assert_called_with(
             EXPECTED_URL,

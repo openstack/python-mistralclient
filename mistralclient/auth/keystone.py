@@ -13,6 +13,9 @@
 #    limitations under the License.
 
 from mistralclient import auth
+from oslo_serialization import jsonutils
+
+import mistralclient.api.httpclient as api
 
 
 def _get_keystone_client(auth_url):
@@ -68,6 +71,8 @@ class KeystoneAuthHandler(auth.AuthHandler):
                 'Only user name or user id should be set'
             )
 
+        auth_response = {}
+
         if auth_url:
             keystone_client = _get_keystone_client(auth_url)
 
@@ -85,9 +90,23 @@ class KeystoneAuthHandler(auth.AuthHandler):
             )
 
             keystone.authenticate()
-            auth_token = keystone.auth_token
-            user_id = keystone.user_id
-            project_id = keystone.project_id
+
+            auth_response.update({
+                api.AUTH_TOKEN: keystone.auth_token,
+                api.PROJECT_ID: keystone.project_id,
+                api.USER_ID: keystone.user_id,
+            })
+
+            if not mistral_url:
+                try:
+                    mistral_url = keystone.service_catalog.url_for(
+                        service_type=service_type,
+                        endpoint_type=endpoint_type
+                    )
+                except Exception:
+                    mistral_url = None
+
+            auth_response['mistral_url'] = mistral_url
 
         if target_auth_url:
             target_keystone_client = _get_keystone_client(target_auth_url)
@@ -107,20 +126,14 @@ class KeystoneAuthHandler(auth.AuthHandler):
 
             target_keystone.authenticate()
 
-        if not mistral_url:
-            try:
-                mistral_url = keystone.service_catalog.url_for(
-                    service_type=service_type,
-                    endpoint_type=endpoint_type
+            auth_response.update({
+                api.TARGET_AUTH_TOKEN: target_keystone.auth_token,
+                api.TARGET_PROJECT_ID: target_keystone.project_id,
+                api.TARGET_USER_ID: target_keystone.user_id,
+                api.TARGET_AUTH_URI: target_auth_url,
+                api.TARGET_SERVICE_CATALOG: jsonutils.dumps(
+                    target_keystone.auth_ref
                 )
-            except Exception:
-                mistral_url = None
+            })
 
-        return {
-            'mistral_url': mistral_url,
-            'token': auth_token,
-            'project_id': target_project_id if target_auth_url else project_id,
-            'user_id': target_user_id if target_auth_url else user_id,
-            'target_auth_token': target_auth_token,
-            'target_auth_url': target_auth_url
-        }
+        return auth_response
