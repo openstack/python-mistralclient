@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Mistral documentation build configuration file, created by
 # sphinx-quickstart on Fri Nov  1 02:06:28 2013.
 #
