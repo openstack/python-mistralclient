@@ -133,7 +133,8 @@ class BaseClientTests(base.BaseTestCase):
         client.client(
             target_username='tmistral',
             target_project_name='tmistralp',
-            target_auth_url=AUTH_HTTP_URL_v3
+            target_auth_url=AUTH_HTTP_URL_v3,
+            target_region_name='tregion'
         )
 
         self.assertTrue(http_client_mock.called)
@@ -148,6 +149,7 @@ class BaseClientTests(base.BaseTestCase):
             'target_auth_url': AUTH_HTTP_URL_v3,
             'target_project_name': 'tmistralp',
             'target_username': 'tmistral',
+            'target_region_name': 'tregion',
             'target_service_catalog': '"{}"'
         }
 

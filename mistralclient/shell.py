@@ -316,6 +316,14 @@ class MistralShell(app.App):
         )
 
         parser.add_argument(
+            '--os-region-name',
+            action='store',
+            dest='region_name',
+            default=env('OS_REGION_NAME'),
+            help='Region name (Env: OS_REGION_NAME)'
+        )
+
+        parser.add_argument(
             '--insecure',
             action='store_true',
             dest='insecure',
@@ -415,6 +423,15 @@ class MistralShell(app.App):
         )
 
         parser.add_argument(
+            '--os-target-region-name',
+            action='store',
+            dest='target_region_name',
+            default=env('OS_TARGET_REGION_NAME'),
+            help='Region name for target cloud'
+                 '(Env: OS_TARGET_REGION_NAME)'
+        )
+
+        parser.add_argument(
             '--target_insecure',
             action='store_true',
             dest='target_insecure',
@@ -499,6 +516,7 @@ class MistralShell(app.App):
             target_project_id=self.options.target_tenant_id,
             target_auth_token=self.options.target_token,
             target_cacert=self.options.target_cacert,
+            target_region_name=self.options.target_region_name,
             target_insecure=self.options.target_insecure,
             **kwargs
         )

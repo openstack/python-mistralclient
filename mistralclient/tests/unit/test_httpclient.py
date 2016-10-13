@@ -139,6 +139,7 @@ class HTTPClientTest(base.BaseTestCase):
         target_user_id = 'target_user'
         target_project_id = 'target_project'
         target_service_catalog = 'this should be there'
+        target_region = 'target region name'
 
         target_client = httpclient.HTTPClient(
             API_BASE_URL,
@@ -149,7 +150,8 @@ class HTTPClientTest(base.BaseTestCase):
             target_auth_token=target_auth_token,
             target_project_id=target_project_id,
             target_user_id=target_user_id,
-            target_service_catalog=target_service_catalog
+            target_service_catalog=target_service_catalog,
+            target_region_name=target_region
         )
 
         target_client.get(API_URL)
@@ -159,6 +161,7 @@ class HTTPClientTest(base.BaseTestCase):
         expected_options["headers"]["X-Target-Auth-Token"] = target_auth_token
         expected_options["headers"]["X-Target-User-Id"] = target_user_id
         expected_options["headers"]["X-Target-Project-Id"] = target_project_id
+        expected_options["headers"]["X-Target-Region-Name"] = target_region
         catalog = base64.b64encode(target_service_catalog.encode('utf-8'))
         expected_options["headers"]["X-Target-Service-Catalog"] = catalog
 

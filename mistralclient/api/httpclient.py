@@ -34,6 +34,7 @@ TARGET_AUTH_URI = 'target_auth_url'
 TARGET_PROJECT_ID = 'target_project_id'
 TARGET_USER_ID = 'target_user_id'
 TARGET_SERVICE_CATALOG = 'target_service_catalog'
+TARGET_REGION_NAME = 'target_region_name'
 USER_ID = 'user_id'
 
 osprofiler_web = importutils.try_import("osprofiler.web")
@@ -61,6 +62,7 @@ class HTTPClient(object):
         self.target_user_id = kwargs.get(TARGET_USER_ID)
         self.target_project_id = kwargs.get(TARGET_PROJECT_ID)
         self.target_service_catalog = kwargs.get(TARGET_SERVICE_CATALOG)
+        self.target_region_name = kwargs.get(TARGET_REGION_NAME)
         self.cacert = kwargs.get(CACERT)
         self.insecure = kwargs.get(INSECURE, False)
         self.ssl_options = {}
@@ -147,6 +149,9 @@ class HTTPClient(object):
 
         if self.target_user_id:
             headers['X-Target-User-Id'] = self.target_user_id
+
+        if self.target_region_name:
+            headers['X-Target-Region-Name'] = self.target_region_name
 
         if self.target_service_catalog:
             headers['X-Target-Service-Catalog'] = base64.b64encode(

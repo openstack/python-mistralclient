@@ -50,6 +50,7 @@ class KeystoneAuthHandler(auth.AuthHandler):
         project_name = req.get('project_name')
         project_id = req.get('project_id')
         cacert = req.get('cacert')
+        region_name = req.get('region_name')
         insecure = req.get('insecure', False)
         target_username = req.get('target_username')
         target_api_key = req.get('target_api_key')
@@ -59,6 +60,7 @@ class KeystoneAuthHandler(auth.AuthHandler):
         target_auth_token = req.get('target_auth_token')
         target_user_id = req.get('target_user_id')
         target_cacert = req.get('target_cacert')
+        target_region_name = req.get('target_region_name')
         target_insecure = req.get('target_insecure')
 
         if project_name and project_id:
@@ -101,7 +103,8 @@ class KeystoneAuthHandler(auth.AuthHandler):
                 try:
                     mistral_url = keystone.service_catalog.url_for(
                         service_type=service_type,
-                        endpoint_type=endpoint_type
+                        endpoint_type=endpoint_type,
+                        region_name=region_name
                     )
                 except Exception:
                     mistral_url = None
@@ -121,7 +124,8 @@ class KeystoneAuthHandler(auth.AuthHandler):
                 auth_url=target_auth_url,
                 endpoint=target_auth_url,
                 cacert=target_cacert,
-                insecure=target_insecure
+                insecure=target_insecure,
+                region_name=target_region_name
             )
 
             target_keystone.authenticate()
