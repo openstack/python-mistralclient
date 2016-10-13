@@ -35,6 +35,7 @@ TARGET_AUTH_TOKEN = 'target_auth_token'
 TARGET_AUTH_URI = 'target_auth_url'
 TARGET_PROJECT_ID = 'target_project_id'
 TARGET_USER_ID = 'target_user_id'
+TARGET_INSECURE = 'target_insecure'
 TARGET_SERVICE_CATALOG = 'target_service_catalog'
 TARGET_REGION_NAME = 'target_region_name'
 TARGET_USER_DOMAIN_NAME = 'target_user_domain_name'
@@ -70,6 +71,7 @@ class HTTPClient(object):
         self.target_project_id = kwargs.get(TARGET_PROJECT_ID)
         self.target_service_catalog = kwargs.get(TARGET_SERVICE_CATALOG)
         self.target_region_name = kwargs.get(TARGET_REGION_NAME)
+        self.target_insecure = kwargs.get(TARGET_INSECURE)
         self.target_user_domain_name = kwargs.get(TARGET_USER_DOMAIN_NAME)
         self.target_project_domain_name = kwargs.get(
             TARGET_PROJECT_DOMAIN_NAME
@@ -157,6 +159,9 @@ class HTTPClient(object):
 
         if self.target_user_id:
             headers['X-Target-User-Id'] = self.target_user_id
+
+        if self.target_insecure:
+            headers['X-Target-Insecure'] = self.target_insecure
 
         if self.target_region_name:
             headers['X-Target-Region-Name'] = self.target_region_name
