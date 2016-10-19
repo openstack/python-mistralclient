@@ -24,6 +24,7 @@
 # serve to show the default.
 
 # import sys, os
+import pbr.version
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -39,7 +40,7 @@
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'oslosphinx',
-    'reno.sphinxtest',
+    'reno.sphinxext',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -61,8 +62,8 @@ copyright = u'2016, Mistral developers'
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
-#
-from mistralclient.version import version_info as mistralclient_version
+
+mistralclient_version = pbr.version.VersionInfo('python-mistralclient')
 # The short X.Y version.
 version = mistralclient_version.canonical_version_string()
 # The full version, including alpha/beta/rc tags.
