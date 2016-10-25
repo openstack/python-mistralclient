@@ -8,10 +8,3 @@ Contents
    :maxdepth: 2
 
    unreleased
-
-
-   Indices and tables
-   ==================
-
-   * :ref:`genindex`
-     * :ref:`search`
