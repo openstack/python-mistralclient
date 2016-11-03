@@ -50,10 +50,10 @@ def validate_args(fn, *args, **kwargs):
     :param arg: the positional arguments supplied
     :param kwargs: the keyword arguments supplied
     """
-    argspec = inspect.getargspec(fn)
+    argspec = list(inspect.signature(fn).parameters.keys())
 
-    num_defaults = len(argspec.defaults or [])
-    required_args = argspec.args[:len(argspec.args) - num_defaults]
+    num_defaults = len(argspec or [])
+    required_args = argspec[:len(argspec) - num_defaults]
 
     def isbound(method):
         return getattr(method, '__self__', None) is not None
