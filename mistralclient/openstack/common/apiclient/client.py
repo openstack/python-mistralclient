@@ -37,7 +37,7 @@ import requests
 
 from mistralclient.openstack.common.apiclient import exceptions
 from mistralclient.openstack.common.gettextutils import _
-from mistralclient.openstack.common import importutils
+from oslo_utils import importutils
 
 
 _logger = logging.getLogger(__name__)
