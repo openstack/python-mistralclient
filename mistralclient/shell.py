@@ -16,8 +16,14 @@
 Command-line interface to the Mistral APIs
 """
 
+import argparse
 import logging
+import os
 import sys
+
+from cliff import app
+from cliff import commandmanager
+from osc_lib.command import command
 
 from mistralclient.api import client
 from mistralclient.auth import auth_types
@@ -32,13 +38,18 @@ import mistralclient.commands.v2.tasks
 import mistralclient.commands.v2.workbooks
 import mistralclient.commands.v2.workflows
 from mistralclient import exceptions as exe
-from mistralclient.openstack.common import cliutils as c
 
-from cliff import app
-from cliff import commandmanager
-from osc_lib.command import command
 
-import argparse
+def env(*args, **kwargs):
+    """Returns the first environment variable set.
+
+    If all are empty, defaults to '' or keyword arg `default`.
+    """
+    for arg in args:
+        value = os.environ.get(arg)
+        if value:
+            return value
+    return kwargs.get('default', '')
 
 
 class OpenStackHelpFormatter(argparse.HelpFormatter):
@@ -199,7 +210,7 @@ class MistralShell(app.App):
             '--os-mistral-url',
             action='store',
             dest='mistral_url',
-            default=c.env('OS_MISTRAL_URL'),
+            default=env('OS_MISTRAL_URL'),
             help='Mistral API host (Env: OS_MISTRAL_URL)'
         )
 
@@ -207,7 +218,7 @@ class MistralShell(app.App):
             '--os-mistral-version',
             action='store',
             dest='mistral_version',
-            default=c.env('OS_MISTRAL_VERSION', default='v2'),
+            default=env('OS_MISTRAL_VERSION', default='v2'),
             help='Mistral API version (default = v2) (Env: '
                  'OS_MISTRAL_VERSION)'
         )
@@ -216,7 +227,7 @@ class MistralShell(app.App):
             '--os-mistral-service-type',
             action='store',
             dest='service_type',
-            default=c.env('OS_MISTRAL_SERVICE_TYPE', default='workflowv2'),
+            default=env('OS_MISTRAL_SERVICE_TYPE', default='workflowv2'),
             help='Mistral service-type (should be the same name as in '
                  'keystone-endpoint) (default = workflowv2) (Env: '
                  'OS_MISTRAL_SERVICE_TYPE)'
@@ -226,7 +237,7 @@ class MistralShell(app.App):
             '--os-mistral-endpoint-type',
             action='store',
             dest='endpoint_type',
-            default=c.env('OS_MISTRAL_ENDPOINT_TYPE', default='publicURL'),
+            default=env('OS_MISTRAL_ENDPOINT_TYPE', default='publicURL'),
             help='Mistral endpoint-type (should be the same name as in '
                  'keystone-endpoint) (default = publicURL) (Env: '
                  'OS_MISTRAL_ENDPOINT_TYPE)'
@@ -236,7 +247,7 @@ class MistralShell(app.App):
             '--os-username',
             action='store',
             dest='username',
-            default=c.env('OS_USERNAME'),
+            default=env('OS_USERNAME'),
             help='Authentication username (Env: OS_USERNAME)'
         )
 
@@ -244,7 +255,7 @@ class MistralShell(app.App):
             '--os-password',
             action='store',
             dest='password',
-            default=c.env('OS_PASSWORD'),
+            default=env('OS_PASSWORD'),
             help='Authentication password (Env: OS_PASSWORD)'
         )
 
@@ -252,7 +263,7 @@ class MistralShell(app.App):
             '--os-tenant-id',
             action='store',
             dest='tenant_id',
-            default=c.env('OS_TENANT_ID'),
+            default=env('OS_TENANT_ID'),
             help='Authentication tenant identifier (Env: OS_TENANT_ID)'
         )
 
@@ -260,7 +271,7 @@ class MistralShell(app.App):
             '--os-tenant-name',
             action='store',
             dest='tenant_name',
-            default=c.env('OS_TENANT_NAME', 'Default'),
+            default=env('OS_TENANT_NAME', 'Default'),
             help='Authentication tenant name (Env: OS_TENANT_NAME)'
         )
 
@@ -268,7 +279,7 @@ class MistralShell(app.App):
             '--os-auth-token',
             action='store',
             dest='token',
-            default=c.env('OS_AUTH_TOKEN'),
+            default=env('OS_AUTH_TOKEN'),
             help='Authentication token (Env: OS_AUTH_TOKEN)'
         )
 
@@ -276,7 +287,7 @@ class MistralShell(app.App):
             '--os-auth-url',
             action='store',
             dest='auth_url',
-            default=c.env('OS_AUTH_URL'),
+            default=env('OS_AUTH_URL'),
             help='Authentication URL (Env: OS_AUTH_URL)'
         )
 
@@ -284,7 +295,7 @@ class MistralShell(app.App):
             '--os-cert',
             action='store',
             dest='os_cert',
-            default=c.env('OS_CERT'),
+            default=env('OS_CERT'),
             help='Client Certificate (Env: OS_CERT)'
         )
 
@@ -292,7 +303,7 @@ class MistralShell(app.App):
             '--os-key',
             action='store',
             dest='os_key',
-            default=c.env('OS_KEY'),
+            default=env('OS_KEY'),
             help='Client Key (Env: OS_KEY)'
         )
 
@@ -300,7 +311,7 @@ class MistralShell(app.App):
             '--os-cacert',
             action='store',
             dest='os_cacert',
-            default=c.env('OS_CACERT'),
+            default=env('OS_CACERT'),
             help='Authentication CA Certificate (Env: OS_CACERT)'
         )
 
@@ -308,7 +319,7 @@ class MistralShell(app.App):
             '--insecure',
             action='store_true',
             dest='insecure',
-            default=c.env('MISTRALCLIENT_INSECURE', default=False),
+            default=env('MISTRALCLIENT_INSECURE', default=False),
             help='Disables SSL/TLS certificate verification '
                  '(Env: MISTRALCLIENT_INSECURE)'
         )
@@ -317,7 +328,7 @@ class MistralShell(app.App):
             '--auth-type',
             action='store',
             dest='auth_type',
-            default=c.env('MISTRAL_AUTH_TYPE', default='keystone'),
+            default=env('MISTRAL_AUTH_TYPE', default='keystone'),
             help='Authentication type. Valid options are: %s.'
                  ' (Env: MISTRAL_AUTH_TYPE)' % auth_types.ALL
         )
@@ -326,7 +337,7 @@ class MistralShell(app.App):
             '--openid-client-id',
             action='store',
             dest='client_id',
-            default=c.env('OPENID_CLIENT_ID'),
+            default=env('OPENID_CLIENT_ID'),
             help='Client ID (according to OpenID Connect).'
                  ' (Env: OPENID_CLIENT_ID)'
         )
@@ -335,7 +346,7 @@ class MistralShell(app.App):
             '--openid-client-secret',
             action='store',
             dest='client_secret',
-            default=c.env('OPENID_CLIENT_SECRET'),
+            default=env('OPENID_CLIENT_SECRET'),
             help='Client secret (according to OpenID Connect)'
                  ' (Env: OPENID_CLIENT_SECRET)'
         )
@@ -344,7 +355,7 @@ class MistralShell(app.App):
             '--os-target-username',
             action='store',
             dest='target_username',
-            default=c.env('OS_TARGET_USERNAME', default='admin'),
+            default=env('OS_TARGET_USERNAME', default='admin'),
             help='Authentication username for target cloud'
                  ' (Env: OS_TARGET_USERNAME)'
         )
@@ -353,7 +364,7 @@ class MistralShell(app.App):
             '--os-target-password',
             action='store',
             dest='target_password',
-            default=c.env('OS_TARGET_PASSWORD'),
+            default=env('OS_TARGET_PASSWORD'),
             help='Authentication password for target cloud'
                  ' (Env: OS_TARGET_PASSWORD)'
         )
@@ -362,7 +373,7 @@ class MistralShell(app.App):
             '--os-target-tenant-id',
             action='store',
             dest='target_tenant_id',
-            default=c.env('OS_TARGET_TENANT_ID'),
+            default=env('OS_TARGET_TENANT_ID'),
             help='Authentication tenant identifier for target cloud'
                  ' (Env: OS_TARGET_TENANT_ID)'
         )
@@ -371,7 +382,7 @@ class MistralShell(app.App):
             '--os-target-tenant-name',
             action='store',
             dest='target_tenant_name',
-            default=c.env('OS_TARGET_TENANT_NAME', 'Default'),
+            default=env('OS_TARGET_TENANT_NAME', 'Default'),
             help='Authentication tenant name for target cloud'
                  ' (Env: OS_TARGET_TENANT_NAME)'
         )
@@ -380,7 +391,7 @@ class MistralShell(app.App):
             '--os-target-auth-token',
             action='store',
             dest='target_token',
-            default=c.env('OS_TARGET_AUTH_TOKEN'),
+            default=env('OS_TARGET_AUTH_TOKEN'),
             help='Authentication token for target cloud'
                  ' (Env: OS_TARGET_AUTH_TOKEN)'
         )
@@ -389,7 +400,7 @@ class MistralShell(app.App):
             '--os-target-auth-url',
             action='store',
             dest='target_auth_url',
-            default=c.env('OS_TARGET_AUTH_URL'),
+            default=env('OS_TARGET_AUTH_URL'),
             help='Authentication URL for target cloud'
                  ' (Env: OS_TARGET_AUTH_URL)'
         )
@@ -398,7 +409,7 @@ class MistralShell(app.App):
             '--os-target_cacert',
             action='store',
             dest='target_cacert',
-            default=c.env('OS_TARGET_CACERT'),
+            default=env('OS_TARGET_CACERT'),
             help='Authentication CA Certificate for target cloud'
                  ' (Env: OS_TARGET_CACERT)'
         )
@@ -407,7 +418,7 @@ class MistralShell(app.App):
             '--target_insecure',
             action='store_true',
             dest='target_insecure',
-            default=c.env('TARGET_MISTRALCLIENT_INSECURE', default=False),
+            default=env('TARGET_MISTRALCLIENT_INSECURE', default=False),
             help='Disables SSL/TLS certificate verification for target cloud '
                  '(Env: TARGET_MISTRALCLIENT_INSECURE)'
         )
