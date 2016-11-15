@@ -41,8 +41,6 @@ ChangeLog
 .idea
 .DS_Store
 etc/mistral.conf
-tools/lintstack.head.py
-tools/pylint_exceptions
 
 # Files created by releasenotes build
 releasenotes/build
