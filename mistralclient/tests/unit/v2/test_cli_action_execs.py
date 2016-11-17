@@ -1,5 +1,5 @@
-# Copyright 2014 Mirantis, Inc.
-# All Rights Reserved
+# Copyright 2014 - Mirantis, Inc.
+# Copyright 2016 - Brocade Communications Systems, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -14,6 +14,7 @@
 #    under the License.
 #
 
+import copy
 import json
 
 import mock
@@ -120,18 +121,45 @@ class TestCLIActionExecutions(base.BaseCommandTest):
         )
 
     def test_update(self):
-        self.client.action_executions.update.return_value = ACTION_EX
+        states = ['IDLE', 'RUNNING', 'SUCCESS', 'ERROR', 'CANCELLED']
 
-        result = self.call(
-            action_ex_cmd.Update,
-            app_args=['id', '--state', 'ERROR']
-        )
+        for state in states:
+            action_ex_dict = copy.deepcopy(ACTION_EX_DICT)
+            action_ex_dict['state'] = state
+            action_ex_dict['state_info'] = 'testing update'
+            action_ex_obj = action_ex.ActionExecution(mock, action_ex_dict)
+            self.client.action_executions.update.return_value = action_ex_obj
 
-        self.assertEqual(
-            ('123', 'some', 'thing', 'task1', '1-2-3-4', 'RUNNING',
-             'RUNNING somehow.', True, '1', '1'),
-            result[1]
-        )
+            result = self.call(
+                action_ex_cmd.Update,
+                app_args=['id', '--state', state]
+            )
+
+            expected_result = (
+                action_ex_dict['id'],
+                action_ex_dict['name'],
+                action_ex_dict['workflow_name'],
+                action_ex_dict['task_name'],
+                action_ex_dict['task_execution_id'],
+                action_ex_dict['state'],
+                action_ex_dict['state_info'],
+                action_ex_dict['accepted'],
+                action_ex_dict['created_at'],
+                action_ex_dict['updated_at']
+            )
+
+            self.assertEqual(expected_result, result[1])
+
+    def test_update_invalid_state(self):
+        states = ['PAUSED', 'WAITING', 'DELAYED']
+
+        for state in states:
+            self.assertRaises(
+                SystemExit,
+                self.call,
+                action_ex_cmd.Update,
+                app_args=['id', '--state', state]
+            )
 
     def test_list(self):
         self.client.action_executions.list.return_value = [ACTION_EX]
