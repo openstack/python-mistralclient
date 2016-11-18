@@ -16,9 +16,9 @@
 import json
 import os
 import tempfile
-import uuid
 
 import mock
+from oslo_utils import uuidutils
 from oslotest import base
 import osprofiler.profiler
 
@@ -37,9 +37,9 @@ class BaseClientTests(base.BaseTestCase):
     @staticmethod
     def setup_keystone_mock(keystone_client_mock):
         keystone_client_instance = keystone_client_mock.return_value
-        keystone_client_instance.auth_token = str(uuid.uuid4())
-        keystone_client_instance.project_id = str(uuid.uuid4())
-        keystone_client_instance.user_id = str(uuid.uuid4())
+        keystone_client_instance.auth_token = uuidutils.generate_uuid()
+        keystone_client_instance.project_id = uuidutils.generate_uuid()
+        keystone_client_instance.user_id = uuidutils.generate_uuid()
         keystone_client_instance.auth_ref = str(json.dumps({}))
         return keystone_client_instance
 

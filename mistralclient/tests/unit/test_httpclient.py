@@ -14,12 +14,12 @@
 
 import base64
 import copy
-import uuid
 
 import mock
 from oslotest import base
 import requests
 
+from oslo_utils import uuidutils
 from osprofiler import _utils as osprofiler_utils
 import osprofiler.profiler
 
@@ -30,11 +30,11 @@ API_URL = '/executions'
 
 EXPECTED_URL = API_BASE_URL + API_URL
 
-AUTH_TOKEN = str(uuid.uuid4())
-PROJECT_ID = str(uuid.uuid4())
-USER_ID = str(uuid.uuid4())
+AUTH_TOKEN = uuidutils.generate_uuid()
+PROJECT_ID = uuidutils.generate_uuid()
+USER_ID = uuidutils.generate_uuid()
 PROFILER_HMAC_KEY = 'SECRET_HMAC_KEY'
-PROFILER_TRACE_ID = str(uuid.uuid4())
+PROFILER_TRACE_ID = uuidutils.generate_uuid()
 
 EXPECTED_AUTH_HEADERS = {
     'x-auth-token': AUTH_TOKEN,
@@ -134,8 +134,8 @@ class HTTPClientTest(base.BaseTestCase):
         mock.MagicMock(return_value=FakeResponse('get', EXPECTED_URL, 200))
     )
     def test_get_request_options_with_headers_for_get(self):
-        target_auth_url = str(uuid.uuid4())
-        target_auth_token = str(uuid.uuid4())
+        target_auth_url = uuidutils.generate_uuid()
+        target_auth_token = uuidutils.generate_uuid()
         target_user_id = 'target_user'
         target_project_id = 'target_project'
         target_service_catalog = 'this should be there'
