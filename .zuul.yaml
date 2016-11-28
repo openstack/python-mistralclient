@@ -22,10 +22,17 @@
       - release-notes-jobs
     check:
       jobs:
-        - python-mistralclient-devstack-dsvm
+        - python-mistralclient-devstack-dsvm:
+            irrelevant-files: &doc-irrelevant-files
+              - ^.*\.rst$
+              - ^.*\.yaml$
         - openstack-tox-cover:
             voting: false
+            irrelevant-files: *doc-irrelevant-files
+        - openstackclient-check-plugins:
+            irrelevant-files: *doc-irrelevant-files
     gate:
       jobs:
-        - python-mistralclient-devstack-dsvm
+        - python-mistralclient-devstack-dsvm:
+            irrelevant-files: *doc-irrelevant-files
 
