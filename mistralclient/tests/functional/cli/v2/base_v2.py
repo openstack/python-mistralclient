@@ -51,6 +51,10 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
             'functionaltests/resources/v2/wf_delay_v2.yaml', os.getcwd()
         )
 
+        cls.wf_wrapping_wf = os.path.relpath(
+            'functionaltests/resources/v2/wf_wrapping_wf_v2.yaml', os.getcwd()
+        )
+
         cls.act_def = os.path.relpath(
             'functionaltests/resources/v2/action_v2.yaml', os.getcwd()
         )

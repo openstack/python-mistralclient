@@ -501,14 +501,38 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
 
         self.assertEqual([], ex_output)
 
+    def test_executions_list_with_task(self):
+        wrapping_wf = self.workflow_create(self.wf_wrapping_wf)
+        decoy = self.execution_create(wrapping_wf[-1]['Name'])
+        wrapping_wf_ex = self.execution_create(wrapping_wf[-1]['Name'])
+
+        wrapping_wf_ex_id = self.get_field_value(wrapping_wf_ex, 'ID')
+
+        self.assertIsNot(wrapping_wf_ex_id, self.get_field_value(decoy, 'ID'))
+
+        tasks = self.mistral_admin(
+            'task-list',
+            params=wrapping_wf_ex_id
+        )
+
+        wrapping_task_id = tasks[-1]['ID']
+
+        wf_execs = self.mistral_cli(
+            True,
+            'execution-list',
+            params="--task {}".format(wrapping_task_id)
+        )
+
+        self.assertEqual(1, len(wf_execs))
+        wf_exec = wf_execs[0]
+        self.assertEqual(wrapping_task_id, wf_exec['Task Execution ID'])
+
     def test_executions_list_with_pagination(self):
-        wf_ex1 = self.mistral_admin(
-            'execution-create',
+        wf_ex1 = self.execution_create(
             params='{0} -d "a"'.format(self.direct_wf['Name'])
         )
 
-        wf_ex2 = self.mistral_admin(
-            'execution-create',
+        wf_ex2 = self.execution_create(
             params='{0} -d "b"'.format(self.direct_wf['Name'])
         )
 

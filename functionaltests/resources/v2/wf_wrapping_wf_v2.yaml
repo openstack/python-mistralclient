@@ -1,0 +1,8 @@
+---
+version: '2.0'
+
+wrapping_wf:
+  type: direct
+  tasks:
+    hello:
+      workflow: wf

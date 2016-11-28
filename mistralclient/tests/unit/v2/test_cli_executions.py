@@ -232,7 +232,8 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
             limit=None,
             marker='',
             sort_dirs='asc',
-            sort_keys='created_at'
+            sort_keys='created_at',
+            task=None
         )
 
         self.call(
@@ -249,7 +250,8 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
             limit=5,
             marker='abc',
             sort_dirs='id, Workflow',
-            sort_keys='desc'
+            sort_keys='desc',
+            task=None
         )
 
     def test_get(self):
