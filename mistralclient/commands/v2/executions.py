@@ -170,18 +170,12 @@ class Create(command.ShowOne):
 
     def take_action(self, parsed_args):
         if parsed_args.workflow_input:
-            try:
-                wf_input = json.loads(parsed_args.workflow_input)
-            except Exception:
-                wf_input = json.load(open(parsed_args.workflow_input))
+            wf_input = utils.load_json(parsed_args.workflow_input)
         else:
             wf_input = {}
 
         if parsed_args.params:
-            try:
-                params = json.loads(parsed_args.params)
-            except Exception:
-                params = json.load(open(parsed_args.params))
+            params = utils.load_json(parsed_args.params)
         else:
             params = {}
 
