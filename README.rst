@@ -47,7 +47,8 @@ and in the case that you are authenticating against keystone over https:
 
     export OS_CACERT=<path_to_ca_cert>
 
->***Note:** In client, we can use both Keystone auth versions - v2.0 and v3. But server supports only v3.*
+.. note:: In client, we can use both Keystone auth versions - v2.0 and v3. But
+          server supports only v3.*
 
 To make sure Mistral client works, type:
 
