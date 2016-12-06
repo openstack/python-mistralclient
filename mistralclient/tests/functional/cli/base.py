@@ -53,11 +53,16 @@ def credentials(group='admin'):
         tenant_name = tenant_name or config.get(group, 'tenant')
         auth_url = auth_url or config.get('auth', 'uri')
 
+    # TODO(ddeja): Default value of OS_AUTH_URL is to provide url to v3 API.
+    # Since tempest openstack client doesn't properly handle it, we switch
+    # it back to v2. Once tempest openstack starts to use v3, this can be
+    # deleted.
+    # https://github.com/openstack/tempest/blob/master/tempest/lib/cli/base.py#L363
     return {
         'username': username,
         'password': password,
         'tenant_name': tenant_name,
-        'auth_url': auth_url
+        'auth_url': auth_url.replace('v3', 'v2.0')
     }
 
 
