@@ -69,8 +69,12 @@ class ExecutionManager(base.ResourceManager):
 
         return self._update('/executions/%s' % id, data)
 
-    def list(self, marker='', limit=None, sort_keys='', sort_dirs=''):
+    def list(self, task=None, marker='', limit=None, sort_keys='',
+             sort_dirs=''):
         qparams = {}
+
+        if task:
+            qparams['task_execution_id'] = task
 
         if marker:
             qparams['marker'] = marker

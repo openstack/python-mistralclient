@@ -76,7 +76,12 @@ class List(base.MistralLister):
 
     def get_parser(self, parsed_args):
         parser = super(List, self).get_parser(parsed_args)
-
+        parser.add_argument(
+            '--task',
+            nargs='?',
+            help="Parent task execution ID associated with workflow "
+                 "execution list.",
+        )
         parser.add_argument(
             '--marker',
             type=str,
@@ -113,6 +118,7 @@ class List(base.MistralLister):
     def _get_resources(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
         return mistral_client.executions.list(
+            task=parsed_args.task,
             marker=parsed_args.marker,
             limit=parsed_args.limit,
             sort_keys=parsed_args.sort_keys,
