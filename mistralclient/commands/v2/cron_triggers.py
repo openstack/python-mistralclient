@@ -14,8 +14,6 @@
 #    under the License.
 #
 
-import json
-
 from osc_lib.command import command
 
 from mistralclient.commands.v2 import base
@@ -140,10 +138,7 @@ class Create(command.ShowOne):
     @staticmethod
     def _get_file_content_or_dict(string):
         if string:
-            try:
-                return json.loads(string)
-            except Exception:
-                return json.load(open(string))
+            return utils.load_json(string)
         else:
             return {}
 

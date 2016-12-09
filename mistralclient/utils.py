@@ -79,3 +79,11 @@ def get_contents_if_file(contents_or_file_name):
         return request.urlopen(definition_url).read().decode('utf8')
     except Exception:
         return contents_or_file_name
+
+
+def load_json(input_string):
+    try:
+        with open(input_string) as fh:
+            return json.load(fh)
+    except IOError:
+        return json.loads(input_string)

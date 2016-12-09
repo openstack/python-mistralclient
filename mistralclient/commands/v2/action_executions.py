@@ -151,10 +151,7 @@ class Create(command.ShowOne):
         action_input = None
 
         if parsed_args.input:
-            try:
-                action_input = json.loads(parsed_args.input)
-            except Exception:
-                action_input = json.load(open(parsed_args.input))
+            action_input = utils.load_json(parsed_args.input)
 
         mistral_client = self.app.client_manager.workflow_engine
         action_ex = mistral_client.action_executions.create(
@@ -240,10 +237,7 @@ class Update(command.ShowOne):
     def take_action(self, parsed_args):
         output = None
         if parsed_args.output:
-            try:
-                output = json.loads(parsed_args.output)
-            except Exception:
-                output = json.load(open(parsed_args.output))
+            output = utils.load_json(parsed_args.output)
 
         mistral_client = self.app.client_manager.workflow_engine
         execution = mistral_client.action_executions.update(

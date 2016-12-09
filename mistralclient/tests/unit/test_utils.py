@@ -55,3 +55,11 @@ class UtilityTest(base.BaseTestCase):
             file_path = os.path.abspath(f.name)
 
             self.assertDictEqual(ENV_DICT, utils.load_file(file_path))
+
+    def test_load_json(self):
+        with tempfile.NamedTemporaryFile() as f:
+            f.write(ENV_STR.encode('utf-8'))
+            f.flush()
+            self.assertDictEqual(ENV_DICT, utils.load_json(f.name))
+
+        self.assertDictEqual(ENV_DICT, utils.load_json(ENV_STR))
