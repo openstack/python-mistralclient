@@ -263,16 +263,19 @@ class MistralShell(app.App):
             '--os-tenant-id',
             action='store',
             dest='tenant_id',
-            default=env('OS_TENANT_ID'),
-            help='Authentication tenant identifier (Env: OS_TENANT_ID)'
+            default=env('OS_TENANT_ID', 'OS_PROJECT_ID'),
+            help='Authentication tenant identifier (Env: OS_TENANT_ID'
+                 ' or OS_PROJECT_ID)'
         )
 
         parser.add_argument(
             '--os-tenant-name',
             action='store',
             dest='tenant_name',
-            default=env('OS_TENANT_NAME', 'Default'),
-            help='Authentication tenant name (Env: OS_TENANT_NAME)'
+            default=env('OS_TENANT_NAME', 'OS_PROJECT_NAME',
+                        default='Default'),
+            help='Authentication tenant name (Env: OS_TENANT_NAME'
+                 ' or OS_PROJECT_NAME)'
         )
 
         parser.add_argument(
