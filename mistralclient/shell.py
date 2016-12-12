@@ -284,6 +284,24 @@ class MistralShell(app.App):
         )
 
         parser.add_argument(
+            '--os-project-domain-name',
+            action='store',
+            dest='project_domain_name',
+            default=env('OS_PROJECT_DOMAIN_NAME', default='Default'),
+            help='Authentication project domain name'
+                 ' (Env: OS_PROJECT_DOMAIN_NAME)'
+        )
+
+        parser.add_argument(
+            '--os-user-domain-name',
+            action='store',
+            dest='user_domain_name',
+            default=env('OS_USER_DOMAIN_NAME', default='Default'),
+            help='Authentication user domain name'
+                 ' (Env: OS_USER_DOMAIN_NAME)'
+        )
+
+        parser.add_argument(
             '--os-auth-url',
             action='store',
             dest='auth_url',
@@ -490,7 +508,9 @@ class MistralShell(app.App):
 
         kwargs = {
             'cert': self.options.os_cert,
-            'key': self.options.os_key
+            'key': self.options.os_key,
+            'user_domain_name': self.options.user_domain_name,
+            'project_domain_name': self.options.project_domain_name
         }
 
         self.client = client.client(

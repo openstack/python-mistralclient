@@ -62,6 +62,8 @@ class KeystoneAuthHandler(auth.AuthHandler):
         target_cacert = req.get('target_cacert')
         target_region_name = req.get('target_region_name')
         target_insecure = req.get('target_insecure')
+        user_domain_name = req.get('user_domain_name', 'Default')
+        project_domain_name = req.get('project_domain_name', 'Default')
 
         if project_name and project_id:
             raise RuntimeError(
@@ -88,7 +90,9 @@ class KeystoneAuthHandler(auth.AuthHandler):
                 auth_url=auth_url,
                 endpoint=auth_url,
                 cacert=cacert,
-                insecure=insecure
+                insecure=insecure,
+                user_domain_name=user_domain_name,
+                project_domain_name=project_domain_name
             )
 
             keystone.authenticate()
