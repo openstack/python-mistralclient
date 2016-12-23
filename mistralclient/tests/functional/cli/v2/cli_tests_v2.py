@@ -578,7 +578,7 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
             elif ex['ID'] == wf_ex2_id:
                 wf_ex2_index = idx
 
-        self.assertTrue(wf_ex1_index < wf_ex2_index)
+        self.assertLess(wf_ex1_index, wf_ex2_index)
 
         wf_execs = self.mistral_cli(
             True,
@@ -598,7 +598,7 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
             elif ex['ID'] == wf_ex2_id:
                 wf_ex2_index = idx
 
-        self.assertTrue(wf_ex1_index > wf_ex2_index)
+        self.assertGreater(wf_ex1_index, wf_ex2_index)
 
 
 class CronTriggerCLITests(base_v2.MistralClientTestBase):
