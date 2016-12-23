@@ -14,8 +14,11 @@
 #    limitations under the License.
 
 import json
+import six
 
 from mistralclient.api import base
+
+urlparse = six.moves.urllib.parse
 
 
 class Task(base.Resource):
@@ -25,13 +28,36 @@ class Task(base.Resource):
 class TaskManager(base.ResourceManager):
     resource_class = Task
 
-    def list(self, workflow_execution_id=None):
+    def list(self, workflow_execution_id=None, marker='', limit=None,
+             sort_keys='', sort_dirs='', **filters):
         url = '/tasks'
 
         if workflow_execution_id:
             url = '/executions/%s/tasks' % workflow_execution_id
 
-        return self._list(url, response_key='tasks')
+        url += '%s'
+
+        qparams = {}
+
+        if marker:
+            qparams['marker'] = marker
+
+        if limit:
+            qparams['limit'] = limit
+
+        if sort_keys:
+            qparams['sort_keys'] = sort_keys
+
+        if sort_dirs:
+            qparams['sort_dirs'] = sort_dirs
+
+        for name, val in filters.items():
+            qparams[name] = val
+
+        query_string = ("?%s" % urlparse.urlencode(list(qparams.items()))
+                        if qparams else "")
+
+        return self._list(url % query_string, response_key='tasks')
 
     def get(self, id):
         self._ensure_not_empty(id=id)

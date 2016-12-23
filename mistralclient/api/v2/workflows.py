@@ -72,7 +72,8 @@ class WorkflowManager(base.ResourceManager):
         return [self.resource_class(self, resource_data)
                 for resource_data in base.extract_json(resp, 'workflows')]
 
-    def list(self, marker='', limit=None, sort_keys='', sort_dirs=''):
+    def list(self, marker='', limit=None, sort_keys='', sort_dirs='',
+             **filters):
         qparams = {}
 
         if marker:
@@ -86,6 +87,9 @@ class WorkflowManager(base.ResourceManager):
 
         if sort_dirs:
             qparams['sort_dirs'] = sort_dirs
+
+        for name, val in filters.items():
+            qparams[name] = val
 
         query_string = ("?%s" % urlparse.urlencode(list(qparams.items()))
                         if qparams else "")
