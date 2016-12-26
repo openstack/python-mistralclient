@@ -112,17 +112,25 @@ class List(base.MistralLister):
             default='asc',
             nargs='?'
         )
+        parser.add_argument(
+            '--filter',
+            dest='filters',
+            action='append',
+            help='Filters. Can be repeated.'
+        )
 
         return parser
 
     def _get_resources(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
+
         return mistral_client.executions.list(
             task=parsed_args.task,
             marker=parsed_args.marker,
             limit=parsed_args.limit,
             sort_keys=parsed_args.sort_keys,
-            sort_dirs=parsed_args.sort_dirs
+            sort_dirs=parsed_args.sort_dirs,
+            **base.get_filters(parsed_args)
         )
 
 
