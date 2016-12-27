@@ -417,6 +417,34 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
         self.assertEqual('False', wf_valid)
         self.assertNotEqual('None', wf_error)
 
+    def test_workflow_list_with_filter(self):
+        workflows = self.parser.listing(self.mistral('workflow-list'))
+
+        self.assertTableStruct(
+            workflows,
+            ['ID', 'Name', 'Tags', 'Input', 'Created at', 'Updated at']
+        )
+
+        # We know that we have more than one workflow by default.
+        self.assertGreater(len(workflows), 1)
+
+        # Now let's provide a filter to the list command.
+        workflows = self.parser.listing(
+            self.mistral(
+                'workflow-list',
+                params='--filter name=std.create_instance'
+            )
+        )
+
+        self.assertTableStruct(
+            workflows,
+            ['ID', 'Name', 'Tags', 'Input', 'Created at', 'Updated at']
+        )
+
+        self.assertEqual(1, len(workflows))
+
+        self.assertIn('std.create_instance', workflows[0]['Name'])
+
 
 class ExecutionCLITests(base_v2.MistralClientTestBase):
     """Test suite checks commands to work with executions."""
@@ -636,6 +664,46 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
 
         self.assertTrue(wf_ex1_index > wf_ex2_index)
 
+    def test_execution_list_with_filter(self):
+        wf_ex1 = self.execution_create(
+            params='{0} -d "a"'.format(self.direct_wf['Name'])
+        )
+
+        wf_ex1_id = self.get_field_value(wf_ex1, 'ID')
+
+        self.execution_create(
+            params='{0} -d "b"'.format(self.direct_wf['Name'])
+        )
+
+        # Request a list without filters.
+        wf_execs = self.mistral_cli(True, 'execution-list')
+
+        self.assertTableStruct(
+            wf_execs,
+            ['ID', 'Workflow name', 'Workflow ID', 'State', 'Created at',
+             'Updated at']
+        )
+
+        self.assertEqual(2, len(wf_execs))
+
+        # Now let's provide a filter.
+        wf_execs = self.mistral_cli(
+            True,
+            'execution-list',
+            params='--filter description=a'
+        )
+
+        self.assertTableStruct(
+            wf_execs,
+            ['ID', 'Workflow name', 'Workflow ID', 'State', 'Created at',
+             'Updated at']
+        )
+
+        self.assertEqual(1, len(wf_execs))
+
+        self.assertEqual(wf_ex1_id, wf_execs[0]['ID'])
+        self.assertEqual('a', wf_execs[0]['Description'])
+
 
 class CronTriggerCLITests(base_v2.MistralClientTestBase):
     """Test suite checks commands to work with cron-triggers."""
@@ -748,6 +816,42 @@ class TaskCLITests(base_v2.MistralClientTestBase):
 
         self.assertEqual(created_task_id, fetched_task_id)
         self.assertEqual(wf_ex_id, task_execution_id)
+
+    def test_task_list_with_filter(self):
+        wf_exec = self.execution_create(
+            "%s input task_name" % self.reverse_wf['Name']
+        )
+
+        exec_id = self.get_field_value(wf_exec, 'ID')
+
+        self.assertTrue(self.wait_execution_success(exec_id))
+
+        # Request task executions without filters.
+        tasks = self.parser.listing(self.mistral('task-list'))
+
+        self.assertTableStruct(
+            tasks,
+            ['ID', 'Name', 'Workflow name', 'Execution ID', 'State']
+        )
+
+        self.assertEqual(2, len(tasks))
+
+        # Now let's provide a filter.
+        tasks = self.parser.listing(
+            self.mistral(
+                'task-list',
+                params='--filter name=goodbye'
+            )
+        )
+
+        self.assertTableStruct(
+            tasks,
+            ['ID', 'Name', 'Workflow name', 'Execution ID', 'State']
+        )
+
+        self.assertEqual(1, len(tasks))
+
+        self.assertEqual('goodbye', tasks[0]['Name'])
 
 
 class ActionCLITests(base_v2.MistralClientTestBase):
@@ -930,6 +1034,50 @@ class ActionCLITests(base_v2.MistralClientTestBase):
         fetched_action_name = self.get_field_value(fetched, 'Name')
 
         self.assertEqual(action_name, fetched_action_name)
+
+    def test_action_list_with_filter(self):
+        actions = self.parser.listing(self.mistral('action-list'))
+
+        self.assertTableStruct(
+            actions,
+            ['Name', 'Is system', 'Input', 'Description',
+             'Tags', 'Created at', 'Updated at']
+        )
+
+        # NOTE(rakhmerov): This length isn't really a number of actions.
+        # The problem is that one entity in a table may be on more than
+        # one lines depending on their data. For example, for the
+        # workflows that we use in our tests it works fine and parsing
+        # algorithm is able to parse entities correctly even if they are
+        # on multiple lines, but for actions it doesn't. So the only thing
+        # we can do is only check if unfiltered table is bigger than
+        # filtered.
+        # We need to think how to improve it.
+        unfiltered_len = len(actions)
+
+        self.assertGreater(unfiltered_len, 0)
+
+        # Now let's provide a filter to the list command.
+        actions = self.parser.listing(
+            self.mistral(
+                'action-list',
+                params='--filter name=in:std.echo,std.noop'
+            )
+        )
+
+        self.assertTableStruct(
+            actions,
+            ['Name', 'Is system', 'Input', 'Description',
+             'Tags', 'Created at', 'Updated at']
+        )
+
+        self.assertGreater(unfiltered_len, len(actions))
+
+        action_names = [a['Name'] for a in actions]
+
+        self.assertIn('std.echo', action_names)
+        self.assertIn('std.noop', action_names)
+        self.assertNotIn('std.ssh', action_names)
 
 
 class EnvironmentCLITests(base_v2.MistralClientTestBase):

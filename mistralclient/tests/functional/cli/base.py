@@ -92,12 +92,22 @@ class MistralCLIAuth(base.ClientTestBase):
 
         if 'WITHOUT_AUTH' in os.environ:
             return base.execute(
-                'mistral %s' % mistral_url_op, action, flags, params,
-                fail_ok, merge_stderr=False, cli_dir='')
+                'mistral %s' % mistral_url_op,
+                action,
+                flags,
+                params,
+                fail_ok,
+                merge_stderr=False,
+                cli_dir=''
+            )
         else:
             return self.clients.cmd_with_auth(
-                'mistral %s' % mistral_url_op, action, flags, params,
-                fail_ok)
+                'mistral %s' % mistral_url_op,
+                action,
+                flags,
+                params,
+                fail_ok
+            )
 
     def get_project_id(self, project='admin'):
         project_name = credentials(project)['tenant_name']
