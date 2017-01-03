@@ -70,7 +70,7 @@ class ExecutionManager(base.ResourceManager):
         return self._update('/executions/%s' % id, data)
 
     def list(self, task=None, marker='', limit=None, sort_keys='',
-             sort_dirs=''):
+             sort_dirs='', **filters):
         qparams = {}
 
         if task:
@@ -87,6 +87,9 @@ class ExecutionManager(base.ResourceManager):
 
         if sort_dirs:
             qparams['sort_dirs'] = sort_dirs
+
+        for name, val in filters.items():
+            qparams[name] = val
 
         query_string = ("?%s" % urlparse.urlencode(list(qparams.items()))
                         if qparams else "")
