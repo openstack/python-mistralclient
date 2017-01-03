@@ -72,7 +72,14 @@ class List(base.MistralLister):
         parser.add_argument(
             'workflow_execution',
             nargs='?',
-            help='Workflow execution ID associated with list of Tasks.')
+            help='Workflow execution ID associated with list of Tasks.'
+        )
+        parser.add_argument(
+            '--filter',
+            dest='filters',
+            action='append',
+            help='Filters. Can be repeated.'
+        )
 
         return parser
 
@@ -82,7 +89,10 @@ class List(base.MistralLister):
     def _get_resources(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
 
-        return mistral_client.tasks.list(parsed_args.workflow_execution)
+        return mistral_client.tasks.list(
+            parsed_args.workflow_execution,
+            **base.get_filters(parsed_args)
+        )
 
 
 class Get(command.ShowOne):

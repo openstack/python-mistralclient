@@ -65,9 +65,24 @@ class List(base.MistralLister):
     def _get_format_function(self):
         return format_list
 
+    def get_parser(self, prog_name):
+        parser = super(List, self).get_parser(prog_name)
+
+        parser.add_argument(
+            '--filter',
+            dest='filters',
+            action='append',
+            help='Filters. Can be repeated.'
+        )
+
+        return parser
+
     def _get_resources(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-        return mistral_client.workflows.list()
+
+        return mistral_client.workflows.list(
+            **base.get_filters(parsed_args)
+        )
 
 
 class Get(show.ShowOne):

@@ -65,3 +65,18 @@ def wrap(string, width=25):
         return textwrap.fill(string, width)
     else:
         return string
+
+
+def get_filters(parsed_args):
+    filters = {}
+
+    if parsed_args.filters:
+        for f in parsed_args.filters:
+            arr = f.split('=')
+
+            if len(arr) != 2:
+                raise ValueError('Invalid filter: %s' % f)
+
+            filters[arr[0]] = arr[1]
+
+    return filters
