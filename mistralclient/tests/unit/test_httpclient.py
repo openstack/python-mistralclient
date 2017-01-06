@@ -59,7 +59,6 @@ class HTTPClientTest(base.BaseClientTest):
 
     def setUp(self):
         super(HTTPClientTest, self).setUp()
-        osprofiler.profiler.init(None)
         self.client = httpclient.HTTPClient(
             API_BASE_URL,
             auth_token=AUTH_TOKEN,

@@ -1,0 +1,8 @@
+[run]
+source = mistralclient
+omit =
+ .tox/*
+ mistralclient/tests/*
+
+[report]
+ignore_errors = True

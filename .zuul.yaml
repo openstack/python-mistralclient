@@ -35,6 +35,13 @@
       - release-notes-jobs-python3
     check:
       jobs:
+        - openstack-tox-cover:
+            voting: false
+            irrelevant-files:
+              - ^.zuul.yaml$
+              - ^.*\.rst$
+              - ^doc/.*$
+              - ^releasenotes/.*$
         - python-mistralclient-functional-devstack
         # TripleO jobs that deploy Mistral.
         # Note we don't use a project-template here, so it's easier
