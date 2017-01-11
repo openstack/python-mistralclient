@@ -11,14 +11,19 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-# import sys, os
-
+import os
 import pbr.version
+import subprocess
+import sys
+
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-# sys.path.insert(0, os.path.abspath('.'))
-
+sys.path.insert(0, os.path.abspath('../../'))
+sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath('./'))
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -26,7 +31,13 @@ import pbr.version
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = []
+extensions = [
+    'sphinx.ext.autodoc',
+    'oslosphinx',
+]
+
+if not on_rtd:
+    extensions.append('oslosphinx')
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -42,7 +53,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Mistral Client'
-copyright = u'2013, OpenStack Foundation'
+copyright = u'2016, Mistral Contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -71,15 +82,15 @@ exclude_patterns = []
 # default_role = None
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
-# add_function_parentheses = True
+add_function_parentheses = True
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
-# add_module_names = True
+add_module_names = True
 
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.
-# show_authors = False
+show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -92,19 +103,32 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+if on_rtd:
+    html_theme_path = ['.']
+    html_theme = 'sphinx_rtd_theme'
+
+# Output file base name for HTML help builder.
+htmlhelp_basename = '%sdoc' % project
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 # html_theme_options = {}
 
+# If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
+# using the given strftime format.
+# html_last_updated_fmt = '%b %d, %Y'
+git_cmd = ["git", "log", "--pretty=format:'%ad, commit %h'", "--date=local",
+           "-n1"]
+html_last_updated_fmt = subprocess.Popen(
+    git_cmd, stdout=subprocess.PIPE).communicate()[0]
+
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-# html_title = None
+html_title = 'MistralClient'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 # html_short_title = None
@@ -132,7 +156,16 @@ html_theme = 'default'
 # html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-# html_sidebars = {}
+html_sidebars = {
+    'index': [
+        'sidebarlinks.html', 'localtoc.html', 'searchbox.html',
+        'sourcelink.html'
+    ],
+    '**': [
+        'localtoc.html', 'relations.html',
+        'searchbox.html', 'sourcelink.html'
+    ]
+}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -216,7 +249,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'mistral_client', u'Mistral Client Documentation',
-     [u'OpenStack Foundation'], 1)
+     [u'Mistral Contributors'], 1)
 ]
 
 # If true, show URL addresses after external links.
