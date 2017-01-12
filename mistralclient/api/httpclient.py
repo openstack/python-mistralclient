@@ -29,13 +29,16 @@ CERT_FILE = 'cert'
 CERT_KEY = 'key'
 INSECURE = 'insecure'
 PROJECT_ID = 'project_id'
+USER_ID = 'user_id'
+
 TARGET_AUTH_TOKEN = 'target_auth_token'
 TARGET_AUTH_URI = 'target_auth_url'
 TARGET_PROJECT_ID = 'target_project_id'
 TARGET_USER_ID = 'target_user_id'
 TARGET_SERVICE_CATALOG = 'target_service_catalog'
 TARGET_REGION_NAME = 'target_region_name'
-USER_ID = 'user_id'
+TARGET_USER_DOMAIN_NAME = 'target_user_domain_name'
+TARGET_PROJECT_DOMAIN_NAME = 'target_project_domain_name'
 
 osprofiler_web = importutils.try_import("osprofiler.web")
 
@@ -57,15 +60,20 @@ class HTTPClient(object):
         self.auth_token = kwargs.get(AUTH_TOKEN)
         self.project_id = kwargs.get(PROJECT_ID)
         self.user_id = kwargs.get(USER_ID)
+        self.cacert = kwargs.get(CACERT)
+        self.insecure = kwargs.get(INSECURE, False)
+        self.ssl_options = {}
+
         self.target_auth_token = kwargs.get(TARGET_AUTH_TOKEN)
         self.target_auth_uri = kwargs.get(TARGET_AUTH_URI)
         self.target_user_id = kwargs.get(TARGET_USER_ID)
         self.target_project_id = kwargs.get(TARGET_PROJECT_ID)
         self.target_service_catalog = kwargs.get(TARGET_SERVICE_CATALOG)
         self.target_region_name = kwargs.get(TARGET_REGION_NAME)
-        self.cacert = kwargs.get(CACERT)
-        self.insecure = kwargs.get(INSECURE, False)
-        self.ssl_options = {}
+        self.target_user_domain_name = kwargs.get(TARGET_USER_DOMAIN_NAME)
+        self.target_project_domain_name = kwargs.get(
+            TARGET_PROJECT_DOMAIN_NAME
+        )
 
         if self.base_url.startswith('https'):
             if self.cacert and not os.path.exists(self.cacert):
@@ -152,6 +160,14 @@ class HTTPClient(object):
 
         if self.target_region_name:
             headers['X-Target-Region-Name'] = self.target_region_name
+
+        if self.target_user_domain_name:
+            headers['X-Target-User-Domain-Name'] = self.target_user_domain_name
+
+        if self.target_project_domain_name:
+            h_name = 'X-Target-Project-Domain-Name'
+
+            headers[h_name] = self.target_project_domain_name
 
         if self.target_service_catalog:
             headers['X-Target-Service-Catalog'] = base64.b64encode(

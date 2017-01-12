@@ -450,6 +450,24 @@ class MistralShell(app.App):
         )
 
         parser.add_argument(
+            '--os-target-user-domain-name',
+            action='store',
+            dest='target_user_domain_name',
+            default=env('OS_TARGET_USER_DOMAIN_NAME'),
+            help='User domain name for target cloud'
+                 '(Env: OS_TARGET_USER_DOMAIN_NAME)'
+        )
+
+        parser.add_argument(
+            '--os-target-project-domain-name',
+            action='store',
+            dest='target_project_domain_name',
+            default=env('OS_TARGET_PROJECT_DOMAIN_NAME'),
+            help='Project domain name for target cloud'
+                 '(Env: OS_TARGET_PROJECT_DOMAIN_NAME)'
+        )
+
+        parser.add_argument(
             '--target_insecure',
             action='store_true',
             dest='target_insecure',
