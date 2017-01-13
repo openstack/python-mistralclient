@@ -10,6 +10,7 @@
 dist
 build
 .venv
+.eggs
 eggs
 parts
 bin
