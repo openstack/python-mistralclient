@@ -39,31 +39,38 @@ class KeystoneAuthHandler(auth.AuthHandler):
         if not isinstance(req, dict):
             raise TypeError('The input "req" is not typeof dict.')
 
-        auth_url = req.get('auth_url')
         mistral_url = req.get('mistral_url')
         endpoint_type = req.get('endpoint_type', 'publicURL')
         service_type = req.get('service_type', 'workflow2')
+
+        auth_url = req.get('auth_url')
         username = req.get('username')
         user_id = req.get('user_id')
         api_key = req.get('api_key')
         auth_token = req.get('auth_token')
         project_name = req.get('project_name')
         project_id = req.get('project_id')
-        cacert = req.get('cacert')
         region_name = req.get('region_name')
-        insecure = req.get('insecure', False)
-        target_username = req.get('target_username')
-        target_api_key = req.get('target_api_key')
-        target_project_name = req.get('target_project_name')
-        target_auth_url = req.get('target_auth_url')
-        target_project_id = req.get('target_project_id')
-        target_auth_token = req.get('target_auth_token')
-        target_user_id = req.get('target_user_id')
-        target_cacert = req.get('target_cacert')
-        target_region_name = req.get('target_region_name')
-        target_insecure = req.get('target_insecure')
         user_domain_name = req.get('user_domain_name', 'Default')
         project_domain_name = req.get('project_domain_name', 'Default')
+        cacert = req.get('cacert')
+        insecure = req.get('insecure', False)
+
+        target_auth_url = req.get('target_auth_url')
+        target_username = req.get('target_username')
+        target_user_id = req.get('target_user_id')
+        target_api_key = req.get('target_api_key')
+        target_auth_token = req.get('target_auth_token')
+        target_project_name = req.get('target_project_name')
+        target_project_id = req.get('target_project_id')
+        target_region_name = req.get('target_region_name')
+        target_user_domain_name = req.get('target_user_domain_name', 'Default')
+        target_project_domain_name = req.get(
+            'target_project_domain_name',
+            'Default'
+        )
+        target_cacert = req.get('target_cacert')
+        target_insecure = req.get('target_insecure')
 
         if project_name and project_id:
             raise RuntimeError(
@@ -129,7 +136,9 @@ class KeystoneAuthHandler(auth.AuthHandler):
                 endpoint=target_auth_url,
                 cacert=target_cacert,
                 insecure=target_insecure,
-                region_name=target_region_name
+                region_name=target_region_name,
+                user_domain_name=target_user_domain_name,
+                project_domain_name=target_project_domain_name
             )
 
             target_keystone.authenticate()

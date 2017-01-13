@@ -140,6 +140,8 @@ class HTTPClientTest(base.BaseTestCase):
         target_project_id = 'target_project'
         target_service_catalog = 'this should be there'
         target_region = 'target region name'
+        target_user_domain_name = 'target user domain name'
+        target_project_domain_name = 'target project domain name'
 
         target_client = httpclient.HTTPClient(
             API_BASE_URL,
@@ -151,24 +153,29 @@ class HTTPClientTest(base.BaseTestCase):
             target_project_id=target_project_id,
             target_user_id=target_user_id,
             target_service_catalog=target_service_catalog,
-            target_region_name=target_region
+            target_region_name=target_region,
+            target_user_domain_name=target_user_domain_name,
+            target_project_domain_name=target_project_domain_name
         )
 
         target_client.get(API_URL)
 
         expected_options = copy.deepcopy(EXPECTED_REQ_OPTIONS)
-        expected_options["headers"]["X-Target-Auth-Uri"] = target_auth_url
-        expected_options["headers"]["X-Target-Auth-Token"] = target_auth_token
-        expected_options["headers"]["X-Target-User-Id"] = target_user_id
-        expected_options["headers"]["X-Target-Project-Id"] = target_project_id
-        expected_options["headers"]["X-Target-Region-Name"] = target_region
-        catalog = base64.b64encode(target_service_catalog.encode('utf-8'))
-        expected_options["headers"]["X-Target-Service-Catalog"] = catalog
 
-        requests.get.assert_called_with(
-            EXPECTED_URL,
-            **expected_options
-        )
+        headers = expected_options["headers"]
+
+        headers["X-Target-Auth-Uri"] = target_auth_url
+        headers["X-Target-Auth-Token"] = target_auth_token
+        headers["X-Target-User-Id"] = target_user_id
+        headers["X-Target-Project-Id"] = target_project_id
+        headers["X-Target-Region-Name"] = target_region
+        headers["X-Target-User-Domain-Name"] = target_user_domain_name
+        headers["X-Target-Project-Domain-Name"] = target_project_domain_name
+
+        catalog = base64.b64encode(target_service_catalog.encode('utf-8'))
+        headers["X-Target-Service-Catalog"] = catalog
+
+        requests.get.assert_called_with(EXPECTED_URL, **expected_options)
 
     @mock.patch.object(
         requests,
