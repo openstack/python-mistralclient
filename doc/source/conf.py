@@ -14,6 +14,7 @@ import os
 import pbr.version
 import subprocess
 import sys
+import warnings
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
@@ -119,8 +120,12 @@ htmlhelp_basename = '%sdoc' % project
 # html_last_updated_fmt = '%b %d, %Y'
 git_cmd = ["git", "log", "--pretty=format:'%ad, commit %h'", "--date=local",
            "-n1"]
-html_last_updated_fmt = subprocess.Popen(
-    git_cmd, stdout=subprocess.PIPE).communicate()[0]
+try:
+    html_last_updated_fmt = subprocess.Popen(
+        git_cmd, stdout=subprocess.PIPE).communicate()[0]
+except Exception:
+    warnings.warn('Cannot get last updated time from git repository. '
+                  'Not setting "html_last_updated_fmt".')
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
