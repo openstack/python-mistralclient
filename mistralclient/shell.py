@@ -356,7 +356,7 @@ class MistralShell(app.App):
             dest='auth_type',
             default=env('MISTRAL_AUTH_TYPE', default='keystone'),
             help='Authentication type. Valid options are: %s.'
-                 ' (Env: MISTRAL_AUTH_TYPE)' % auth_types.ALL
+                 ' (Env: MISTRAL_AUTH_TYPE)' % ', '.join(auth_types.ALL)
         )
 
         parser.add_argument(
