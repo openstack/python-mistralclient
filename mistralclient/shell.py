@@ -269,6 +269,16 @@ class MistralShell(app.App):
         )
 
         parser.add_argument(
+            '--os-project-id',
+            action='store',
+            dest='project_id',
+            default=env('OS_TENANT_ID', 'OS_PROJECT_ID'),
+            help='Authentication project identifier (Env: OS_TENANT_ID'
+                 ' or OS_PROJECT_ID), will use tenant_id if both tenant_id'
+                 ' and project_id are set'
+        )
+
+        parser.add_argument(
             '--os-tenant-name',
             action='store',
             dest='tenant_name',
@@ -276,6 +286,17 @@ class MistralShell(app.App):
                         default='Default'),
             help='Authentication tenant name (Env: OS_TENANT_NAME'
                  ' or OS_PROJECT_NAME)'
+        )
+
+        parser.add_argument(
+            '--os-project-name',
+            action='store',
+            dest='project_name',
+            default=env('OS_TENANT_NAME', 'OS_PROJECT_NAME',
+                        default='Default'),
+            help='Authentication project name (Env: OS_TENANT_NAME'
+                 ' or OS_PROJECT_NAME), will use tenant_name if both'
+                 ' tenant_name and project_name are set'
         )
 
         parser.add_argument(
@@ -538,9 +559,9 @@ class MistralShell(app.App):
             mistral_url=self.options.mistral_url,
             username=self.options.username,
             api_key=self.options.password,
-            project_name=self.options.tenant_name,
+            project_name=self.options.tenant_name or self.options.project_name,
             auth_url=self.options.auth_url,
-            project_id=self.options.tenant_id,
+            project_id=self.options.tenant_id or self.options.project_id,
             endpoint_type=self.options.endpoint_type,
             service_type=self.options.service_type,
             auth_token=self.options.token,
