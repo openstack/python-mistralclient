@@ -96,7 +96,7 @@ show_authors = False
 pygments_style = 'sphinx'
 
 # A list of ignored prefixes for module index sorting.
-# modindex_common_prefix = []
+modindex_common_prefix = ['mistralclient.']
 
 
 # -- Options for HTML output -------------------------------------------------
