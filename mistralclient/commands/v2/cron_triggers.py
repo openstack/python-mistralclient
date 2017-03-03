@@ -13,6 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
+import datetime
+import time
 
 from osc_lib.command import command
 
@@ -123,7 +125,9 @@ class Create(command.ShowOne):
         parser.add_argument(
             '--first-time',
             type=str,
-            help="Date and time of the first execution",
+            default=None,
+            help=("Date and time of the first execution. Time is treated as "
+                  "local time unless --utc is also specified"),
             metavar='<YYYY-MM-DD HH:MM>'
         )
         parser.add_argument(
@@ -131,6 +135,11 @@ class Create(command.ShowOne):
             type=int,
             help="Number of wanted executions",
             metavar='<integer>'
+        )
+        parser.add_argument(
+            '--utc',
+            action='store_true',
+            help="All times specified should be treated as UTC"
         )
 
         return parser
@@ -142,11 +151,30 @@ class Create(command.ShowOne):
         else:
             return {}
 
+    @staticmethod
+    def _convert_time_string_to_utc(time_string):
+        datetime_format = '%Y-%m-%d %H:%M'
+
+        the_time = time_string
+        if the_time:
+            the_time = datetime.datetime.strptime(
+                the_time, datetime_format)
+            the_second = time.mktime(the_time.timetuple())
+            the_utc_time = datetime.datetime.utcfromtimestamp(the_second)
+            the_time = the_utc_time.strftime(datetime_format)
+
+        return the_time
+
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
 
         wf_input = self._get_file_content_or_dict(parsed_args.workflow_input)
         wf_params = self._get_file_content_or_dict(parsed_args.params)
+
+        first_time = parsed_args.first_time
+        if not parsed_args.utc:
+            first_time = self._convert_time_string_to_utc(
+                parsed_args.first_time)
 
         trigger = mistral_client.cron_triggers.create(
             parsed_args.name,
@@ -154,7 +182,7 @@ class Create(command.ShowOne):
             wf_input,
             wf_params,
             parsed_args.pattern,
-            parsed_args.first_time,
+            first_time,
             parsed_args.count
         )
 

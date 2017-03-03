@@ -14,7 +14,9 @@
 #    under the License.
 #
 
+import datetime
 import mock
+import time
 
 from mistralclient.api.v2 import cron_triggers
 from mistralclient.commands.v2 import cron_triggers as cron_triggers_cmd
@@ -37,10 +39,36 @@ TRIGGER = cron_triggers.CronTrigger(mock, TRIGGER_DICT)
 
 
 class TestCLITriggersV2(base.BaseCommandTest):
+    @mock.patch('mistralclient.commands.v2.cron_triggers.Create.'
+                '_convert_time_string_to_utc')
     @mock.patch('argparse.open', create=True)
-    def test_create(self, mock_open):
+    def test_create(self, mock_open, mock_convert):
         self.client.cron_triggers.create.return_value = TRIGGER
         mock_open.return_value = mock.MagicMock(spec=open)
+
+        result = self.call(
+            cron_triggers_cmd.Create,
+            app_args=['my_trigger', 'flow1', '--pattern', '* * * * *',
+                      '--params', '{}', '--count', '5', '--first-time',
+                      '4242-12-20 13:37', '--utc']
+        )
+
+        mock_convert.assert_not_called()
+        self.assertEqual(
+            (
+                'my_trigger', 'flow1', {}, '* * * * *',
+                '4242-12-20 13:37', 5, '1', '1'
+            ),
+            result[1]
+        )
+
+    @mock.patch('mistralclient.commands.v2.cron_triggers.Create.'
+                '_convert_time_string_to_utc')
+    @mock.patch('argparse.open', create=True)
+    def test_create_no_utc(self, mock_open, mock_convert):
+        self.client.cron_triggers.create.return_value = TRIGGER
+        mock_open.return_value = mock.MagicMock(spec=open)
+        mock_convert.return_value = '4242-12-20 18:37'
 
         result = self.call(
             cron_triggers_cmd.Create,
@@ -49,6 +77,9 @@ class TestCLITriggersV2(base.BaseCommandTest):
                       '4242-12-20 13:37']
         )
 
+        mock_convert.assert_called_once_with('4242-12-20 13:37')
+        self.client.cron_triggers.create.assert_called_once_with(
+            'my_trigger', 'flow1', {}, {}, '* * * * *', '4242-12-20 18:37', 5)
         self.assertEqual(
             (
                 'my_trigger', 'flow1', {}, '* * * * *',
@@ -56,6 +87,20 @@ class TestCLITriggersV2(base.BaseCommandTest):
             ),
             result[1]
         )
+
+    def test_convert_time_string_to_utc(self):
+        cmd = cron_triggers_cmd.Create(self.app, None)
+
+        utc_value = cmd._convert_time_string_to_utc('4242-12-20 13:37')
+
+        is_dst = time.daylight and time.localtime().tm_isdst > 0
+        utc_offset = - (time.altzone if is_dst else time.timezone)
+
+        expected_time = (datetime.datetime(
+            4242, 12, 20, 13, 37) - datetime.timedelta(
+            0, utc_offset)).strftime('%Y-%m-%d %H:%M')
+
+        self.assertEqual(expected_time, utc_value)
 
     def test_list(self):
         self.client.cron_triggers.list.return_value = [TRIGGER]
