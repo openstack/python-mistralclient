@@ -43,7 +43,7 @@ class BaseClientTests(base.BaseTestCase):
         keystone_client_instance.auth_ref = str(json.dumps({}))
         return keystone_client_instance
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
+    @mock.patch('keystoneclient.client.Client')
     def test_mistral_url_from_catalog_v2(self, keystone_client_mock):
         keystone_client_instance = self.setup_keystone_mock(
             keystone_client_mock
@@ -64,7 +64,7 @@ class BaseClientTests(base.BaseTestCase):
             mistralclient.actions.http_client.base_url
         )
 
-    @mock.patch('keystoneclient.v3.client.Client')
+    @mock.patch('keystoneclient.client.Client')
     def test_mistral_url_from_catalog(self, keystone_client_mock):
         keystone_client_instance = self.setup_keystone_mock(
             keystone_client_mock
@@ -86,7 +86,7 @@ class BaseClientTests(base.BaseTestCase):
             mistralclient.actions.http_client.base_url
         )
 
-    @mock.patch('keystoneclient.v3.client.Client')
+    @mock.patch('keystoneclient.client.Client')
     @mock.patch('mistralclient.api.httpclient.HTTPClient')
     def test_mistral_url_default(self, http_client_mock, keystone_client_mock):
         keystone_client_instance = self.setup_keystone_mock(
@@ -116,7 +116,7 @@ class BaseClientTests(base.BaseTestCase):
             keystone_client_instance.user_id, kwargs['user_id']
         )
 
-    @mock.patch('keystoneclient.v3.client.Client')
+    @mock.patch('keystoneclient.client.Client')
     @mock.patch('mistralclient.api.httpclient.HTTPClient')
     def test_target_parameters_processed(
         self,
@@ -156,7 +156,7 @@ class BaseClientTests(base.BaseTestCase):
         for key in expected_values:
             self.assertEqual(expected_values[key], kwargs[key])
 
-    @mock.patch('keystoneclient.v3.client.Client')
+    @mock.patch('keystoneclient.client.Client')
     @mock.patch('mistralclient.api.httpclient.HTTPClient')
     def test_mistral_url_https_insecure(self, http_client_mock,
                                         keystone_client_mock):
@@ -181,7 +181,7 @@ class BaseClientTests(base.BaseTestCase):
         self.assertEqual(http_client_mock.call_args[0], expected_args)
         self.assertEqual(http_client_mock.call_args[1]['insecure'], True)
 
-    @mock.patch('keystoneclient.v3.client.Client')
+    @mock.patch('keystoneclient.client.Client')
     @mock.patch('mistralclient.api.httpclient.HTTPClient')
     def test_mistral_url_https_secure(self, http_client_mock,
                                       keystone_client_mock):
@@ -212,7 +212,7 @@ class BaseClientTests(base.BaseTestCase):
         self.assertEqual(http_client_mock.call_args[0], expected_args)
         self.assertEqual(http_client_mock.call_args[1]['cacert'], cert_path)
 
-    @mock.patch('keystoneclient.v3.client.Client')
+    @mock.patch('keystoneclient.client.Client')
     def test_mistral_url_https_bad_cacert(self, keystone_client_mock):
         keystone_client_instance = self.setup_keystone_mock(  # noqa
             keystone_client_mock
@@ -230,7 +230,7 @@ class BaseClientTests(base.BaseTestCase):
         )
 
     @mock.patch('logging.Logger.warning')
-    @mock.patch('keystoneclient.v3.client.Client')
+    @mock.patch('keystoneclient.client.Client')
     def test_mistral_url_https_bad_insecure(self, keystone_client_mock,
                                             log_warning_mock):
         fd, path = tempfile.mkstemp(suffix='.pem')
@@ -254,7 +254,7 @@ class BaseClientTests(base.BaseTestCase):
 
         self.assertTrue(log_warning_mock.called)
 
-    @mock.patch('keystoneclient.v3.client.Client')
+    @mock.patch('keystoneclient.client.Client')
     @mock.patch('mistralclient.api.httpclient.HTTPClient')
     def test_mistral_profile_enabled(self, http_client_mock,
                                      keystone_client_mock):

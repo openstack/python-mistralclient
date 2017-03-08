@@ -12,19 +12,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from keystoneclient import client
 from mistralclient import auth
 from oslo_serialization import jsonutils
 
 import mistralclient.api.httpclient as api
-
-
-def _get_keystone_client(auth_url):
-    if 'v2.0' in auth_url:
-        from keystoneclient.v2_0 import client
-    else:
-        from keystoneclient.v3 import client
-
-    return client
 
 
 class KeystoneAuthHandler(auth.AuthHandler):
@@ -85,9 +77,7 @@ class KeystoneAuthHandler(auth.AuthHandler):
         auth_response = {}
 
         if auth_url:
-            keystone_client = _get_keystone_client(auth_url)
-
-            keystone = keystone_client.Client(
+            keystone = client.Client(
                 username=username,
                 user_id=user_id,
                 password=api_key,
@@ -95,7 +85,6 @@ class KeystoneAuthHandler(auth.AuthHandler):
                 tenant_id=project_id,
                 tenant_name=project_name,
                 auth_url=auth_url,
-                endpoint=auth_url,
                 cacert=cacert,
                 insecure=insecure,
                 user_domain_name=user_domain_name,
@@ -123,17 +112,16 @@ class KeystoneAuthHandler(auth.AuthHandler):
             auth_response['mistral_url'] = mistral_url
 
         if target_auth_url:
-            target_keystone_client = _get_keystone_client(target_auth_url)
-
-            target_keystone = target_keystone_client.Client(
+            target_keystone = client.Client(
                 username=target_username,
                 user_id=target_user_id,
                 password=target_api_key,
                 token=target_auth_token,
                 tenant_id=target_project_id,
                 tenant_name=target_project_name,
+                project_id=target_project_id,
+                project_name=target_project_name,
                 auth_url=target_auth_url,
-                endpoint=target_auth_url,
                 cacert=target_cacert,
                 insecure=target_insecure,
                 region_name=target_region_name,
