@@ -21,7 +21,7 @@ import mistralclient.api.httpclient as api
 
 class KeystoneAuthHandler(auth.AuthHandler):
 
-    def authenticate(self, req):
+    def authenticate(self, req, session=None):
         """Performs authentication via Keystone.
 
         :param req: Request dict containing list of parameters required
@@ -31,6 +31,7 @@ class KeystoneAuthHandler(auth.AuthHandler):
         if not isinstance(req, dict):
             raise TypeError('The input "req" is not typeof dict.')
 
+        session = session
         mistral_url = req.get('mistral_url')
         endpoint_type = req.get('endpoint_type', 'publicURL')
         service_type = req.get('service_type', 'workflow2')
@@ -76,7 +77,9 @@ class KeystoneAuthHandler(auth.AuthHandler):
 
         auth_response = {}
 
-        if auth_url:
+        if session:
+            keystone = client.Client(session=session)
+        elif auth_url:
             keystone = client.Client(
                 username=username,
                 user_id=user_id,
@@ -90,15 +93,14 @@ class KeystoneAuthHandler(auth.AuthHandler):
                 user_domain_name=user_domain_name,
                 project_domain_name=project_domain_name
             )
-
             keystone.authenticate()
-
             auth_response.update({
                 api.AUTH_TOKEN: keystone.auth_token,
                 api.PROJECT_ID: keystone.project_id,
                 api.USER_ID: keystone.user_id,
             })
 
+        if session or auth_url:
             if not mistral_url:
                 try:
                     mistral_url = keystone.service_catalog.url_for(

@@ -196,7 +196,7 @@ class HTTPClientTest(base.BaseTestCase):
 
         requests.post.assert_called_with(
             EXPECTED_URL,
-            EXPECTED_BODY,
+            data=EXPECTED_BODY,
             **expected_options
         )
 
@@ -216,7 +216,7 @@ class HTTPClientTest(base.BaseTestCase):
 
         requests.put.assert_called_with(
             EXPECTED_URL,
-            EXPECTED_BODY,
+            data=EXPECTED_BODY,
             **expected_options
         )
 
@@ -281,7 +281,7 @@ class HTTPClientTest(base.BaseTestCase):
 
         requests.post.assert_called_with(
             EXPECTED_URL,
-            EXPECTED_BODY,
+            data=EXPECTED_BODY,
             **EXPECTED_REQ_OPTIONS
         )
 
@@ -305,7 +305,7 @@ class HTTPClientTest(base.BaseTestCase):
 
         requests.put.assert_called_with(
             EXPECTED_URL,
-            EXPECTED_BODY,
+            data=EXPECTED_BODY,
             **EXPECTED_REQ_OPTIONS
         )
 

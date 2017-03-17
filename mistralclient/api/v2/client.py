@@ -39,6 +39,9 @@ _DEFAULT_MISTRAL_URL = "http://localhost:8989/v2"
 
 class Client(object):
     def __init__(self, auth_type='keystone', **kwargs):
+        # We get the session at this point, as some instances of session
+        # objects might have mutexes that can't be deep-copied.
+        session = kwargs.pop('session', None)
         req = copy.deepcopy(kwargs)
         mistral_url = req.get('mistral_url')
         profile = req.get('profile')
@@ -47,7 +50,7 @@ class Client(object):
             raise RuntimeError('Mistral url should be a string.')
 
         auth_handler = auth.get_auth_handler(auth_type)
-        auth_response = auth_handler.authenticate(req) or {}
+        auth_response = auth_handler.authenticate(req, session=session) or {}
 
         req.update(auth_response)
 
@@ -59,7 +62,8 @@ class Client(object):
         if profile:
             osprofiler_profiler.init(profile)
 
-        http_client = httpclient.HTTPClient(mistral_url, **req)
+        http_client = httpclient.HTTPClient(mistral_url, session=session,
+                                            **req)
 
         # Create all resource managers.
         self.workbooks = workbooks.WorkbookManager(http_client)

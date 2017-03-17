@@ -58,6 +58,7 @@ def log_request(func):
 class HTTPClient(object):
     def __init__(self, base_url, **kwargs):
         self.base_url = base_url
+        self.session = kwargs.pop('session', None)
         self.auth_token = kwargs.get(AUTH_TOKEN)
         self.project_id = kwargs.get(PROJECT_ID)
         self.user_id = kwargs.get(USER_ID)
@@ -77,6 +78,11 @@ class HTTPClient(object):
             TARGET_PROJECT_DOMAIN_NAME
         )
 
+        if self.session:
+            self.crud_provider = self.session
+        else:
+            self.crud_provider = requests
+
         if self.base_url.startswith('https'):
             if self.cacert and not os.path.exists(self.cacert):
                 raise ValueError('Unable to locate cacert file '
@@ -86,42 +92,47 @@ class HTTPClient(object):
                 LOG.warning('Client is set to not verify even though '
                             'cacert is provided.')
 
-            if self.insecure:
-                self.ssl_options['verify'] = False
-            else:
-                if self.cacert:
-                    self.ssl_options['verify'] = self.cacert
+            # These are already set by the session, so it's not needed
+            if not self.session:
+                if self.insecure:
+                    self.ssl_options['verify'] = False
                 else:
-                    self.ssl_options['verify'] = True
+                    if self.cacert:
+                        self.ssl_options['verify'] = self.cacert
+                    else:
+                        self.ssl_options['verify'] = True
 
-            self.ssl_options['cert'] = (
-                kwargs.get(CERT_FILE),
-                kwargs.get(CERT_KEY)
-            )
+                self.ssl_options['cert'] = (
+                    kwargs.get(CERT_FILE),
+                    kwargs.get(CERT_KEY)
+                )
 
     @log_request
     def get(self, url, headers=None):
         options = self._get_request_options('get', headers)
 
-        return requests.get(self.base_url + url, **options)
+        return self.crud_provider.get(self.base_url + url, **options)
 
     @log_request
     def post(self, url, body, headers=None):
         options = self._get_request_options('post', headers)
 
-        return requests.post(self.base_url + url, body, **options)
+        return self.crud_provider.post(self.base_url + url,
+                                       data=body, **options)
 
     @log_request
     def put(self, url, body, headers=None):
         options = self._get_request_options('put', headers)
 
-        return requests.put(self.base_url + url, body, **options)
+        return self.crud_provider.put(self.base_url + url,
+                                      data=body, **options)
 
     @log_request
     def delete(self, url, headers=None):
         options = self._get_request_options('delete', headers)
 
-        return requests.delete(self.base_url + url, **options)
+        return self.crud_provider.delete(self.base_url + url,
+                                         **options)
 
     def _get_request_options(self, method, headers):
         headers = self._update_headers(headers)
@@ -139,14 +150,15 @@ class HTTPClient(object):
         if not headers:
             headers = {}
 
-        if self.auth_token:
-            headers['x-auth-token'] = self.auth_token
+        if not self.session:
+            if self.auth_token:
+                headers['x-auth-token'] = self.auth_token
 
-        if self.project_id:
-            headers['X-Project-Id'] = self.project_id
+            if self.project_id:
+                headers['X-Project-Id'] = self.project_id
 
-        if self.user_id:
-            headers['X-User-Id'] = self.user_id
+            if self.user_id:
+                headers['X-User-Id'] = self.user_id
 
         if self.target_auth_token:
             headers['X-Target-Auth-Token'] = self.target_auth_token

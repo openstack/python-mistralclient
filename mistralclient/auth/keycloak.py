@@ -24,7 +24,7 @@ LOG = logging.getLogger(__name__)
 
 class KeycloakAuthHandler(auth.AuthHandler):
 
-    def authenticate(self, req):
+    def authenticate(self, req, session=None):
         """Performs authentication using Keycloak OpenID Protocol.
 
         :param req: Request dict containing list of parameters required
@@ -45,6 +45,8 @@ class KeycloakAuthHandler(auth.AuthHandler):
                 provided).
             cacert: SSL certificate file (Optional).
             insecure: If True, SSL certificate is not verified (Optional).
+
+        :param session: Keystone session object. Not used by this plugin.
 
         """
         if not isinstance(req, dict):
