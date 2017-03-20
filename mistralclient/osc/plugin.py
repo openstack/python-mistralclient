@@ -42,12 +42,7 @@ def make_client(instance):
         interface='publicURL'
     )
 
-    client = workflow_client(
-        mistral_url=mistral_url,
-        auth_token=instance.auth_ref.auth_token,
-        project_id=instance.auth_ref.project_id,
-        user_id=instance.auth_ref.user_id,
-    )
+    client = workflow_client(mistral_url=mistral_url, session=instance.session)
 
     return client
 
