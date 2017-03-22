@@ -33,13 +33,15 @@ EXPECTED_URL = API_BASE_URL + API_URL
 AUTH_TOKEN = uuidutils.generate_uuid()
 PROJECT_ID = uuidutils.generate_uuid()
 USER_ID = uuidutils.generate_uuid()
+REGION_NAME = 'fake_region'
 PROFILER_HMAC_KEY = 'SECRET_HMAC_KEY'
 PROFILER_TRACE_ID = uuidutils.generate_uuid()
 
 EXPECTED_AUTH_HEADERS = {
     'x-auth-token': AUTH_TOKEN,
     'X-Project-Id': PROJECT_ID,
-    'X-User-Id': USER_ID
+    'X-User-Id': USER_ID,
+    'X-Region-Name': REGION_NAME
 }
 
 EXPECTED_REQ_OPTIONS = {
@@ -76,7 +78,8 @@ class HTTPClientTest(base.BaseTestCase):
             API_BASE_URL,
             auth_token=AUTH_TOKEN,
             project_id=PROJECT_ID,
-            user_id=USER_ID
+            user_id=USER_ID,
+            region_name=REGION_NAME
         )
 
     @mock.patch.object(
@@ -149,6 +152,7 @@ class HTTPClientTest(base.BaseTestCase):
             auth_token=AUTH_TOKEN,
             project_id=PROJECT_ID,
             user_id=USER_ID,
+            region_name=REGION_NAME,
             target_auth_url=target_auth_url,
             target_auth_token=target_auth_token,
             target_project_id=target_project_id,

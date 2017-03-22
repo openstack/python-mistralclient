@@ -30,6 +30,7 @@ CERT_KEY = 'key'
 INSECURE = 'insecure'
 PROJECT_ID = 'project_id'
 USER_ID = 'user_id'
+REGION_NAME = 'region_name'
 
 TARGET_AUTH_TOKEN = 'target_auth_token'
 TARGET_AUTH_URI = 'target_auth_url'
@@ -64,6 +65,7 @@ class HTTPClient(object):
         self.user_id = kwargs.get(USER_ID)
         self.cacert = kwargs.get(CACERT)
         self.insecure = kwargs.get(INSECURE, False)
+        self.region_name = kwargs.get(REGION_NAME)
         self.ssl_options = {}
 
         self.target_auth_token = kwargs.get(TARGET_AUTH_TOKEN)
@@ -159,6 +161,9 @@ class HTTPClient(object):
 
             if self.user_id:
                 headers['X-User-Id'] = self.user_id
+
+        if self.region_name:
+            headers['X-Region-Name'] = self.region_name
 
         if self.target_auth_token:
             headers['X-Target-Auth-Token'] = self.target_auth_token

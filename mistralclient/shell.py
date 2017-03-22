@@ -564,6 +564,7 @@ class MistralShell(app.App):
             project_id=self.options.tenant_id or self.options.project_id,
             endpoint_type=self.options.endpoint_type,
             service_type=self.options.service_type,
+            region_name=self.options.region_name,
             auth_token=self.options.token,
             cacert=self.options.os_cacert,
             insecure=self.options.insecure,
