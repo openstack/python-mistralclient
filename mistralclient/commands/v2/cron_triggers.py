@@ -159,9 +159,12 @@ class Create(command.ShowOne):
         if the_time:
             the_time = datetime.datetime.strptime(
                 the_time, datetime_format)
-            the_second = time.mktime(the_time.timetuple())
-            the_utc_time = datetime.datetime.utcfromtimestamp(the_second)
-            the_time = the_utc_time.strftime(datetime_format)
+
+            is_dst = time.daylight and time.localtime().tm_isdst > 0
+            utc_offset = - (time.altzone if is_dst else time.timezone)
+
+            the_time = (the_time - datetime.timedelta(
+                0, utc_offset)).strftime(datetime_format)
 
         return the_time
 
