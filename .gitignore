@@ -5,8 +5,7 @@
 *.so
 
 # Packages
-*.egg
-*.egg-info
+*.egg*
 dist
 build
 .venv
@@ -26,6 +25,7 @@ pip-log.txt
 
 # Unit test / coverage reports
 .coverage
+cover/*
 .tox
 nosetests.xml
 functional_creds.conf
@@ -42,6 +42,9 @@ ChangeLog
 .idea
 .DS_Store
 etc/mistral.conf
+
+#swap file
+*.swp
 
 # Files created by releasenotes build
 releasenotes/build
