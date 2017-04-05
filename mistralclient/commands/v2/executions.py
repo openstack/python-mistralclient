@@ -159,7 +159,7 @@ class Create(command.ShowOne):
 
         parser.add_argument(
             'workflow_identifier',
-            help='Workflow ID or name. Workflow name will be deprecated since'
+            help='Workflow ID or name. Workflow name will be deprecated since '
                  'Mitaka.'
         )
         parser.add_argument(
