@@ -1,5 +1,6 @@
 ---
 fixes:
-  - ``--os-region-name`` or ``OS_REGION_NAME`` is fully supported now and will
+  - |
+    ``--os-region-name`` or ``OS_REGION_NAME`` is fully supported now and will
     be passed to Mistral service in order to get OpenStack service client for
     the specific region.
