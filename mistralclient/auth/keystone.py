@@ -34,7 +34,7 @@ class KeystoneAuthHandler(auth.AuthHandler):
         session = session
         mistral_url = req.get('mistral_url')
         endpoint_type = req.get('endpoint_type', 'publicURL')
-        service_type = req.get('service_type', 'workflow2')
+        service_type = req.get('service_type', 'workflowv2')
 
         auth_url = req.get('auth_url')
         username = req.get('username')
