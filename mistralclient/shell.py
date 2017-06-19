@@ -504,6 +504,7 @@ class MistralShell(app.App):
             '--profile',
             dest='profile',
             metavar='HMAC_KEY',
+            default=env('OS_PROFILE'),
             help='HMAC key to use for encrypting context data for performance '
                  'profiling of operation. This key should be one of the '
                  'values configured for the osprofiler middleware in mistral, '
