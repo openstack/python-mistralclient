@@ -2,9 +2,7 @@
 
 import os
 import pbr.version
-import subprocess
 import sys
-import warnings
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
@@ -21,14 +19,11 @@ sys.path.insert(0, os.path.abspath('./'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'oslosphinx',
+    'openstackdocstheme',
 ]
 
-if not on_rtd:
-    extensions.append('oslosphinx')
-
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+# templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -73,21 +68,13 @@ modindex_common_prefix = ['mistralclient.']
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-if on_rtd:
-    html_theme_path = ['.']
-    html_theme = 'sphinx_rtd_theme'
+html_theme = 'openstackdocs'
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 # html_last_updated_fmt = '%b %d, %Y'
-git_cmd = ["git", "log", "--pretty=format:'%ad, commit %h'", "--date=local",
-           "-n1"]
-try:
-    html_last_updated_fmt = subprocess.check_output(
-        git_cmd).decode('utf-8')
-except Exception:
-    warnings.warn('Cannot get last updated time from git repository. '
-                  'Not setting "html_last_updated_fmt".')
+# Must set this variable to include year, month, day, hours, and minutes.
+html_last_updated_fmt = '%Y-%m-%d %H:%M'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -118,3 +105,7 @@ man_pages = [
     [u'Mistral Contributors'], 1)
 ]
 
+# -- Options for openstackdocstheme -------------------------------------------
+repository_name = 'openstack/python-mistralclient'
+bug_project = 'python-mistralclient'
+bug_tag = ''
