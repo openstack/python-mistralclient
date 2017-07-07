@@ -1,0 +1,7 @@
+---
+critical:
+  - |
+    The "--limit" parameter of heavy CLI commands like "task-list" and
+    "execution-list" and "action-execution-list" is set to "100" by
+    default to avoid the huge load on server. To fetch the full result
+    set, user may use "--limit -1".

@@ -80,6 +80,14 @@ class List(base.MistralLister):
             action='append',
             help='Filters. Can be repeated.'
         )
+        parser.add_argument(
+            '--limit',
+            type=int,
+            help='Maximum number of tasks to return in a single result. '
+                 'limit is set to %s by default. Use --limit -1 to fetch the '
+                 'full result set.' % base.DEFAULT_LIMIT,
+            nargs='?'
+        )
 
         return parser
 
@@ -87,10 +95,17 @@ class List(base.MistralLister):
         return format_list
 
     def _get_resources(self, parsed_args):
+        if parsed_args.limit is None:
+            parsed_args.limit = base.DEFAULT_LIMIT
+            LOG.info("limit is set to %s by default. Set "
+                     "the limit explicitly using \'--limit\', if required. "
+                     "Use \'--limit\' -1 to fetch the full result set.",
+                     base.DEFAULT_LIMIT)
         mistral_client = self.app.client_manager.workflow_engine
 
         return mistral_client.tasks.list(
             parsed_args.workflow_execution,
+            limit=parsed_args.limit,
             **base.get_filters(parsed_args)
         )
 

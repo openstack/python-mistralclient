@@ -182,14 +182,29 @@ class List(base.MistralLister):
             nargs='?',
             help='Task execution ID.'
         )
+        parser.add_argument(
+            '--limit',
+            type=int,
+            help='Maximum number of action-executions to return in a single '
+                 'result. limit is set to %s by default. Use --limit -1 to '
+                 'fetch the full result set.' % base.DEFAULT_LIMIT,
+            nargs='?'
+        )
 
         return parser
 
     def _get_resources(self, parsed_args):
+        if parsed_args.limit is None:
+            parsed_args.limit = base.DEFAULT_LIMIT
+            LOG.info("limit is set to %s by default. Set "
+                     "the limit explicitly using \'--limit\', if required. "
+                     "Use \'--limit\' -1 to fetch the full result set.",
+                     base.DEFAULT_LIMIT)
         mistral_client = self.app.client_manager.workflow_engine
 
         return mistral_client.action_executions.list(
-            parsed_args.task_execution_id
+            parsed_args.task_execution_id,
+            limit=parsed_args.limit,
         )
 
 

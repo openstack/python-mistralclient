@@ -21,6 +21,9 @@ from osc_lib.command import command
 import six
 
 
+DEFAULT_LIMIT = 100
+
+
 @six.add_metaclass(abc.ABCMeta)
 class MistralLister(command.Lister):
     @abc.abstractmethod

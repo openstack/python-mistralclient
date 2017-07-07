@@ -229,7 +229,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
 
         self.call(execution_cmd.List)
         self.client.executions.list.assert_called_once_with(
-            limit=None,
+            limit=100,
             marker='',
             sort_dirs='asc',
             sort_keys='created_at',
