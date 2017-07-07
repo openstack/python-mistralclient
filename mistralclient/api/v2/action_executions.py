@@ -63,11 +63,16 @@ class ActionExecutionManager(base.ResourceManager):
 
         return self._update('/action_executions/%s' % id, data)
 
-    def list(self, task_execution_id=None):
+    def list(self, task_execution_id=None, limit=None):
         url = '/action_executions'
+
+        qparams = {}
 
         if task_execution_id:
             url = '/tasks/%s/action_executions' % task_execution_id
+
+        if limit:
+            qparams['limit'] = limit
 
         return self._list(url, response_key='action_executions')
 

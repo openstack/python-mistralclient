@@ -97,6 +97,16 @@ class SimpleMistralCLITests(base.MistralCLIAuth):
             ['ID', 'Name', 'Workflow name', 'State', 'Accepted']
         )
 
+    def test_action_execution_list_with_limit(self):
+        act_execs = self.parser.listing(
+            self.mistral(
+                'action-execution-list',
+                params='--limit 1'
+            )
+        )
+
+        self.assertEqual(1, len(act_execs))
+
 
 class WorkbookCLITests(base_v2.MistralClientTestBase):
     """Test suite checks commands to work with workbooks."""
@@ -852,6 +862,26 @@ class TaskCLITests(base_v2.MistralClientTestBase):
         self.assertEqual(1, len(tasks))
 
         self.assertEqual('goodbye', tasks[0]['Name'])
+
+    def test_task_list_with_limit(self):
+        wf_exec = self.execution_create(
+            "%s input task_name" % self.reverse_wf['Name']
+        )
+
+        exec_id = self.get_field_value(wf_exec, 'ID')
+
+        self.assertTrue(self.wait_execution_success(exec_id))
+
+        tasks = self.parser.listing(self.mistral('task-list'))
+
+        tasks = self.parser.listing(
+            self.mistral(
+                'task-list',
+                params='--limit 1'
+            )
+        )
+
+        self.assertEqual(1, len(tasks))
 
 
 class ActionCLITests(base_v2.MistralClientTestBase):
