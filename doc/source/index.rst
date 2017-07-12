@@ -14,24 +14,25 @@ Using mistralclient
    cli_usage_with_openstack
    cli_usage_with_keycloak
    cli_usage_without_auth
+   class_reference
 
 For information about using the mistral command-line client, see
 `Workflow service command-line client`_.
 
-.. _Workflow service command-line client: http://docs.openstack.org/cli-reference/mistral.html
+.. _Workflow service command-line client: https://docs.openstack.org/cli-reference/mistral.html
 
 Python API Reference
 --------------------
 
 * `REST API Specification`_
 
-.. _REST API Specification: http://docs.openstack.org/developer/mistral/developer/webapi/v2.html
+.. _REST API Specification: https://docs.openstack.org/mistral/latest/api/v2.html
 
 Contributing
 ------------
 
 Code is hosted `on GitHub`_. Submit bugs to the python-mistralclient project on
-`Launchpad`_. Submit code to the openstack/python-heatclient project
+`Launchpad`_. Submit code to the openstack/python-mistralclient project
 using `Gerrit`_.
 
 .. _on GitHub: https://github.com/openstack/python-mistralclient

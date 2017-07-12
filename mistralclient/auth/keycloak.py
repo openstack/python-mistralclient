@@ -30,25 +30,26 @@ class KeycloakAuthHandler(auth.AuthHandler):
         :param req: Request dict containing list of parameters required
             for Keycloak authentication.
 
-            auth_url: Base authentication url of KeyCloak server (e.g.
+            * auth_url: Base authentication url of KeyCloak server (e.g.
                 "https://my.keycloak:8443/auth"
-            client_id: Client ID (according to OpenID Connect protocol).
-            client_secret: Client secret (according to OpenID Connect
+            * client_id: Client ID (according to OpenID Connect protocol).
+            * client_secret: Client secret (according to OpenID Connect
                 protocol).
-            realm_name: KeyCloak realm name.
-            username: User name (Optional, if None then access_token must be
+            * realm_name: KeyCloak realm name.
+            * username: User name (Optional, if None then access_token must be
                 provided).
-            password: Password (Optional).
-            access_token: Access token. If passed, username and password are
+            * password: Password (Optional).
+            * access_token: Access token. If passed, username and password are
                 not used and this method just validates the token and refreshes
                 it if needed (Optional, if None then username must be
                 provided).
-            cacert: SSL certificate file (Optional).
-            insecure: If True, SSL certificate is not verified (Optional).
+            * cacert: SSL certificate file (Optional).
+            * insecure: If True, SSL certificate is not verified (Optional).
 
         :param session: Keystone session object. Not used by this plugin.
 
         """
+
         if not isinstance(req, dict):
             raise TypeError('The input "req" is not typeof dict.')
 
