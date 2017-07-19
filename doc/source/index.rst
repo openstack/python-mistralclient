@@ -19,7 +19,7 @@ Using mistralclient
 For information about using the mistral command-line client, see
 `Workflow service command-line client`_.
 
-.. _Workflow service command-line client: https://docs.openstack.org/cli-reference/mistral.html
+.. _Workflow service command-line client: https://docs.openstack.org/mistral/latest/cli/index.html
 
 Python API Reference
 --------------------
@@ -37,4 +37,4 @@ using `Gerrit`_.
 
 .. _on GitHub: https://github.com/openstack/python-mistralclient
 .. _Launchpad: https://launchpad.net/python-mistralclient
-.. _Gerrit: http://docs.openstack.org/infra/manual/developers.html#development-workflow
+.. _Gerrit: https://docs.openstack.org/infra/manual/developers.html#development-workflow

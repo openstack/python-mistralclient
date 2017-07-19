@@ -11,7 +11,7 @@
 #    under the License.
 
 """oslo.i18n integration module.
-See http://docs.openstack.org/developer/oslo.i18n/usage.html
+See https://docs.openstack.org/oslo.i18n/latest/user/usage.html
 """
 
 import oslo_i18n
