@@ -9,11 +9,11 @@ Using mistralclient
 -------------------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   cli_usage_with_openstack
-   cli_usage_with_keycloak
-   cli_usage_without_auth
+   cli/cli_usage_with_openstack
+   cli/cli_usage_with_keycloak
+   cli/cli_usage_without_auth
    class_reference
 
 For information about using the mistral command-line client, see
@@ -37,4 +37,4 @@ using `Gerrit`_.
 
 .. _on GitHub: https://github.com/openstack/python-mistralclient
 .. _Launchpad: https://launchpad.net/python-mistralclient
-.. _Gerrit: http://docs.openstack.org/infra/manual/developers.html#development-workflow
+.. _Gerrit: https://docs.openstack.org/infra/manual/developers.html#development-workflow
