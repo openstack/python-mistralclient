@@ -16,6 +16,9 @@
 
 import copy
 import json
+import sys
+
+from six import StringIO
 
 import mock
 
@@ -153,6 +156,10 @@ class TestCLIActionExecutions(base.BaseCommandTest):
     def test_update_invalid_state(self):
         states = ['PAUSED', 'WAITING', 'DELAYED']
 
+        # Redirect the stderr so it doesn't show during tox
+        _stderr = sys.stderr
+        sys.stderr = StringIO()
+
         for state in states:
             self.assertRaises(
                 SystemExit,
@@ -160,6 +167,10 @@ class TestCLIActionExecutions(base.BaseCommandTest):
                 action_ex_cmd.Update,
                 app_args=['id', '--state', state]
             )
+
+        # Stop the redirection
+        print(sys.stderr.getvalue())
+        sys.stderr = _stderr
 
     def test_list(self):
         self.client.action_executions.list.return_value = [ACTION_EX]
