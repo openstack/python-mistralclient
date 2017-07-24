@@ -145,10 +145,8 @@ class KeycloakAuthHandler(auth.AuthHandler):
         except Exception as e:
             raise Exception("Failed to get access token:\n %s" % str(e))
 
-        LOG.debug(
-            "HTTP response from OIDC provider: %s" %
-            pprint.pformat(resp.json())
-        )
+        LOG.debug("HTTP response from OIDC provider: %s",
+                  pprint.pformat(resp.json()))
 
         return resp.json()['access_token']
 
