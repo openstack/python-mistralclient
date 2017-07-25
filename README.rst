@@ -96,5 +96,5 @@ Useful Links
 .. _Blueprints: https://blueprints.launchpad.net/python-mistralclient
 .. _Bugs: https://bugs.launchpad.net/python-mistralclient
 .. _Source: https://git.openstack.org/cgit/openstack/python-mistralclient
-.. _How to Contribute: http://docs.openstack.org/infra/manual/developers.html
-.. _Specs: http://specs.openstack.org/openstack/mistral-specs/
+.. _How to Contribute: https://docs.openstack.org/infra/manual/developers.html
+.. _Specs: https://specs.openstack.org/openstack/mistral-specs/

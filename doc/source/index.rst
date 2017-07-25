@@ -19,7 +19,7 @@ Using mistralclient
 For information about using the mistral command-line client, see
 `Workflow service command-line client`_.
 
-.. _Workflow service command-line client: https://docs.openstack.org/cli-reference/mistral.html
+.. _Workflow service command-line client: https://docs.openstack.org/mistral/latest/cli/index.html
 
 Python API Reference
 --------------------
