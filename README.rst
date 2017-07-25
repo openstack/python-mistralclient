@@ -37,16 +37,16 @@ Command Line Interface (CLI) library.
 Installation
 ------------
 
-First of all, clone the repo and go to the repo directory:
+First of all, clone the repo and go to the repo directory::
 
     $ git clone git://git.openstack.org/openstack/python-mistralclient.git
     $ cd python-mistralclient
 
-Then just run:
+Then just run::
 
     $ pip install -e .
 
-or
+or::
 
     $ pip install -r requirements.txt
     $ python setup.py install
@@ -56,7 +56,7 @@ Running Mistral client
 ----------------------
 
 If Mistral authentication is enabled, provide the information about OpenStack
-auth to environment variables. Type:
+auth to environment variables. Type::
 
     $ export OS_AUTH_URL=http://<Keystone_host>:5000/v2.0
     $ export OS_USERNAME=admin
@@ -72,11 +72,11 @@ and in the case that you are authenticating against keystone over https:
 .. note:: In client, we can use both Keystone auth versions - v2.0 and v3. But
           server supports only v3.*
 
-To make sure Mistral client works, type:
+To make sure Mistral client works, type::
 
     $ mistral workbook-list
 
-You can see the list of available commands typing:
+You can see the list of available commands typing::
 
     $ mistral --help
 
