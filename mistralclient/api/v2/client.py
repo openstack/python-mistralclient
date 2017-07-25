@@ -23,6 +23,7 @@ from mistralclient.api.v2 import action_executions
 from mistralclient.api.v2 import actions
 from mistralclient.api.v2 import cron_triggers
 from mistralclient.api.v2 import environments
+from mistralclient.api.v2 import event_triggers
 from mistralclient.api.v2 import executions
 from mistralclient.api.v2 import members
 from mistralclient.api.v2 import services
@@ -38,6 +39,7 @@ _DEFAULT_MISTRAL_URL = "http://localhost:8989/v2"
 
 
 class Client(object):
+
     def __init__(self, auth_type='keystone', **kwargs):
         # We get the session at this point, as some instances of session
         # objects might have mutexes that can't be deep-copied.
@@ -72,6 +74,7 @@ class Client(object):
         self.actions = actions.ActionManager(http_client)
         self.workflows = workflows.WorkflowManager(http_client)
         self.cron_triggers = cron_triggers.CronTriggerManager(http_client)
+        self.event_triggers = event_triggers.EventTriggerManager(http_client)
         self.environments = environments.EnvironmentManager(http_client)
         self.action_executions = action_executions.ActionExecutionManager(
             http_client)

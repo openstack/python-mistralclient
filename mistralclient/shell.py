@@ -31,6 +31,7 @@ import mistralclient.commands.v2.action_executions
 import mistralclient.commands.v2.actions
 import mistralclient.commands.v2.cron_triggers
 import mistralclient.commands.v2.environments
+import mistralclient.commands.v2.event_triggers
 import mistralclient.commands.v2.executions
 import mistralclient.commands.v2.members
 import mistralclient.commands.v2.services
@@ -53,6 +54,7 @@ def env(*args, **kwargs):
 
 
 class OpenStackHelpFormatter(argparse.HelpFormatter):
+
     def __init__(self, prog, indent_increment=2, max_help_position=32,
                  width=None):
         super(OpenStackHelpFormatter, self).__init__(
@@ -78,6 +80,7 @@ class HelpAction(argparse.Action):
     instance, passed in as the "default" value for the action.
 
     """
+
     def __call__(self, parser, namespace, values, option_string=None):
         outputs = []
         max_len = 0
@@ -682,6 +685,13 @@ class MistralShell(app.App):
             mistralclient.commands.v2.cron_triggers.Create,
             'cron-trigger-delete':
             mistralclient.commands.v2.cron_triggers.Delete,
+            'event-trigger-list':
+            mistralclient.commands.v2.event_triggers.List,
+            'event-trigger-get': mistralclient.commands.v2.event_triggers.Get,
+            'event-trigger-create':
+            mistralclient.commands.v2.event_triggers.Create,
+            'event-trigger-delete':
+            mistralclient.commands.v2.event_triggers.Delete,
             'service-list': mistralclient.commands.v2.services.List,
             'member-create': mistralclient.commands.v2.members.Create,
             'member-delete': mistralclient.commands.v2.members.Delete,
