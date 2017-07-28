@@ -1,0 +1,8 @@
+---
+version: '2.0'
+
+lowest_level_wf:
+  type: direct
+  tasks:
+    hello:
+      action: std.noop

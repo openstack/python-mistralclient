@@ -31,8 +31,8 @@ class Execution(base.Resource):
 class ExecutionManager(base.ResourceManager):
     resource_class = Execution
 
-    def create(self, workflow_identifier, workflow_input=None, description='',
-               **params):
+    def create(self, workflow_identifier, namespace='', workflow_input=None,
+               description='', **params):
         self._ensure_not_empty(workflow_identifier=workflow_identifier)
 
         data = {
@@ -43,6 +43,9 @@ class ExecutionManager(base.ResourceManager):
             data.update({'workflow_id': workflow_identifier})
         else:
             data.update({'workflow_name': workflow_identifier})
+
+        if namespace:
+            data.update({'workflow_namespace': namespace})
 
         if workflow_input:
             if isinstance(workflow_input, six.string_types):

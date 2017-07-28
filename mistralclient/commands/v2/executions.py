@@ -38,6 +38,7 @@ def format(execution=None, lister=False):
         'ID',
         'Workflow ID',
         'Workflow name',
+        'Workflow namespace',
         'Description',
         'Task Execution ID',
         'State',
@@ -55,6 +56,7 @@ def format(execution=None, lister=False):
             execution.id,
             execution.workflow_id,
             execution.workflow_name,
+            execution.workflow_namespace,
             execution.description,
             execution.task_execution_id or '<none>',
             execution.state,
@@ -175,6 +177,12 @@ class Create(command.ShowOne):
                  'Mitaka.'
         )
         parser.add_argument(
+            '--namespace',
+            nargs='?',
+            default='',
+            help="Workflow namespace."
+        )
+        parser.add_argument(
             'workflow_input',
             nargs='?',
             help='Workflow input'
@@ -209,6 +217,7 @@ class Create(command.ShowOne):
 
         execution = mistral_client.executions.create(
             parsed_args.workflow_identifier,
+            parsed_args.namespace,
             wf_input,
             parsed_args.description,
             **params

@@ -54,6 +54,22 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
         cls.wf_wrapping_wf = os.path.relpath(
             'functionaltests/resources/v2/wf_wrapping_wf_v2.yaml', os.getcwd()
         )
+        cls.top_level_wf = os.path.relpath(
+            'functionaltests/resources/v2/for_namespaces/top_level_wf.yaml',
+            os.getcwd()
+        )
+        cls.middle_wf = os.path.relpath(
+            'functionaltests/resources/v2/for_namespaces/middle_wf.yaml',
+            os.getcwd()
+        )
+        cls.lowest_level_wf = os.path.relpath(
+            'functionaltests/resources/v2/for_namespaces/lowest_level_wf.yaml',
+            os.getcwd()
+        )
+        cls.async_wf_def = os.path.relpath(
+            'functionaltests/resources/v2/async.yaml',
+            os.getcwd()
+        )
 
         cls.act_def = os.path.relpath(
             'functionaltests/resources/v2/action_v2.yaml', os.getcwd()
@@ -120,11 +136,15 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
 
         return wb
 
-    def workflow_create(self, wf_def, admin=True, scope='private'):
+    def workflow_create(self, wf_def, namespace='', admin=True,
+                        scope='private'):
         params = '{0}'.format(wf_def)
 
         if scope == 'public':
             params += ' --public'
+
+        if namespace:
+            params += " --namespace " + namespace
 
         wf = self.mistral_cli(
             admin,

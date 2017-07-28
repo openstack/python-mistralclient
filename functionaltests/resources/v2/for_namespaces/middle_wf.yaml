@@ -1,0 +1,8 @@
+---
+version: '2.0'
+
+middle_wf:
+  type: direct
+  tasks:
+    hello:
+      workflow: lowest_level_wf

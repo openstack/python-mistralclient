@@ -256,6 +256,35 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
         for wf in wf_names:
             self.assertNotIn(wf, [workflow['Name'] for workflow in wfs])
 
+    def test_workflow_within_namespace_create_delete(self):
+        params = self.wf_def + ' --namespace abcdef'
+        init_wfs = self.mistral_admin('workflow-create', params=params)
+
+        wf_names = [wf['Name'] for wf in init_wfs]
+
+        self.assertTableStruct(init_wfs, ['Name', 'Created at', 'Updated at'])
+
+        wfs = self.mistral_admin('workflow-list')
+        self.assertIn(wf_names[0], [workflow['Name'] for workflow in wfs])
+
+        for wf_name in wf_names:
+            self.mistral_admin(
+                'workflow-delete',
+                params=wf_name+' --namespace abcdef'
+            )
+
+        wfs = self.mistral_admin('workflow-list')
+        for wf in wf_names:
+            self.assertNotIn(wf, [workflow['Name'] for workflow in wfs])
+
+        init_wfs = self.mistral_admin('workflow-create', params=params)
+        wf_ids = [wf['ID'] for wf in init_wfs]
+        for wf_id in wf_ids:
+            self.mistral_admin('workflow-delete', params=wf_id)
+
+        for wf in wf_names:
+            self.assertNotIn(wf, [workflow['Name'] for workflow in wfs])
+
     def test_create_wf_with_tags(self):
         init_wfs = self.workflow_create(self.wf_def)
         wf_name = init_wfs[1]['Name']
@@ -313,6 +342,96 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
         upd_wf = self.mistral_admin(
             'workflow-update',
             params='{0}'.format(self.wf_with_delay_def)
+        )
+
+        self.assertTableStruct(upd_wf, ['Name', 'Created at', 'Updated at'])
+
+        updated_wf_info = self.get_item_info(
+            get_from=upd_wf,
+            get_by='Name',
+            value=wf_name
+        )
+
+        self.assertEqual(wf_name, upd_wf[0]['Name'])
+        self.assertEqual(
+            created_wf_info['Created at'].split(".")[0],
+            updated_wf_info['Created at']
+        )
+        self.assertNotEqual(
+            created_wf_info['Updated at'],
+            updated_wf_info['Updated at']
+        )
+
+        # Update a workflow with uuid.
+        upd_wf = self.mistral_admin(
+            'workflow-update',
+            params='{0} --id {1}'.format(self.wf_with_delay_def, wf_id)
+        )
+
+        self.assertTableStruct(upd_wf, ['Name', 'Created at', 'Updated at'])
+
+        updated_wf_info = self.get_item_info(
+            get_from=upd_wf,
+            get_by='ID',
+            value=wf_id
+        )
+
+        self.assertEqual(wf_name, upd_wf[0]['Name'])
+        self.assertEqual(
+            created_wf_info['Created at'].split(".")[0],
+            updated_wf_info['Created at']
+        )
+        self.assertNotEqual(
+            created_wf_info['Updated at'],
+            updated_wf_info['Updated at']
+        )
+
+    def test_workflow_update_within_namespace(self):
+        namespace = 'abc'
+        wf = self.workflow_create(self.wf_def, namespace=namespace)
+
+        wf_name = wf[0]['Name']
+        wf_id = wf[0]['ID']
+        wf_namespace = wf[0]['Namespace']
+        created_wf_info = self.get_item_info(
+            get_from=wf,
+            get_by='Name',
+            value=wf_name
+        )
+
+        # Update a workflow with definition unchanged.
+        upd_wf = self.mistral_admin(
+            'workflow-update',
+            params='{0} --namespace {1}'.format(self.wf_def, namespace)
+        )
+
+        self.assertTableStruct(upd_wf, ['Name', 'Created at', 'Updated at'])
+
+        updated_wf_info = self.get_item_info(
+            get_from=upd_wf,
+            get_by='Name',
+            value=wf_name
+        )
+
+        self.assertEqual(wf_name, upd_wf[0]['Name'])
+        self.assertEqual(namespace, wf_namespace)
+        self.assertEqual(wf_namespace, upd_wf[0]['Namespace'])
+        self.assertEqual(
+            created_wf_info['Created at'].split(".")[0],
+            updated_wf_info['Created at']
+        )
+        self.assertEqual(
+            created_wf_info['Updated at'],
+            updated_wf_info['Updated at']
+        )
+
+        # Update a workflow with definition changed.
+        upd_wf = self.mistral_admin(
+            'workflow-update',
+            params='{0} --namespace {1}'.format(
+                self.wf_with_delay_def,
+                namespace
+            )
         )
 
         self.assertTableStruct(upd_wf, ['Name', 'Created at', 'Updated at'])
@@ -476,6 +595,7 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
         super(ExecutionCLITests, self).setUp()
 
         wfs = self.workflow_create(self.wf_def)
+        self.async_wf = self.workflow_create(self.async_wf_def)[0]
 
         self.direct_wf = wfs[0]
         self.reverse_wf = wfs[1]
@@ -483,7 +603,64 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
         self.create_file('input', '{\n    "farewell": "Bye"\n}\n')
         self.create_file('task_name', '{\n    "task_name": "goodbye"\n}\n')
 
+    def test_execution_by_id_of_workflow_within_namespace(self):
+        namespace = 'abc'
+
+        wfs = self.workflow_create(self.lowest_level_wf, namespace=namespace)
+
+        wf_def_name = wfs[0]['Name']
+        wf_id = wfs[0]['ID']
+
+        execution = self.execution_create(wf_id)
+
+        self.assertTableStruct(execution, ['Field', 'Value'])
+
+        wf_name = self.get_field_value(execution, 'Workflow name')
+        wf_namespace = self.get_field_value(execution, 'Workflow namespace')
+        wf_id = self.get_field_value(execution, 'Workflow ID')
+
+        self.assertEqual(wf_def_name, wf_name)
+        self.assertEqual(namespace, wf_namespace)
+        self.assertIsNotNone(wf_id)
+
+    def test_execution_within_namespace_create_delete(self):
+        namespace = 'abc'
+
+        self.workflow_create(self.lowest_level_wf)
+        self.workflow_create(self.lowest_level_wf, namespace=namespace)
+        self.workflow_create(self.middle_wf, namespace=namespace)
+        self.workflow_create(self.top_level_wf)
+        wfs = self.workflow_create(self.top_level_wf, namespace=namespace)
+
+        top_wf_name = wfs[0]['Name']
+        execution = self.mistral_admin(
+            'execution-create',
+            params='{0} --namespace {1}'.format(top_wf_name, namespace)
+        )
+        exec_id = self.get_field_value(execution, 'ID')
+
+        self.assertTableStruct(execution, ['Field', 'Value'])
+
+        wf_name = self.get_field_value(execution, 'Workflow name')
+        wf_namespace = self.get_field_value(execution, 'Workflow namespace')
+        wf_id = self.get_field_value(execution, 'Workflow ID')
+        created_at = self.get_field_value(execution, 'Created at')
+
+        self.assertEqual(top_wf_name, wf_name)
+        self.assertEqual(namespace, wf_namespace)
+        self.assertIsNotNone(wf_id)
+        self.assertIsNotNone(created_at)
+
+        execs = self.mistral_admin('execution-list')
+
+        self.assertIn(exec_id, [ex['ID'] for ex in execs])
+        self.assertIn(wf_name, [ex['Workflow name'] for ex in execs])
+        self.assertIn(namespace, [ex['Workflow namespace'] for ex in execs])
+
+        self.mistral_admin('execution-delete', params=exec_id)
+
     def test_execution_create_delete(self):
+
         execution = self.mistral_admin(
             'execution-create',
             params='{0} -d "execution test"'.format(self.direct_wf['Name'])
@@ -522,7 +699,7 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
         self.assertTrue(result)
 
     def test_execution_update(self):
-        execution = self.execution_create(self.direct_wf['Name'])
+        execution = self.execution_create(self.async_wf['Name'])
 
         exec_id = self.get_field_value(execution, 'ID')
         status = self.get_field_value(execution, 'State')
@@ -917,9 +1094,41 @@ class TaskCLITests(base_v2.MistralClientTestBase):
 
         fetched_task = self.mistral_admin('task-get', params=created_task_id)
         fetched_task_id = self.get_field_value(fetched_task, 'ID')
+        fetched_task_wf_namespace = self.get_field_value(
+            fetched_task,
+            'Workflow namespace'
+        )
         task_execution_id = self.get_field_value(fetched_task, 'Execution ID')
 
         self.assertEqual(created_task_id, fetched_task_id)
+        self.assertEqual('', fetched_task_wf_namespace)
+        self.assertEqual(wf_ex_id, task_execution_id)
+
+    def test_task_get_list_within_namespace(self):
+        namespace = 'aaa'
+        self.workflow_create(self.wf_def, namespace=namespace)
+        wf_ex = self.execution_create(
+            self.direct_wf['Name'] + ' --namespace ' + namespace
+        )
+
+        wf_ex_id = self.get_field_value(wf_ex, 'ID')
+
+        tasks = self.mistral_admin('task-list', params=wf_ex_id)
+
+        created_task_id = tasks[-1]['ID']
+        created_wf_namespace = tasks[-1]['Workflow namespace']
+
+        fetched_task = self.mistral_admin('task-get', params=created_task_id)
+        fetched_task_id = self.get_field_value(fetched_task, 'ID')
+        fetched_task_wf_namespace = self.get_field_value(
+            fetched_task,
+            'Workflow namespace'
+        )
+        task_execution_id = self.get_field_value(fetched_task, 'Execution ID')
+
+        self.assertEqual(created_task_id, fetched_task_id)
+        self.assertEqual(namespace, created_wf_namespace)
+        self.assertEqual(created_wf_namespace, fetched_task_wf_namespace)
         self.assertEqual(wf_ex_id, task_execution_id)
 
     def test_task_list_with_filter(self):
@@ -1376,6 +1585,39 @@ class ActionExecutionCLITests(base_v2.MistralClientTestBase):
 
         self.assertEqual(self.direct_wf['Name'], act_ex['Workflow name'])
         self.assertEqual('SUCCESS', act_ex['State'])
+
+    def test_act_execution_get_list_within_namespace(self):
+        namespace = 'bbb'
+        self.workflow_create(self.wf_def, namespace=namespace)
+        wf_ex = self.execution_create(
+            self.direct_wf['Name'] + ' --namespace ' + namespace
+        )
+        exec_id = self.get_field_value(wf_ex, 'ID')
+        self.wait_execution_success(exec_id)
+        task = self.mistral_admin('task-list', params=exec_id)[0]
+
+        act_ex_from_list = self.mistral_admin(
+            'action-execution-list',
+            params=task['ID']
+        )[0]
+
+        act_ex = self.mistral_admin(
+            'action-execution-get',
+            params=act_ex_from_list['ID']
+        )
+
+        wf_name = self.get_field_value(act_ex, 'Workflow name')
+        wf_namespace = self.get_field_value(act_ex, 'Workflow namespace')
+        status = self.get_field_value(act_ex, 'State')
+
+        self.assertEqual(
+            act_ex_from_list['ID'],
+            self.get_field_value(act_ex, 'ID')
+        )
+        self.assertEqual(self.direct_wf['Name'], wf_name)
+        self.assertEqual('SUCCESS', status)
+        self.assertEqual(namespace, wf_namespace)
+        self.assertEqual(namespace, act_ex_from_list['Workflow namespace'])
 
     def test_act_execution_create_delete(self):
         action_ex = self.mistral_admin(
