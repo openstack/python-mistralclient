@@ -13,8 +13,11 @@
 #    limitations under the License.
 
 import json
+import six
 
 from mistralclient.api import base
+
+urlparse = six.moves.urllib.parse
 
 
 class ActionExecution(base.Resource):
@@ -66,15 +69,20 @@ class ActionExecutionManager(base.ResourceManager):
     def list(self, task_execution_id=None, limit=None):
         url = '/action_executions'
 
-        qparams = {}
-
         if task_execution_id:
             url = '/tasks/%s/action_executions' % task_execution_id
+
+        url += "%s"
+
+        qparams = {}
 
         if limit:
             qparams['limit'] = limit
 
-        return self._list(url, response_key='action_executions')
+        query_string = ("?%s" % urlparse.urlencode(list(qparams.items()))
+                        if qparams else "")
+
+        return self._list(url % query_string, response_key='action_executions')
 
     def get(self, id):
         self._ensure_not_empty(id=id)
