@@ -31,6 +31,8 @@ source openrc alt_demo alt_demo
 
 export OS_ALT_USERNAME=${OS_USERNAME}
 export OS_ALT_TENANT_NAME=${OS_TENANT_NAME}
+export OS_ALT_USER_DOMAIN_NAME=${OS_USER_DOMAIN_NAME}
+export OS_ALT_PROJECT_DOMAIN__NAME=${OS_PROJECT_DOMAIN_NAME}
 export OS_ALT_PASSWORD=${OS_PASSWORD}
 
 # Get admin credentials.
@@ -46,10 +48,14 @@ uri = $OS_AUTH_URL
 user = $OS_USERNAME
 tenant = $OS_TENANT_NAME
 pass = $OS_PASSWORD
+user_domain = $OS_USER_DOMAIN_NAME
+project_domain = $OS_PROJECT_DOMAIN_NAME
 [demo]
 user = $OS_ALT_USERNAME
 tenant = $OS_ALT_TENANT_NAME
 pass = $OS_ALT_PASSWORD
+user_domain = $OS_ALT_USER_DOMAIN_NAME
+project_domain = $OS_ALT_PROJECT_DOMAIN_NAME
 EOF
 
 cd $MISTRALCLIENT_DIR

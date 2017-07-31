@@ -285,8 +285,7 @@ class MistralShell(app.App):
             '--os-tenant-name',
             action='store',
             dest='tenant_name',
-            default=env('OS_TENANT_NAME', 'OS_PROJECT_NAME',
-                        default='Default'),
+            default=env('OS_TENANT_NAME', 'OS_PROJECT_NAME'),
             help='Authentication tenant name (Env: OS_TENANT_NAME'
                  ' or OS_PROJECT_NAME)'
         )
@@ -295,8 +294,7 @@ class MistralShell(app.App):
             '--os-project-name',
             action='store',
             dest='project_name',
-            default=env('OS_TENANT_NAME', 'OS_PROJECT_NAME',
-                        default='Default'),
+            default=env('OS_TENANT_NAME', 'OS_PROJECT_NAME'),
             help='Authentication project name (Env: OS_TENANT_NAME'
                  ' or OS_PROJECT_NAME), will use tenant_name if both'
                  ' tenant_name and project_name are set'
@@ -314,7 +312,7 @@ class MistralShell(app.App):
             '--os-project-domain-name',
             action='store',
             dest='project_domain_name',
-            default=env('OS_PROJECT_DOMAIN_NAME', default='Default'),
+            default=env('OS_PROJECT_DOMAIN_NAME'),
             help='Authentication project domain name'
                  ' (Env: OS_PROJECT_DOMAIN_NAME)'
         )
@@ -323,7 +321,7 @@ class MistralShell(app.App):
             '--os-user-domain-name',
             action='store',
             dest='user_domain_name',
-            default=env('OS_USER_DOMAIN_NAME', default='Default'),
+            default=env('OS_USER_DOMAIN_NAME'),
             help='Authentication user domain name'
                  ' (Env: OS_USER_DOMAIN_NAME)'
         )
@@ -435,7 +433,7 @@ class MistralShell(app.App):
             '--os-target-tenant-name',
             action='store',
             dest='target_tenant_name',
-            default=env('OS_TARGET_TENANT_NAME', 'Default'),
+            default=env('OS_TARGET_TENANT_NAME'),
             help='Authentication tenant name for target cloud'
                  ' (Env: OS_TARGET_TENANT_NAME)'
         )

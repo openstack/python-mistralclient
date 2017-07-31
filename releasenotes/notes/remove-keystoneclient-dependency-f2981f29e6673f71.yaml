@@ -1,0 +1,6 @@
+---
+other:
+  - The dependency to python-keystoneclient was removed. Relying solely on
+    keystoneauth1.
+  - The user has to set the "OS_USER_DOMAIN_NAME" and "OS_PROJECT_DOMAIN_NAME"
+    explicitly if keystone v3 version is being used.

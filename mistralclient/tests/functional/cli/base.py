@@ -39,10 +39,14 @@ def credentials(group='admin'):
         username = os.environ.get('OS_USERNAME')
         password = os.environ.get('OS_PASSWORD')
         tenant_name = os.environ.get('OS_TENANT_NAME')
+        user_domain = os.environ.get('OS_USER_DOMAIN_NAME')
+        project_domain = os.environ.get('OS_PROJECT_DOMAIN_NAME')
     else:
         username = os.environ.get('OS_ALT_USERNAME')
         password = os.environ.get('OS_ALT_PASSWORD')
         tenant_name = os.environ.get('OS_ALT_TENANT_NAME')
+        user_domain = os.environ.get('OS_ALT_USER_DOMAIN_NAME')
+        project_domain = os.environ.get('OS_ALT_PROJECT_DOMAIN_NAME')
 
     auth_url = os.environ.get('OS_AUTH_URL')
 
@@ -52,6 +56,8 @@ def credentials(group='admin'):
         password = password or config.get(group, 'pass')
         tenant_name = tenant_name or config.get(group, 'tenant')
         auth_url = auth_url or config.get('auth', 'uri')
+        user_domain = user_domain or config.get(group, 'user_domain')
+        project_domain = project_domain or config.get(group, 'project_domain')
 
     # TODO(ddeja): Default value of OS_AUTH_URL is to provide url to v3 API.
     # Since tempest openstack client doesn't properly handle it, we switch
@@ -77,6 +83,7 @@ class MistralCLIAuth(base.ClientTestBase):
             username=creds['username'],
             password=creds['password'],
             tenant_name=creds['tenant_name'],
+            project_name=creds['tenant_name'],
             uri=creds['auth_url'],
             cli_dir=CLI_DIR
         )
@@ -130,6 +137,7 @@ class MistralCLIAltAuth(base.ClientTestBase):
         clients = base.CLIClient(
             username=creds['username'],
             password=creds['password'],
+            project_name=creds['tenant_name'],
             tenant_name=creds['tenant_name'],
             uri=creds['auth_url'],
             cli_dir=CLI_DIR
