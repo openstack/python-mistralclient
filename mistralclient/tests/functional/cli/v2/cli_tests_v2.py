@@ -1347,14 +1347,35 @@ class ActionExecutionCLITests(base_v2.MistralClientTestBase):
         )
 
         wf_name = self.get_field_value(act_ex, 'Workflow name')
-        status = self.get_field_value(act_ex, 'State')
+        state = self.get_field_value(act_ex, 'State')
 
         self.assertEqual(
             act_ex_from_list['ID'],
             self.get_field_value(act_ex, 'ID')
         )
         self.assertEqual(self.direct_wf['Name'], wf_name)
-        self.assertEqual('SUCCESS', status)
+        self.assertEqual('SUCCESS', state)
+
+    def test_act_execution_list_with_limit(self):
+        self.wait_execution_success(self.direct_ex_id)
+
+        act_execs = self.mistral_admin('action-execution-list')
+
+        # The workflow execution started in setUp()
+        # generates 2 action executions.
+        self.assertGreater(len(act_execs), 1)
+
+        act_execs = self.mistral_admin(
+            'action-execution-list',
+            params="--limit 1"
+        )
+
+        self.assertEqual(len(act_execs), 1)
+
+        act_ex = act_execs[0]
+
+        self.assertEqual(self.direct_wf['Name'], act_ex['Workflow name'])
+        self.assertEqual('SUCCESS', act_ex['State'])
 
     def test_act_execution_create_delete(self):
         action_ex = self.mistral_admin(
