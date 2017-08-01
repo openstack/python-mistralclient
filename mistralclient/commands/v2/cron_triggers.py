@@ -62,7 +62,7 @@ def format(trigger=None, lister=False):
         else:
             data += (None,)
     else:
-        data = (tuple('<none>' for _ in range(len(columns))),)
+        data = (tuple('' for _ in range(len(columns))),)
 
     return columns, data
 

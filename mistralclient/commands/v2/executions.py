@@ -63,7 +63,7 @@ def format(execution=None, lister=False):
             execution.updated_at or '<none>'
         )
     else:
-        data = (tuple('<none>' for _ in range(len(columns))),)
+        data = (tuple('' for _ in range(len(columns))),)
 
     return columns, data
 

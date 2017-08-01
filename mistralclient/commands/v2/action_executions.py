@@ -51,7 +51,7 @@ def format_list(action_ex=None):
             action_ex.updated_at or '<none>'
         )
     else:
-        data = (tuple('<none>' for _ in range(len(columns))),)
+        data = (tuple('' for _ in range(len(columns))),)
 
     return columns, data
 
@@ -84,7 +84,7 @@ def format(action_ex=None):
             action_ex.updated_at or '<none>'
         )
     else:
-        data = (tuple('<none>' for _ in range(len(columns))),)
+        data = (tuple('' for _ in range(len(columns))),)
 
     return columns, data
 
