@@ -178,7 +178,10 @@ class HTTPClient(object):
             headers['X-Target-User-Id'] = self.target_user_id
 
         if self.target_insecure:
-            headers['X-Target-Insecure'] = self.target_insecure
+            # Note(akovi): due to changes in requests, this parameter
+            # must be a string. Basically, it is a truthy value on
+            # the server side.
+            headers['X-Target-Insecure'] = str(self.target_insecure)
 
         if self.target_region_name:
             headers['X-Target-Region-Name'] = self.target_region_name

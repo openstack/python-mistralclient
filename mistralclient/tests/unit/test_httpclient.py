@@ -162,7 +162,7 @@ class HTTPClientTest(base.BaseClientTest):
         self.assertEqual(target_auth_token, headers['X-Target-Auth-Token'])
         self.assertEqual(target_user_id, headers['X-Target-User-Id'])
         self.assertEqual(target_project_id, headers['X-Target-Project-Id'])
-        self.assertEqual(target_insecure, headers['X-Target-Insecure'])
+        self.assertEqual(str(target_insecure), headers['X-Target-Insecure'])
         self.assertEqual(target_region, headers['X-Target-Region-Name'])
         self.assertEqual(target_user_domain_name,
                          headers['X-Target-User-Domain-Name'])
