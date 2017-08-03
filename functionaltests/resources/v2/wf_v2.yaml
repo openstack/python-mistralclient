@@ -7,9 +7,15 @@ wf:
   tasks:
     hello:
       action: std.echo output="Hello"
-      wait-before: 5
+      wait-before: 1
       publish:
-        result: <% task(hello).result %>
+        result: <% task().result %>
+      on-success: bye
+
+    bye:
+      action: std.echo output="Bye"
+      publish:
+        result: <% $.result + ', ' + task().result %>
 
 wf1:
   type: reverse
