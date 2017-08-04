@@ -29,7 +29,7 @@ class TaskManager(base.ResourceManager):
     resource_class = Task
 
     def list(self, workflow_execution_id=None, marker='', limit=None,
-             sort_keys='', sort_dirs='', **filters):
+             sort_keys='', sort_dirs='', fields=[], **filters):
         url = '/tasks'
 
         if workflow_execution_id:
@@ -50,6 +50,9 @@ class TaskManager(base.ResourceManager):
 
         if sort_dirs:
             qparams['sort_dirs'] = sort_dirs
+
+        if fields:
+            qparams['fields'] = ",".join(fields)
 
         for name, val in filters.items():
             qparams[name] = val

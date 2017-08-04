@@ -27,40 +27,45 @@ from mistralclient import utils
 LOG = logging.getLogger(__name__)
 
 
-def format_list(task=None):
-    return format(task, lister=True)
+class TaskFormatter(object):
+    COLUMNS = [
+        ('id',                      'ID'),
+        ('name',                    'Name'),
+        ('workflow_name',           'Workflow name'),
+        ('workflow_execution_id',   'Execution ID'),
+        ('state',                   'State'),
+        ('state_info',              'State info'),
+        ('created_at',              'Created at'),
+        ('updated_at',              'Updated at'),
+    ]
 
+    COLUMN_FIELD_NAMES = list(zip(*COLUMNS))[0]
+    COLUMN_HEADING_NAMES = list(zip(*COLUMNS))[1]
 
-def format(task=None, lister=False):
-    columns = (
-        'ID',
-        'Name',
-        'Workflow name',
-        'Execution ID',
-        'State',
-        'State info',
-        'Created at',
-        'Updated at'
-    )
+    @staticmethod
+    def format_list(task=None):
+        return TaskFormatter.format(task, lister=True)
 
-    if task:
-        state_info = (task.state_info if not lister
-                      else base.cut(task.state_info))
+    @staticmethod
+    def format(task=None, lister=False):
+        if task:
+            state_info = (task.state_info if not lister
+                          else base.cut(task.state_info))
 
-        data = (
-            task.id,
-            task.name,
-            task.workflow_name,
-            task.workflow_execution_id,
-            task.state,
-            state_info,
-            task.created_at,
-            task.updated_at or '<none>'
-        )
-    else:
-        data = (tuple('' for _ in range(len(columns))),)
+            data = (
+                task.id,
+                task.name,
+                task.workflow_name,
+                task.workflow_execution_id,
+                task.state,
+                state_info,
+                task.created_at,
+                task.updated_at or '<none>'
+            )
+        else:
+            data = (tuple('' for _ in range(len(TaskFormatter.COLUMNS))),)
 
-    return columns, data
+        return TaskFormatter.COLUMN_HEADING_NAMES, data
 
 
 class List(base.MistralLister):
@@ -92,7 +97,7 @@ class List(base.MistralLister):
         return parser
 
     def _get_format_function(self):
-        return format_list
+        return TaskFormatter.format_list
 
     def _get_resources(self, parsed_args):
         if parsed_args.limit is None:
@@ -110,6 +115,7 @@ class List(base.MistralLister):
         return mistral_client.tasks.list(
             parsed_args.workflow_execution,
             limit=parsed_args.limit,
+            fields=TaskFormatter.COLUMN_FIELD_NAMES,
             **base.get_filters(parsed_args)
         )
 
@@ -128,7 +134,7 @@ class Get(command.ShowOne):
         mistral_client = self.app.client_manager.workflow_engine
         execution = mistral_client.tasks.get(parsed_args.task)
 
-        return format(execution)
+        return TaskFormatter.format(execution)
 
 
 class GetResult(command.Command):
@@ -223,4 +229,4 @@ class Rerun(command.ShowOne):
             env=env
         )
 
-        return format(execution)
+        return TaskFormatter.format(execution)

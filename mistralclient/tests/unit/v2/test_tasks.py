@@ -50,6 +50,15 @@ class TestTasksV2(base.BaseClientV2Test):
             task.to_dict()
         )
 
+    def test_list_with_fields(self):
+        field_params = "?fields=id,name"
+
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE + field_params,
+                               json={'tasks': [TASK]})
+
+        self.tasks.list(fields=["id,name"])
+        self.assertTrue(self.requests_mock.called_once)
+
     def test_get(self):
         url = self.TEST_URL + URL_TEMPLATE_ID % TASK['id']
         self.requests_mock.get(url, json=TASK)
