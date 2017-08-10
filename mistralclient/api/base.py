@@ -15,6 +15,8 @@
 import copy
 import json
 
+from keystoneauth1 import exceptions
+
 
 class Resource(object):
     resource_name = 'Something'
@@ -89,7 +91,10 @@ class ResourceManager(object):
         if dump_json:
             data = json.dumps(data)
 
-        resp = self.http_client.post(url, data)
+        try:
+            resp = self.http_client.post(url, data)
+        except exceptions.HttpError as ex:
+            self._raise_api_exception(ex.response)
 
         if resp.status_code != 201:
             self._raise_api_exception(resp)
@@ -100,7 +105,10 @@ class ResourceManager(object):
         if dump_json:
             data = json.dumps(data)
 
-        resp = self.http_client.put(url, data)
+        try:
+            resp = self.http_client.put(url, data)
+        except exceptions.HttpError as ex:
+            self._raise_api_exception(ex.response)
 
         if resp.status_code != 200:
             self._raise_api_exception(resp)
@@ -108,7 +116,10 @@ class ResourceManager(object):
         return self.resource_class(self, extract_json(resp, response_key))
 
     def _list(self, url, response_key=None):
-        resp = self.http_client.get(url)
+        try:
+            resp = self.http_client.get(url)
+        except exceptions.HttpError as ex:
+            self._raise_api_exception(ex.response)
 
         if resp.status_code != 200:
             self._raise_api_exception(resp)
@@ -117,7 +128,10 @@ class ResourceManager(object):
                 for resource_data in extract_json(resp, response_key)]
 
     def _get(self, url, response_key=None):
-        resp = self.http_client.get(url)
+        try:
+            resp = self.http_client.get(url)
+        except exceptions.HttpError as ex:
+            self._raise_api_exception(ex.response)
 
         if resp.status_code == 200:
             return self.resource_class(self, extract_json(resp, response_key))
@@ -125,7 +139,10 @@ class ResourceManager(object):
             self._raise_api_exception(resp)
 
     def _delete(self, url):
-        resp = self.http_client.delete(url)
+        try:
+            resp = self.http_client.delete(url)
+        except exceptions.HttpError as ex:
+            self._raise_api_exception(ex.response)
 
         if resp.status_code != 204:
             self._raise_api_exception(resp)

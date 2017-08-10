@@ -38,7 +38,7 @@ PROFILER_HMAC_KEY = 'SECRET_HMAC_KEY'
 PROFILER_TRACE_ID = uuidutils.generate_uuid()
 
 EXPECTED_AUTH_HEADERS = {
-    'x-auth-token': AUTH_TOKEN,
+    'X-Auth-Token': AUTH_TOKEN,
     'X-Project-Id': PROJECT_ID,
     'X-User-Id': USER_ID,
     'X-Region-Name': REGION_NAME

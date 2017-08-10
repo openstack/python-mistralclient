@@ -192,7 +192,8 @@ class WorkflowSharingCLITests(base_v2.MistralClientTestBase):
 
         self.assertEqual('pending', status)
 
-        cmd_param = '%s workflow --status %s' % (self.wf[0]["ID"], new_status)
+        cmd_param = '%s workflow --status %s --member-id %s' % (
+            self.wf[0]["ID"], new_status, self.get_project_id("demo"))
         member = self.mistral_alt_user("member-update", params=cmd_param)
         status = self.get_field_value(member, 'Status')
 

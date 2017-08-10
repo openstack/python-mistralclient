@@ -54,6 +54,10 @@ class Client(object):
         auth_handler = auth.get_auth_handler(auth_type)
         auth_response = auth_handler.authenticate(req, session=session) or {}
 
+        # If the session was None and we're using keystone auth, it will be
+        # created by the auth_handler.
+        session = auth_response.pop('session', None)
+
         req.update(auth_response)
 
         mistral_url = auth_response.get('mistral_url') or mistral_url
