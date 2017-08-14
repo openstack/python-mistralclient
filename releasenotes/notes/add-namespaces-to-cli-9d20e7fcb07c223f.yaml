@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    Using namespaces is now supported from the client. It is possible to use
+    the namespace flag with all workflows commands and when creating a workflow
+    execution. Namespace feature allows a user to add two workflows with the
+    same name to Mistral as long as they are within two different namespaces.
+    Namespace will also be visible in the table printed when using the CLI to
+    get info about workflows. Plus, the CLI will print the workflow namespace
+    along with the workflow name where needed.
