@@ -313,8 +313,17 @@ class MistralShell(app.App):
             action='store',
             dest='project_domain_name',
             default=env('OS_PROJECT_DOMAIN_NAME'),
-            help='Authentication project domain name'
-                 ' (Env: OS_PROJECT_DOMAIN_NAME)'
+            help='Authentication project domain name or ID'
+                 ' (Env: OS_PROJECT_DOMAIN_NAME or OS_PROJECT_DOMAIN_NAME)'
+        )
+
+        parser.add_argument(
+            '--os-project-domain-id',
+            action='store',
+            dest='project_domain_id',
+            default=env('OS_PROJECT_DOMAIN_ID'),
+            help='Authentication project domain ID'
+                 ' (Env: OS_PROJECT_DOMAIN_ID)'
         )
 
         parser.add_argument(
@@ -324,6 +333,15 @@ class MistralShell(app.App):
             default=env('OS_USER_DOMAIN_NAME'),
             help='Authentication user domain name'
                  ' (Env: OS_USER_DOMAIN_NAME)'
+        )
+
+        parser.add_argument(
+            '--os-user-domain-id',
+            action='store',
+            dest='user_domain_id',
+            default=env('OS_USER_DOMAIN_ID'),
+            help='Authentication user domain name'
+                 ' (Env: OS_USER_DOMAIN_ID)'
         )
 
         parser.add_argument(
@@ -484,12 +502,30 @@ class MistralShell(app.App):
         )
 
         parser.add_argument(
+            '--os-target-user-domain-id',
+            action='store',
+            dest='target_user_domain_id',
+            default=env('OS_TARGET_USER_DOMAIN_ID'),
+            help='User domain ID for target cloud'
+                 '(Env: OS_TARGET_USER_DOMAIN_ID)'
+        )
+
+        parser.add_argument(
             '--os-target-project-domain-name',
             action='store',
             dest='target_project_domain_name',
             default=env('OS_TARGET_PROJECT_DOMAIN_NAME'),
             help='Project domain name for target cloud'
                  '(Env: OS_TARGET_PROJECT_DOMAIN_NAME)'
+        )
+
+        parser.add_argument(
+            '--os-target-project-domain-id',
+            action='store',
+            dest='target_project_domain_id',
+            default=env('OS_TARGET_PROJECT_DOMAIN_ID'),
+            help='Project domain ID for target cloud'
+                 '(Env: OS_TARGET_PROJECT_DOMAIN_ID)'
         )
 
         parser.add_argument(
@@ -554,7 +590,15 @@ class MistralShell(app.App):
             'cert': self.options.os_cert,
             'key': self.options.os_key,
             'user_domain_name': self.options.user_domain_name,
-            'project_domain_name': self.options.project_domain_name
+            'user_domain_id': self.options.user_domain_id,
+            'project_domain_name': self.options.project_domain_name,
+            'project_domain_id': self.options.project_domain_id,
+            'target_project_domain_name':
+                self.options.target_project_domain_name,
+            'target_project_domain_id':
+                self.options.target_project_domain_id,
+            'target_user_domain_name': self.options.target_user_domain_name,
+            'target_user_domain_id': self.options.target_user_domain_id
         }
 
         self.client = client.client(
