@@ -25,6 +25,7 @@ from mistralclient.tests.unit import base
 WORKFLOW_DICT = {
     'id': '1-2-3-4',
     'name': 'a',
+    'namespace': '',
     'project_id': '12345',
     'tags': ['a', 'b'],
     'input': 'param',
@@ -55,7 +56,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.Create, app_args=['1.txt'])
 
         self.assertEqual(
-            [('1-2-3-4', 'a', '12345', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', '1', '1')],
             result[1]
         )
 
@@ -69,7 +70,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            [('1-2-3-4', 'a', '12345', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', '1', '1')],
             result[1]
         )
 
@@ -91,7 +92,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.Create, app_args=['1.txt'])
 
         self.assertEqual(
-            [('1-2-3-4', 'a', '12345', 'a, b', cmd_base.cut(long_input),
+            [('1-2-3-4', 'a', '', '12345', 'a, b', cmd_base.cut(long_input),
               '1', '1')],
             result[1]
         )
@@ -103,7 +104,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.Update, app_args=['1.txt'])
 
         self.assertEqual(
-            [('1-2-3-4', 'a', '12345', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', '1', '1')],
             result[1]
         )
 
@@ -117,7 +118,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            [('1-2-3-4', 'a', '12345', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', '1', '1')],
             result[1]
         )
 
@@ -136,7 +137,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            [('1-2-3-4', 'a', '12345', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', '1', '1')],
             result[1]
         )
 
@@ -146,7 +147,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.List)
 
         self.assertEqual(
-            [('1-2-3-4', 'a', '12345', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', '1', '1')],
             result[1]
         )
 
@@ -156,21 +157,21 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.Get, app_args=['name'])
 
         self.assertEqual(
-            ('1-2-3-4', 'a', '12345', 'a, b', 'param', '1', '1'),
+            ('1-2-3-4', 'a', '', '12345', 'a, b', 'param', '1', '1'),
             result[1]
         )
 
     def test_delete(self):
         self.call(workflow_cmd.Delete, app_args=['name'])
 
-        self.client.workflows.delete.assert_called_once_with('name')
+        self.client.workflows.delete.assert_called_once_with('name', None)
 
     def test_delete_with_multi_names(self):
         self.call(workflow_cmd.Delete, app_args=['name1', 'name2'])
 
         self.assertEqual(2, self.client.workflows.delete.call_count)
         self.assertEqual(
-            [mock.call('name1'), mock.call('name2')],
+            [mock.call('name1', None), mock.call('name2', None)],
             self.client.workflows.delete.call_args_list
         )
 

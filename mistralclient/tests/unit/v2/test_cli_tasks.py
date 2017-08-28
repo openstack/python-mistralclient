@@ -28,6 +28,7 @@ TASK_DICT = {
     'id': '123',
     'name': 'some',
     'workflow_name': 'thing',
+    'workflow_namespace': '',
     'workflow_execution_id': '321',
     'state': 'RUNNING',
     'state_info': None,
@@ -48,7 +49,7 @@ TASK_WITH_RESULT = tasks.Task(mock, TASK_WITH_RESULT_DICT)
 TASK_WITH_PUBLISHED = tasks.Task(mock, TASK_WITH_PUBLISHED_DICT)
 
 EXPECTED_TASK_RESULT = (
-    '123', 'some', 'thing', '321', 'RUNNING', None, '1', '1'
+    '123', 'some', 'thing', '', '321', 'RUNNING', None, '1', '1'
 )
 
 

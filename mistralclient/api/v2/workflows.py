@@ -29,7 +29,7 @@ class Workflow(base.Resource):
 class WorkflowManager(base.ResourceManager):
     resource_class = Workflow
 
-    def create(self, definition, scope='private'):
+    def create(self, definition, namespace='', scope='private'):
         self._ensure_not_empty(definition=definition)
 
         # If the specified definition is actually a file, read in the
@@ -37,7 +37,7 @@ class WorkflowManager(base.ResourceManager):
         definition = utils.get_contents_if_file(definition)
 
         resp = self.http_client.post(
-            '/workflows?scope=%s' % scope,
+            '/workflows?scope=%s&namespace=%s' % (scope, namespace),
             definition,
             headers={'content-type': 'text/plain'}
         )
@@ -48,7 +48,7 @@ class WorkflowManager(base.ResourceManager):
         return [self.resource_class(self, resource_data)
                 for resource_data in base.extract_json(resp, 'workflows')]
 
-    def update(self, definition, scope='private', id=None):
+    def update(self, definition, namespace='', scope='private', id=None):
         self._ensure_not_empty(definition=definition)
 
         url_pre = ('/workflows/%s' % id) if id else '/workflows'
@@ -58,7 +58,7 @@ class WorkflowManager(base.ResourceManager):
         definition = utils.get_contents_if_file(definition)
 
         resp = self.http_client.put(
-            '%s?scope=%s' % (url_pre, scope),
+            '%s?namespace=%s&scope=%s' % (url_pre, namespace, scope),
             definition,
             headers={'content-type': 'text/plain'}
         )
@@ -72,9 +72,12 @@ class WorkflowManager(base.ResourceManager):
         return [self.resource_class(self, resource_data)
                 for resource_data in base.extract_json(resp, 'workflows')]
 
-    def list(self, marker='', limit=None, sort_keys='', sort_dirs='',
-             **filters):
+    def list(self, namespace='', marker='', limit=None, sort_keys='',
+             sort_dirs='', **filters):
         qparams = {}
+
+        if namespace:
+            qparams['namespace'] = namespace
 
         if marker:
             qparams['marker'] = marker
@@ -99,15 +102,22 @@ class WorkflowManager(base.ResourceManager):
             response_key='workflows',
         )
 
-    def get(self, identifier):
+    def get(self, identifier, namespace=''):
         self._ensure_not_empty(identifier=identifier)
 
-        return self._get('/workflows/%s' % identifier)
+        return self._get(
+            '/workflows/%s?namespace=%s' % (identifier, namespace)
+        )
 
-    def delete(self, identifier):
+    def delete(self, identifier, namespace=None):
         self._ensure_not_empty(identifier=identifier)
 
-        self._delete('/workflows/%s' % identifier)
+        path = '/workflows/%s' % identifier
+
+        if namespace:
+            path = path + '?namespace=%s' % namespace
+
+        self._delete(path)
 
     def validate(self, definition):
         self._ensure_not_empty(definition=definition)

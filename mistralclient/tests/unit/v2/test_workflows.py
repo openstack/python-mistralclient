@@ -106,7 +106,7 @@ class TestWorkflowsV2(base.BaseClientV2Test):
 
         last_request = self.requests_mock.last_request
 
-        self.assertEqual('scope=private', last_request.query)
+        self.assertEqual('namespace=&scope=private', last_request.query)
         self.assertEqual(WF_DEF, last_request.text)
         self.assertEqual('text/plain', last_request.headers['content-type'])
 

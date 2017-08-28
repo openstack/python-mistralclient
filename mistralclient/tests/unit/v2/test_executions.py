@@ -25,6 +25,7 @@ EXEC = {
     'id': "123",
     'workflow_id': '123e4567-e89b-12d3-a456-426655440000',
     'workflow_name': 'my_wf',
+    'workflow_namespace': '',
     'description': '',
     'state': 'RUNNING',
     'input': {
@@ -39,6 +40,7 @@ SUB_WF_EXEC = {
     'id': "456",
     'workflow_id': '123e4567-e89b-12d3-a456-426655440000',
     'workflow_name': 'my_sub_wf',
+    'workflow_namespace': '',
     'task_execution_id': "abc",
     'description': '',
     'state': 'RUNNING',
@@ -68,6 +70,7 @@ class TestExecutionsV2(base.BaseClientV2Test):
 
         ex = self.executions.create(
             EXEC['workflow_name'],
+            EXEC['workflow_namespace'],
             EXEC['input']
         )
 
@@ -93,7 +96,7 @@ class TestExecutionsV2(base.BaseClientV2Test):
 
         ex = self.executions.create(
             EXEC['workflow_id'],
-            EXEC['input']
+            workflow_input=EXEC['input']
         )
 
         self.assertIsNotNone(ex)

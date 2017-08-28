@@ -30,6 +30,7 @@ def format(workflow=None, lister=False):
     columns = (
         'ID',
         'Name',
+        'Namespace',
         'Project ID',
         'Tags',
         'Input',
@@ -43,6 +44,7 @@ def format(workflow=None, lister=False):
         data = (
             workflow.id,
             workflow.name,
+            workflow.namespace,
             workflow.project_id,
             base.wrap(', '.join(tags)) or '<none>',
             workflow.input if not lister else base.cut(workflow.input),
@@ -114,6 +116,12 @@ class Create(base.MistralLister):
             help='Workflow definition file.'
         )
         parser.add_argument(
+            '--namespace',
+            nargs='?',
+            default='',
+            help="Namespace to create the workflow within.",
+        )
+        parser.add_argument(
             '--public',
             action='store_true',
             help='With this flag workflow will be marked as "public".'
@@ -135,6 +143,7 @@ class Create(base.MistralLister):
 
         return mistral_client.workflows.create(
             parsed_args.definition.read(),
+            namespace=parsed_args.namespace,
             scope=scope
         )
 
@@ -151,12 +160,21 @@ class Delete(command.Command):
             help='Name or ID of workflow(s).'
         )
 
+        parser.add_argument(
+            '--namespace',
+            nargs='?',
+            default=None,
+            help="Parent task execution ID associated with workflow "
+                 "execution list.",
+        )
+
         return parser
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
         utils.do_action_on_many(
-            lambda s: mistral_client.workflows.delete(s),
+            lambda s: mistral_client.workflows.delete(s,
+                                                      parsed_args.namespace),
             parsed_args.workflow,
             "Request to delete workflow %s has been accepted.",
             "Unable to delete the specified workflow(s)."
@@ -174,7 +192,17 @@ class Update(base.MistralLister):
             type=argparse.FileType('r'),
             help='Workflow definition'
         )
+
         parser.add_argument('--id', help='Workflow ID.')
+
+        parser.add_argument(
+            '--namespace',
+            nargs='?',
+            default='',
+            help="Parent task execution ID associated with workflow "
+                 "execution list.",
+        )
+
         parser.add_argument(
             '--public',
             action='store_true',
@@ -193,7 +221,8 @@ class Update(base.MistralLister):
         return mistral_client.workflows.update(
             parsed_args.definition.read(),
             scope=scope,
-            id=parsed_args.id
+            id=parsed_args.id,
+            namespace=parsed_args.namespace
         )
 
 

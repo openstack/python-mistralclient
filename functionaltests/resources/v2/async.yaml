@@ -1,0 +1,8 @@
+---
+version: '2.0'
+
+async_wf:
+  type: direct
+  tasks:
+    async_task:
+      action: std.async_noop

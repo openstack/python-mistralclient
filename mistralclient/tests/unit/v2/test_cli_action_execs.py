@@ -30,6 +30,7 @@ ACTION_EX_DICT = {
     'id': '123',
     'name': 'some',
     'workflow_name': 'thing',
+    'workflow_namespace': '',
     'task_name': 'task1',
     'task_execution_id': "1-2-3-4",
     'state': 'RUNNING',
@@ -86,7 +87,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            ('123', 'some', 'thing', 'task1', '1-2-3-4', 'RUNNING',
+            ('123', 'some', 'thing', '', 'task1', '1-2-3-4', 'RUNNING',
              'RUNNING somehow.', True, '1', '1'),
             result[1]
         )
@@ -142,6 +143,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
                 action_ex_dict['id'],
                 action_ex_dict['name'],
                 action_ex_dict['workflow_name'],
+                action_ex_dict['workflow_namespace'],
                 action_ex_dict['task_name'],
                 action_ex_dict['task_execution_id'],
                 action_ex_dict['state'],
@@ -178,7 +180,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
         result = self.call(action_ex_cmd.List)
 
         self.assertEqual(
-            [('123', 'some', 'thing', 'task1', '1-2-3-4', 'RUNNING', True,
+            [('123', 'some', 'thing', '', 'task1', '1-2-3-4', 'RUNNING', True,
               '1', '1')],
             result[1]
         )
@@ -189,7 +191,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
         result = self.call(action_ex_cmd.Get, app_args=['id'])
 
         self.assertEqual(
-            ('123', 'some', 'thing', 'task1', '1-2-3-4', 'RUNNING',
+            ('123', 'some', 'thing', '', 'task1', '1-2-3-4', 'RUNNING',
              'RUNNING somehow.', True, '1', '1'), result[1]
         )
 

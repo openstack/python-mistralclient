@@ -32,6 +32,7 @@ EXEC = executions.Execution(
         'id': '123',
         'workflow_id': '123e4567-e89b-12d3-a456-426655440000',
         'workflow_name': 'some',
+        'workflow_namespace': '',
         'description': '',
         'state': 'RUNNING',
         'state_info': None,
@@ -47,6 +48,7 @@ SUB_WF_EXEC = executions.Execution(
         'id': '456',
         'workflow_id': '123e4567-e89b-12d3-a456-426655440000',
         'workflow_name': 'some_sub_wf',
+        'workflow_namespace': '',
         'description': '',
         'state': 'RUNNING',
         'state_info': None,
@@ -61,6 +63,7 @@ EX_RESULT = (
     '123e4567-e89b-12d3-a456-426655440000',
     'some',
     '',
+    '',
     '<none>',
     'RUNNING',
     None,
@@ -72,6 +75,7 @@ SUB_WF_EX_RESULT = (
     '456',
     '123e4567-e89b-12d3-a456-426655440000',
     'some_sub_wf',
+    '',
     '',
     'abc',
     'RUNNING',
@@ -154,6 +158,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
                     'id': '123',
                     'workflow_id': '123e4567-e89b-12d3-a456-426655440000',
                     'workflow_name': 'some',
+                    'workflow_namespace': '',
                     'description': '',
                     'state': state,
                     'state_info': None,
@@ -164,7 +169,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
             )
 
             ex_result = list(EX_RESULT)
-            ex_result[5] = state
+            ex_result[6] = state
             ex_result = tuple(ex_result)
 
             result = self.call(
