@@ -13,8 +13,11 @@
 #    limitations under the License.
 
 import logging
+import os
 import pprint
+
 import requests
+from six.moves import urllib
 
 from mistralclient import auth
 
@@ -111,11 +114,13 @@ class KeycloakAuthHandler(auth.AuthHandler):
 
         return response
 
+    @staticmethod
     def _authenticate_with_token(auth_url, client_id, client_secret,
                                  auth_token, cacert=None, insecure=None):
         # TODO(rakhmerov): Implement.
         raise NotImplementedError
 
+    @staticmethod
     def _authenticate_with_password(auth_url, client_id, client_secret,
                                     realm_name, username, password,
                                     cacert=None, insecure=None):
@@ -123,6 +128,10 @@ class KeycloakAuthHandler(auth.AuthHandler):
             "%s/realms/%s/protocol/openid-connect/token" %
             (auth_url, realm_name)
         )
+
+        verify = None
+        if urllib.parse.urlparse(access_token_endpoint).scheme == "https":
+            verify = False if insecure else cacert
 
         client_auth = (client_id, client_secret)
 
@@ -137,7 +146,7 @@ class KeycloakAuthHandler(auth.AuthHandler):
             access_token_endpoint,
             auth=client_auth,
             data=body,
-            verify=not insecure
+            verify=verify
         )
 
         try:
@@ -151,6 +160,24 @@ class KeycloakAuthHandler(auth.AuthHandler):
         return resp.json()['access_token']
 
 
+def get_system_ca_file():
+    """Return path to system default CA file."""
+    # Standard CA file locations for Debian/Ubuntu, RedHat/Fedora,
+    # Suse, FreeBSD/OpenBSD, MacOSX, and the bundled ca
+    ca_path = ['/etc/ssl/certs/ca-certificates.crt',
+               '/etc/pki/tls/certs/ca-bundle.crt',
+               '/etc/ssl/ca-bundle.pem',
+               '/etc/ssl/cert.pem',
+               '/System/Library/OpenSSL/certs/cacert.pem',
+               requests.certs.where()]
+    for ca in ca_path:
+        LOG.debug("Looking for ca file %s", ca)
+        if os.path.exists(ca):
+            LOG.debug("Using ca file %s", ca)
+            return ca
+    LOG.warning("System ca file could not be found.")
+
+
 # An example of using KeyCloak OpenID authentication.
 if __name__ == '__main__':
     print("Using username/password to get access token from KeyCloak...")
@@ -158,13 +185,15 @@ if __name__ == '__main__':
     auth_handler = KeycloakAuthHandler()
 
     a_token = auth_handler.authenticate(
-        "https://my.keycloak:8443/auth",
-        client_id="mistral_client",
-        client_secret="4a080907-921b-409a-b793-c431609c3a47",
-        realm_name="mistral",
-        username="user",
-        password="secret",
-        insecure=True
+        dict(
+            "https://my.keycloak:8443/auth",
+            client_id="mistral_client",
+            client_secret="4a080907-921b-409a-b793-c431609c3a47",
+            realm_name="mistral",
+            username="user",
+            password="secret",
+            insecure=True
+        )
     )
 
     print("Access token: %s" % a_token)
