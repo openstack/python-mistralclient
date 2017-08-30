@@ -134,3 +134,124 @@ class TestShell(base.BaseShellTests):
         params = client_mock.call_args
 
         self.assertEqual('RegionOne', params[1]['region_name'])
+
+    @mock.patch('mistralclient.api.client.client')
+    def test_tenant_id_and_tenant_name(self, client_mock):
+        self.shell(
+            '--os-tenant-id=123tenant --os-tenant-name=fake_tenant'
+            ' workbook-list')
+
+        self.assertTrue(client_mock.called)
+
+        params = client_mock.call_args
+        self.assertEqual('fake_tenant', params[1]['project_name'])
+        self.assertEqual('123tenant', params[1]['project_id'])
+
+    @mock.patch('mistralclient.api.client.client')
+    def test_project_id_and_project_name(self, client_mock):
+        self.shell(
+            '--os-project-name=fake_tenant --os-project-id=123tenant'
+            ' workbook-list')
+
+        self.assertTrue(client_mock.called)
+
+        params = client_mock.call_args
+
+        self.assertEqual('fake_tenant', params[1]['project_name'])
+        self.assertEqual('123tenant', params[1]['project_id'])
+
+    @mock.patch('mistralclient.api.client.client')
+    def test_project_domain_name(self, client_mock):
+        self.shell('--os-project-domain-name=default workbook-list')
+
+        self.assertTrue(client_mock.called)
+
+        params = client_mock.call_args
+
+        self.assertEqual('default', params[1]['project_domain_name'])
+
+    @mock.patch('mistralclient.api.client.client')
+    def test_project_domain_id(self, client_mock):
+        self.shell('--os-project-domain-id=default workbook-list')
+
+        self.assertTrue(client_mock.called)
+
+        params = client_mock.call_args
+
+        self.assertEqual('default', params[1]['project_domain_id'])
+
+    @mock.patch('mistralclient.api.client.client')
+    def test_user_domain_name(self, client_mock):
+        self.shell('--os-user-domain-name=default workbook-list')
+
+        self.assertTrue(client_mock.called)
+
+        params = client_mock.call_args
+        self.assertEqual('default', params[1]['user_domain_name'])
+
+    @mock.patch('mistralclient.api.client.client')
+    def test_user_domain_id(self, client_mock):
+        self.shell('--os-user-domain-id=default workbook-list')
+
+        self.assertTrue(client_mock.called)
+
+        params = client_mock.call_args
+        self.assertEqual('default', params[1]['user_domain_id'])
+
+    @mock.patch('mistralclient.api.client.client')
+    def test_target_user_name_and_password(self, client_mock):
+        self.shell(
+            '--os-target-username=admin'
+            ' --os-target-password=secret_pass workbook-list')
+        self.assertTrue(client_mock.called)
+
+        params = client_mock.call_args
+        self.assertEqual('admin', params[1]['target_username'])
+        self.assertEqual('secret_pass', params[1]['target_api_key'])
+
+    @mock.patch('mistralclient.api.client.client')
+    def test_target_tenant_name_and_id(self, client_mock):
+        self.shell(
+            '--os-target-tenant-id=123fake'
+            ' --os-target-tenant-name=fake_target workbook-list')
+        self.assertTrue(client_mock.called)
+
+        params = client_mock.call_args
+        self.assertEqual('123fake', params[1]['target_project_id'])
+        self.assertEqual('fake_target', params[1]['target_project_name'])
+
+    @mock.patch('mistralclient.api.client.client')
+    def test_target_user_domain_id(self, client_mock):
+        self.shell('--os-target-user-domain-id=default workbook-list')
+
+        self.assertTrue(client_mock.called)
+
+        params = client_mock.call_args
+        self.assertEqual('default', params[1]['target_user_domain_id'])
+
+    @mock.patch('mistralclient.api.client.client')
+    def test_target_user_domain_name(self, client_mock):
+        self.shell('--os-target-user-domain-name=default workbook-list')
+
+        self.assertTrue(client_mock.called)
+
+        params = client_mock.call_args
+        self.assertEqual('default', params[1]['target_user_domain_name'])
+
+    @mock.patch('mistralclient.api.client.client')
+    def test_target_project_domain_id(self, client_mock):
+        self.shell('--os-target-project-domain-id=default workbook-list')
+
+        self.assertTrue(client_mock.called)
+
+        params = client_mock.call_args
+        self.assertEqual('default', params[1]['target_project_domain_id'])
+
+    @mock.patch('mistralclient.api.client.client')
+    def test_target_project_domain_name(self, client_mock):
+        self.shell('--os-target-project-domain-name=default workbook-list')
+
+        self.assertTrue(client_mock.called)
+
+        params = client_mock.call_args
+        self.assertEqual('default', params[1]['target_project_domain_name'])

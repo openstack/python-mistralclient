@@ -50,10 +50,11 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
         project_id = req.get('project_id')
         region_name = req.get('region_name')
         user_domain_name = req.get('user_domain_name')
+        user_domain_id = req.get('user_domain_id')
         project_domain_name = req.get('project_domain_name')
+        project_domain_id = req.get('project_domain_id')
         cacert = req.get('cacert')
         insecure = req.get('insecure', False)
-
         target_auth_url = req.get('target_auth_url')
         target_username = req.get('target_username')
         target_user_id = req.get('target_user_id')
@@ -62,7 +63,9 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
         target_project_name = req.get('target_project_name')
         target_project_id = req.get('target_project_id')
         target_user_domain_name = req.get('target_user_domain_name')
+        target_user_domain_id = req.get('target_user_domain_id')
         target_project_domain_name = req.get('target_project_domain_name')
+        target_project_domain_id = req.get('target_project_domain_id')
         target_cacert = req.get('target_cacert')
         target_insecure = req.get('target_insecure')
 
@@ -87,6 +90,7 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
                     project_id=project_id,
                     project_name=project_name,
                     project_domain_name=project_domain_name,
+                    project_domain_id=project_domain_id,
                     cacert=cacert,
                     insecure=insecure)
             elif api_key and (username or user_id):
@@ -96,9 +100,11 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
                     user_id=user_id,
                     password=api_key,
                     user_domain_name=user_domain_name,
+                    user_domain_id=user_domain_id,
                     project_id=project_id,
                     project_name=project_name,
-                    project_domain_name=project_domain_name)
+                    project_domain_name=project_domain_name,
+                    project_domain_id=project_domain_id)
 
             else:
                 # NOTE(jaosorior): We don't crash here cause it's needed for
@@ -132,6 +138,7 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
                     project_id=target_project_id,
                     project_name=target_project_name,
                     project_domain_name=target_project_domain_name,
+                    project_domain_id=target_project_domain_id,
                     cacert=target_cacert,
                     insecure=target_insecure)
             elif target_api_key and (target_username or target_user_id):
@@ -141,10 +148,11 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
                     user_id=target_user_id,
                     password=target_api_key,
                     user_domain_name=target_user_domain_name,
+                    user_domain_id=target_user_domain_id,
                     project_id=target_project_id,
                     project_name=target_project_name,
                     project_domain_name=target_project_domain_name,
-                )
+                    project_domain_id=target_project_domain_id)
             else:
                 raise RuntimeError("You must either provide a valid token or "
                                    "a password (target_api_key) and a user.")
