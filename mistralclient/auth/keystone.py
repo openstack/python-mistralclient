@@ -27,7 +27,7 @@ LOG = logging.getLogger(__name__)
 class KeystoneAuthHandler(mistral_auth.AuthHandler):
 
     def authenticate(self, req, session=None):
-        """Performs authentication via Keystone.
+        """Perform authentication via Keystone.
 
         :param req: Request dict containing list of parameters required
             for Keystone authentication.
@@ -53,8 +53,6 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
         user_domain_id = req.get('user_domain_id')
         project_domain_name = req.get('project_domain_name')
         project_domain_id = req.get('project_domain_id')
-        cacert = req.get('cacert')
-        insecure = req.get('insecure', False)
         target_auth_url = req.get('target_auth_url')
         target_username = req.get('target_username')
         target_user_id = req.get('target_user_id')
@@ -66,8 +64,6 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
         target_user_domain_id = req.get('target_user_domain_id')
         target_project_domain_name = req.get('target_project_domain_name')
         target_project_domain_id = req.get('target_project_domain_id')
-        target_cacert = req.get('target_cacert')
-        target_insecure = req.get('target_insecure')
 
         if project_name and project_id:
             raise RuntimeError(
@@ -90,9 +86,8 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
                     project_id=project_id,
                     project_name=project_name,
                     project_domain_name=project_domain_name,
-                    project_domain_id=project_domain_id,
-                    cacert=cacert,
-                    insecure=insecure)
+                    project_domain_id=project_domain_id)
+
             elif api_key and (username or user_id):
                 auth = auth_plugin.Password(
                     auth_url=auth_url,
@@ -138,9 +133,8 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
                     project_id=target_project_id,
                     project_name=target_project_name,
                     project_domain_name=target_project_domain_name,
-                    project_domain_id=target_project_domain_id,
-                    cacert=target_cacert,
-                    insecure=target_insecure)
+                    project_domain_id=target_project_domain_id)
+
             elif target_api_key and (target_username or target_user_id):
                 target_auth = auth_plugin.Password(
                     auth_url=target_auth_url,
