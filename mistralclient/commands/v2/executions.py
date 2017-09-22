@@ -173,6 +173,7 @@ class Create(command.ShowOne):
 
         parser.add_argument(
             'workflow_identifier',
+            nargs='?',
             help='Workflow ID or name. Workflow name will be deprecated since '
                  'Mitaka.'
         )
@@ -199,6 +200,14 @@ class Create(command.ShowOne):
             default='',
             help='Execution description'
         )
+        parser.add_argument(
+            '-s',
+            dest='source_execution_id',
+            nargs='?',
+            help="Workflow Execution id which will allow operators to create "
+                 "a new workflow execution based on the previously successful "
+                 "executed workflow. Example: mistral execution-create -s "
+                 "123e4567-e89b-12d3-a456-426655440000")
 
         return parser
 
@@ -220,6 +229,7 @@ class Create(command.ShowOne):
             parsed_args.namespace,
             wf_input,
             parsed_args.description,
+            parsed_args.source_execution_id,
             **params
         )
 
