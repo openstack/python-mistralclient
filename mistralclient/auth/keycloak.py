@@ -38,10 +38,10 @@ class KeycloakAuthHandler(auth.AuthHandler):
             * client_id: Client ID (according to OpenID Connect protocol).
             * client_secret: Client secret (according to OpenID Connect
                 protocol).
-            * realm_name: KeyCloak realm name.
+            * project_name: KeyCloak realm name.
             * username: User name (Optional, if None then access_token must be
                 provided).
-            * password: Password (Optional).
+            * api_key: Password (Optional).
             * access_token: Access token. If passed, username and password are
                 not used and this method just validates the token and refreshes
                 it if needed (Optional, if None then username must be
@@ -59,9 +59,9 @@ class KeycloakAuthHandler(auth.AuthHandler):
         auth_url = req.get('auth_url')
         client_id = req.get('client_id')
         client_secret = req.get('client_secret')
-        realm_name = req.get('realm_name')
+        realm_name = req.get('project_name')
         username = req.get('username')
-        password = req.get('password')
+        password = req.get('api_key')
         access_token = req.get('access_token')
         cacert = req.get('cacert')
         insecure = req.get('insecure', False)
@@ -71,9 +71,6 @@ class KeycloakAuthHandler(auth.AuthHandler):
 
         if not client_id:
             raise ValueError('Client ID is not provided.')
-
-        if not client_secret:
-            raise ValueError('Client secret is not provided.')
 
         if not realm_name:
             raise ValueError('Project(realm) name is not provided.')
@@ -110,9 +107,7 @@ class KeycloakAuthHandler(auth.AuthHandler):
                 insecure
             )
 
-        response['project_id'] = realm_name
-
-        return response
+        return {'auth_token': response, 'project_id': realm_name}
 
     @staticmethod
     def _authenticate_with_token(auth_url, client_id, client_secret,
@@ -131,20 +126,21 @@ class KeycloakAuthHandler(auth.AuthHandler):
 
         verify = None
         if urllib.parse.urlparse(access_token_endpoint).scheme == "https":
-            verify = False if insecure else cacert
-
-        client_auth = (client_id, client_secret)
+            verify = False if insecure else cacert if cacert else True
 
         body = {
             'grant_type': 'password',
             'username': username,
             'password': password,
+            'client_id': client_id,
             'scope': 'profile'
         }
 
+        if client_secret:
+            body['client_secret'] = client_secret,
+
         resp = requests.post(
             access_token_endpoint,
-            auth=client_auth,
             data=body,
             verify=verify
         )
@@ -177,6 +173,10 @@ def get_system_ca_file():
             return ca
     LOG.warning("System ca file could not be found.")
 
+# An example of working curl request to keycloak
+# curl -d "client_id=admin-cli" -d "client_secret=secret"
+# -d "username=admin" -d "password=qwerty" -d "grant_type=password"
+# "http://localhost:8080/auth/realms/master/protocol/openid-connect/token"
 
 # An example of using KeyCloak OpenID authentication.
 if __name__ == '__main__':
@@ -188,12 +188,12 @@ if __name__ == '__main__':
         dict(
             "https://my.keycloak:8443/auth",
             client_id="mistral_client",
-            client_secret="4a080907-921b-409a-b793-c431609c3a47",
-            realm_name="mistral",
+            client_secret="secret",
+            project_name="mistral",
             username="user",
-            password="secret",
+            api_key="secret",
             insecure=True
         )
-    )
+    )['auth_token']
 
-    print("Access token: %s" % a_token)
+    print("Auth token: %s" % a_token)
