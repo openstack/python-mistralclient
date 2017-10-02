@@ -13,6 +13,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import mock
+
 from mistralclient.api.v2 import client
 from mistralclient.tests.unit import base
 
@@ -24,14 +26,17 @@ class BaseClientV2Test(base.BaseClientTest):
     def setUp(self):
         super(BaseClientV2Test, self).setUp()
 
-        self._client = client.Client(project_name="test",
-                                     mistral_url=self.TEST_URL)
-        self.workbooks = self._client.workbooks
-        self.executions = self._client.executions
-        self.tasks = self._client.tasks
-        self.workflows = self._client.workflows
-        self.environments = self._client.environments
-        self.action_executions = self._client.action_executions
-        self.actions = self._client.actions
-        self.services = self._client.services
-        self.members = self._client.members
+        with mock.patch(
+                'mistralclient.auth.keystone.KeystoneAuthHandler.authenticate',
+                return_value={'session': None}):
+            self._client = client.Client(project_name="test",
+                                         mistral_url=self.TEST_URL)
+            self.workbooks = self._client.workbooks
+            self.executions = self._client.executions
+            self.tasks = self._client.tasks
+            self.workflows = self._client.workflows
+            self.environments = self._client.environments
+            self.action_executions = self._client.action_executions
+            self.actions = self._client.actions
+            self.services = self._client.services
+            self.members = self._client.members
