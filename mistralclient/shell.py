@@ -523,7 +523,13 @@ class MistralShell(app.App):
 
         self._set_shell_commands(self._get_commands(ver))
 
-        do_help = ('help' in argv) or ('-h' in argv) or not argv
+        # bash-completion and help messages should not require client creation
+        need_client = not (
+            ('bash-completion' in argv) or
+            ('help' in argv) or
+            ('-h' in argv) or
+            ('--help' in argv) or
+            not argv)
 
         # Set default for auth_url if not supplied. The default is not
         # set at the parser to support use cases where auth is not enabled.
@@ -531,10 +537,6 @@ class MistralShell(app.App):
         if not self.options.auth_url:
             if self.options.password or self.options.token:
                 self.options.auth_url = 'http://localhost:35357/v3'
-
-        # bash-completion should not require authentification.
-        if do_help or ('bash-completion' in argv):
-            self.options.auth_url = None
 
         if self.options.auth_url and not self.options.token:
             if not self.options.username:
@@ -549,6 +551,19 @@ class MistralShell(app.App):
                      "via --os-password env[OS_PASSWORD]")
                 )
 
+        self.client = self._create_client() if need_client else None
+
+        # Adding client_manager variable to make mistral client work with
+        # unified OpenStack client.
+        ClientManager = type(
+            'ClientManager',
+            (object,),
+            dict(workflow_engine=self.client)
+        )
+
+        self.client_manager = ClientManager()
+
+    def _create_client(self):
         kwargs = {
             'cert': self.options.os_cert,
             'key': self.options.os_key,
@@ -556,7 +571,7 @@ class MistralShell(app.App):
             'project_domain_name': self.options.project_domain_name
         }
 
-        self.client = client.client(
+        return client.client(
             mistral_url=self.options.mistral_url,
             username=self.options.username,
             api_key=self.options.password,
@@ -584,16 +599,6 @@ class MistralShell(app.App):
             target_insecure=self.options.target_insecure,
             **kwargs
         )
-
-        # Adding client_manager variable to make mistral client work with
-        # unified OpenStack client.
-        ClientManager = type(
-            'ClientManager',
-            (object,),
-            dict(workflow_engine=self.client)
-        )
-
-        self.client_manager = ClientManager()
 
     def _set_shell_commands(self, cmds_dict):
         for k, v in cmds_dict.items():
