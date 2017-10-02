@@ -171,7 +171,7 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
                 api.TARGET_AUTH_URI: target_auth_url,
                 api.TARGET_SERVICE_CATALOG: jsonutils.dumps(
                     target_auth.get_access(
-                        target_session)._data['access'])
+                        target_session).service_catalog.catalog)
             })
 
         return auth_response

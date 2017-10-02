@@ -569,6 +569,23 @@ class MistralShell(app.App):
             if self.options.password or self.options.token:
                 self.options.auth_url = 'http://localhost:35357/v3'
 
+        if (self.options.auth_type == 'keystone' and
+                not self.options.auth_url.endswith("/v2.0")):
+            # Assume that keystone V3 is used and try to be more user-friendly,
+            # i.e provide default values for domains
+            if (not self.options.project_domain_id and
+                    not self.options.project_domain_name):
+                self.options.project_domain_id = "default"
+            if (not self.options.user_domain_id and
+                    not self.options.user_domain_name):
+                self.options.user_domain_id = "default"
+            if (not self.options.target_project_domain_id and
+                    not self.options.target_project_domain_name):
+                self.options.target_project_domain_id = "default"
+            if (not self.options.target_user_domain_id and
+                    not self.options.target_user_domain_name):
+                self.options.target_user_domain_id = "default"
+
         # bash-completion should not require authentification.
         if do_help or ('bash-completion' in argv):
             self.options.auth_url = None

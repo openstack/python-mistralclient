@@ -255,3 +255,65 @@ class TestShell(base.BaseShellTests):
 
         params = client_mock.call_args
         self.assertEqual('default', params[1]['target_project_domain_name'])
+
+    @mock.patch('mistralclient.api.client.client')
+    def test_no_domains_keystone_v3(self, client_mock):
+        self.shell(
+            '--os-auth-url=https://127.0.0.1:35357/v3 '
+            '--os-username=admin '
+            '--os-password=1234 '
+            'workbook-list'
+        )
+        self.assertTrue(client_mock.called)
+        params = client_mock.call_args
+        self.assertEqual('https://127.0.0.1:35357/v3', params[1]['auth_url'])
+        # For keystone v3 'default' values are automatically substituted for
+        # project_domain_id and user_domain_id, if nothing was provided
+        self.assertEqual('default', params[1]['project_domain_id'])
+        self.assertEqual('default', params[1]['user_domain_id'])
+        self.assertEqual('default', params[1]['target_project_domain_id'])
+        self.assertEqual('default', params[1]['target_user_domain_id'])
+
+    @mock.patch('mistralclient.api.client.client')
+    def test_with_domain_names_keystone_v3(self, client_mock):
+        self.shell(
+            '--os-auth-url=https://127.0.0.1:35357/v3 '
+            '--os-username=admin '
+            '--os-password=1234 '
+            '--os-project-domain-name=fake_domain '
+            '--os-user-domain-name=fake_domain '
+            '--os-target-project-domain-name=fake_domain '
+            '--os-target-user-domain-name=fake_domain '
+            'workbook-list'
+        )
+        self.assertTrue(client_mock.called)
+        params = client_mock.call_args
+        self.assertEqual('https://127.0.0.1:35357/v3', params[1]['auth_url'])
+        # No need to substitute values for project_domain_id and
+        # user_domain_id if related domain names were provided
+        self.assertEqual('', params[1]['project_domain_id'])
+        self.assertEqual('', params[1]['user_domain_id'])
+        self.assertEqual('fake_domain', params[1]['project_domain_name'])
+        self.assertEqual('fake_domain', params[1]['user_domain_name'])
+        self.assertEqual(
+            'fake_domain',
+            params[1]['target_project_domain_name']
+        )
+        self.assertEqual('fake_domain', params[1]['target_user_domain_name'])
+
+    @mock.patch('mistralclient.api.client.client')
+    def test_no_domains_keystone_v2(self, client_mock):
+        self.shell(
+            '--os-auth-url=https://127.0.0.1:35357/v2.0 '
+            '--os-username=admin '
+            '--os-password=1234 '
+            'workbook-list'
+        )
+        self.assertTrue(client_mock.called)
+        params = client_mock.call_args
+        self.assertEqual('https://127.0.0.1:35357/v2.0', params[1]['auth_url'])
+        # For keystone v2 nothing is substituted
+        self.assertEqual('', params[1]['project_domain_id'])
+        self.assertEqual('', params[1]['user_domain_id'])
+        self.assertEqual('', params[1]['target_project_domain_id'])
+        self.assertEqual('', params[1]['target_user_domain_id'])

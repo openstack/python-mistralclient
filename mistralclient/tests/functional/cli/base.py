@@ -120,8 +120,18 @@ class MistralCLIAuth(base.ClientTestBase):
         project_name = credentials(project)['tenant_name']
 
         admin_clients = self._get_clients()
+
+        # TODO(mfedosin): when bug #1719687 is closed we should provide
+        # domain names in related parameters, not just as abstract flags
+        flags = "--os-user-domain-name default " \
+                "--os-project-domain-name default " \
+                "--os-identity-api-version 3"
         projects = self.parser.listing(
-            admin_clients.openstack('project show', params=project_name)
+            admin_clients.openstack(
+                'project show',
+                params=project_name,
+                flags=flags
+            )
         )
 
         return [o['Value'] for o in projects if o['Field'] == 'id'][0]
