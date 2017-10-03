@@ -924,7 +924,7 @@ class CronTriggerCLITests(base_v2.MistralClientTestBase):
         trigger = self.mistral_admin(
             'cron-trigger-create',
             params=('trigger %s {} --pattern "5 * * * *" --count 5'
-                    ' --first-time "4242-12-25 13:37"' % self.wf_name)
+                    ' --first-time "4242-12-25 13:37" --utc' % self.wf_name)
         )
 
         self.assertTableStruct(trigger, ['Field', 'Value'])
