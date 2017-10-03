@@ -169,7 +169,7 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
 
     def workflow_member_create(self, wf_id):
         cmd_param = (
-            '%s workflow %s' % (wf_id, self.get_project_id("demo"))
+            '%s workflow %s' % (wf_id, self.get_project_id("alt_demo"))
         )
         member = self.mistral_admin("member-create", params=cmd_param)
 

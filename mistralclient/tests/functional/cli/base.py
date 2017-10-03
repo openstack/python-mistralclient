@@ -14,7 +14,7 @@
 
 import os
 
-from six.moves import configparser
+import os_client_config
 from tempest.lib.cli import base
 
 
@@ -22,54 +22,24 @@ CLI_DIR = os.environ.get(
     'OS_MISTRALCLIENT_EXEC_DIR',
     os.path.join(os.path.abspath('.'), '.tox/functional/bin')
 )
-_CREDS_FILE = 'functional_creds.conf'
 
 
-def credentials(group='admin'):
-    """Retrieves credentials to run functional tests.
+def credentials(cloud='devstack-admin'):
+    """Retrieves credentials to run functional tests
 
-    Credentials are either read from the environment or from a config file
-    ('functional_creds.conf'). Environment variables override those from the
-    config file.
-
-    The 'functional_creds.conf' file is the clean and new way to use (by
-    default tox 2.0 does not pass environment variables).
+    Credentials are either read via os-client-config from the environment
+    or from a config file ('clouds.yaml'). Environment variables override
+    those from the config file.
+    devstack produces a clouds.yaml with two named clouds - one named
+    'devstack' which has user privs and one named 'devstack-admin' which
+    has admin privs. This function will default to getting the devstack-admin
+    cloud as that is the current expected behavior.
     """
-    if group == 'admin':
-        username = os.environ.get('OS_USERNAME')
-        password = os.environ.get('OS_PASSWORD')
-        tenant_name = os.environ.get('OS_TENANT_NAME')
-        user_domain = os.environ.get('OS_USER_DOMAIN_NAME')
-        project_domain = os.environ.get('OS_PROJECT_DOMAIN_NAME')
-    else:
-        username = os.environ.get('OS_ALT_USERNAME')
-        password = os.environ.get('OS_ALT_PASSWORD')
-        tenant_name = os.environ.get('OS_ALT_TENANT_NAME')
-        user_domain = os.environ.get('OS_ALT_USER_DOMAIN_NAME')
-        project_domain = os.environ.get('OS_ALT_PROJECT_DOMAIN_NAME')
+    return get_cloud_config(cloud=cloud).get_auth_args()
 
-    auth_url = os.environ.get('OS_AUTH_URL')
 
-    config = configparser.RawConfigParser()
-    if config.read(_CREDS_FILE):
-        username = username or config.get(group, 'user')
-        password = password or config.get(group, 'pass')
-        tenant_name = tenant_name or config.get(group, 'tenant')
-        auth_url = auth_url or config.get('auth', 'uri')
-        user_domain = user_domain or config.get(group, 'user_domain')
-        project_domain = project_domain or config.get(group, 'project_domain')
-
-    # TODO(ddeja): Default value of OS_AUTH_URL is to provide url to v3 API.
-    # Since tempest openstack client doesn't properly handle it, we switch
-    # it back to v2. Once tempest openstack starts to use v3, this can be
-    # deleted.
-    # https://github.com/openstack/tempest/blob/master/tempest/lib/cli/base.py#L363
-    return {
-        'username': username,
-        'password': password,
-        'tenant_name': tenant_name,
-        'auth_url': auth_url.replace('v3', 'v2.0')
-    }
+def get_cloud_config(cloud='devstack-admin'):
+    return os_client_config.OpenStackConfig().get_one_cloud(cloud=cloud)
 
 
 class MistralCLIAuth(base.ClientTestBase):
@@ -82,8 +52,10 @@ class MistralCLIAuth(base.ClientTestBase):
         clients = base.CLIClient(
             username=creds['username'],
             password=creds['password'],
-            tenant_name=creds['tenant_name'],
-            project_name=creds['tenant_name'],
+            tenant_name=creds['project_name'],
+            project_name=creds['project_name'],
+            user_domain_id=creds['user_domain_id'],
+            project_domain_id=creds['project_domain_id'],
             uri=creds['auth_url'],
             cli_dir=CLI_DIR
         )
@@ -96,6 +68,7 @@ class MistralCLIAuth(base.ClientTestBase):
     def mistral(self, action, flags='', params='', fail_ok=False):
         """Executes Mistral command."""
         mistral_url_op = "--os-mistral-url %s" % self._mistral_url
+        flags = "{} --insecure".format(flags)
 
         if 'WITHOUT_AUTH' in os.environ:
             return base.execute(
@@ -116,21 +89,14 @@ class MistralCLIAuth(base.ClientTestBase):
                 fail_ok
             )
 
-    def get_project_id(self, project='admin'):
-        project_name = credentials(project)['tenant_name']
-
+    def get_project_id(self, project_name='admin'):
         admin_clients = self._get_clients()
 
-        # TODO(mfedosin): when bug #1719687 is closed we should provide
-        # domain names in related parameters, not just as abstract flags
-        flags = "--os-user-domain-name default " \
-                "--os-project-domain-name default " \
-                "--os-identity-api-version 3"
         projects = self.parser.listing(
             admin_clients.openstack(
                 'project show',
                 params=project_name,
-                flags=flags
+                flags='--os-identity-api-version 3 --insecure'
             )
         )
 
@@ -142,13 +108,15 @@ class MistralCLIAltAuth(base.ClientTestBase):
     _mistral_url = None
 
     def _get_alt_clients(self):
-        creds = credentials('demo')
+        creds = credentials('devstack-alt')
 
         clients = base.CLIClient(
             username=creds['username'],
             password=creds['password'],
-            project_name=creds['tenant_name'],
-            tenant_name=creds['tenant_name'],
+            project_name=creds['project_name'],
+            tenant_name=creds['project_name'],
+            user_domain_id=creds['user_domain_id'],
+            project_domain_id=creds['project_domain_id'],
             uri=creds['auth_url'],
             cli_dir=CLI_DIR
         )
@@ -161,6 +129,7 @@ class MistralCLIAltAuth(base.ClientTestBase):
     def mistral_alt(self, action, flags='', params='', mode='alt_user'):
         """Executes Mistral command for alt_user from alt_tenant."""
         mistral_url_op = "--os-mistral-url %s" % self._mistral_url
+        flags = "{} --insecure".format(flags)
 
         return self.clients.cmd_with_auth(
             'mistral %s' % mistral_url_op, action, flags, params)

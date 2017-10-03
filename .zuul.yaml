@@ -1,21 +1,33 @@
 - job:
-    name: python-mistralclient-devstack-dsvm
-    parent: legacy-dsvm-base
-    run: playbooks/legacy/python-mistralclient-devstack-dsvm/run.yaml
-    post-run: playbooks/legacy/python-mistralclient-devstack-dsvm/post.yaml
-    timeout: 4200
+    name: python-mistralclient-functional-devstack
+    parent: devstack-tox-functional-consumer
+    timeout: 9000
+    vars:
+      devstack_plugins:
+        mistral: https://git.openstack.org/openstack/mistral
+        heat: https://git.openstack.org/openstack/heat
+      devstack_services:
+        heat: True
+        h-api: True
+        h-api-cfn: True
+        h-api-cw: True
+        h-eng: True
+      tox_envlist: functional
+      tox_environment:
+        IDENTITY_API_VERSION: 3
+        PYTHONUNBUFFERED: 'true'
+        MISTRAL_USE_MOD_WSGI: True
+        MISTRAL_RPC_IMPLEMENTATION: oslo
+        MYSQL_ROOT_PW: secretdatabase
     required-projects:
-      - openstack-dev/devstack
-      - openstack-infra/devstack-gate
       - openstack/heat
       - openstack/mistral
-      - openstack/mistral-dashboard
       - openstack/python-mistralclient
 
 - project:
     check:
       jobs:
-        - python-mistralclient-devstack-dsvm
+        - python-mistralclient-functional-devstack
         # TripleO jobs that deploy Mistral.
         # Note we don't use a project-template here, so it's easier
         # to disable voting on one specific job if things go wrong.
@@ -29,8 +41,8 @@
         - openstack-tox-lower-constraints
     gate:
       jobs:
-        - python-mistralclient-devstack-dsvm
+        - python-mistralclient-functional-devstack
         - tripleo-ci-centos-7-scenario003-multinode-oooq
         - tripleo-ci-centos-7-scenario003-multinode-oooq-container
-
         - openstack-tox-lower-constraints
+
