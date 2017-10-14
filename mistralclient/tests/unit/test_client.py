@@ -109,6 +109,8 @@ class BaseClientTests(base.BaseTestCase):
         mistral_url_for_http = http_client_mock.call_args[0][0]
         self.assertEqual(MISTRAL_HTTP_URL, mistral_url_for_http)
 
+    @mock.patch('mistralclient.auth.keystone.KeystoneAuthHandler'
+                '._is_service_catalog_v2', return_value=True)
     @mock.patch('keystoneauth1.identity.generic.Password')
     @mock.patch('keystoneauth1.session.Session')
     @mock.patch('mistralclient.api.httpclient.HTTPClient')
@@ -116,14 +118,18 @@ class BaseClientTests(base.BaseTestCase):
         self,
         http_client_mock,
         session_mock,
-        password_mock
+        password_mock,
+        catalog_type_mock
     ):
 
         session = mock.MagicMock()
         target_session = mock.MagicMock()
         session_mock.side_effect = [session, target_session]
         auth = mock.MagicMock()
-        password_mock.side_effect = [auth, auth]
+        target_auth = mock.MagicMock()
+        target_auth._plugin.auth_url = AUTH_HTTP_URL_v3
+
+        password_mock.side_effect = [auth, target_auth]
 
         get_endpoint = mock.Mock(return_value='http://mistral_host:8989/v2')
         session.get_endpoint = get_endpoint
