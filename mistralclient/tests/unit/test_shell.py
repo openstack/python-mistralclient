@@ -19,6 +19,17 @@ import mistralclient.tests.unit.base_shell_test as base
 
 class TestShell(base.BaseShellTests):
 
+    def test_help(self):
+        """Test that client is not created for help and bash complete"""
+        for command in ('-h',
+                        '--help',
+                        'help',
+                        'help workbook-list',
+                        'bash-completion'):
+            with mock.patch('mistralclient.api.client.client') as client_mock:
+                self.shell(command)
+                self.assertFalse(client_mock.called)
+
     @mock.patch('mistralclient.api.client.client')
     def test_command_no_mistral_url(self, client_mock):
         self.shell(

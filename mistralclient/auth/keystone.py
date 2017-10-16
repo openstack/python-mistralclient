@@ -12,16 +12,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import logging
-
 import keystoneauth1.identity.generic as auth_plugin
 from keystoneauth1 import session as ks_session
 import mistralclient.api.httpclient as api
 from mistralclient import auth as mistral_auth
 from oslo_serialization import jsonutils
-
-
-LOG = logging.getLogger(__name__)
 
 
 class KeystoneAuthHandler(mistral_auth.AuthHandler):
@@ -78,7 +73,6 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
         auth_response = {}
 
         if not session:
-            auth = None
             if auth_token:
                 auth = auth_plugin.Token(
                     auth_url=auth_url,
@@ -100,14 +94,10 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
                     project_name=project_name,
                     project_domain_name=project_domain_name,
                     project_domain_id=project_domain_id)
-
             else:
-                # NOTE(jaosorior): We don't crash here cause it's needed for
-                # bash-completion to work. However, we do issue a warning to
-                # the user so if the request doesn't work. It's because of
-                # this.
-                LOG.warning("You must either provide a valid token or "
-                            "a password (api_key) and a user.")
+                raise RuntimeError("You must either provide a valid token or "
+                                   "a password (api_key) and a user.")
+
             if auth:
                 session = ks_session.Session(auth=auth)
 
