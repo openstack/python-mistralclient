@@ -127,10 +127,11 @@ class BaseClientTests(base.BaseTestCase):
             keystone_client_mock
         )
 
-        url_for = mock.Mock(return_value='http://mistral_host:8989/v2')
+        url_for = mock.Mock(return_value=MISTRAL_HTTP_URL)
         keystone_client_instance.service_catalog.url_for = url_for
 
         client.client(
+            auth_url=AUTH_HTTP_URL_v3,
             target_username='tmistral',
             target_project_name='tmistralp',
             target_auth_url=AUTH_HTTP_URL_v3,
@@ -274,3 +275,16 @@ class BaseClientTests(base.BaseTestCase):
         profiler = osprofiler.profiler.get()
 
         self.assertEqual(profiler.hmac_key, PROFILER_HMAC_KEY)
+
+    @mock.patch('mistralclient.auth.get_auth_handler')
+    def test_mistral_no_auth(self, get_auth_handler_mock):
+        # Test that we don't authenticate if auth url wasn't provided
+
+        client.client(
+            username='mistral',
+            project_name='mistral',
+            api_key='password',
+            service_type='workflowv2'
+        )
+
+        self.assertEqual(0, get_auth_handler_mock.call_count)

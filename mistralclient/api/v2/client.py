@@ -49,8 +49,13 @@ class Client(object):
         if mistral_url and not isinstance(mistral_url, six.string_types):
             raise RuntimeError('Mistral url should be a string.')
 
-        auth_handler = auth.get_auth_handler(auth_type)
-        auth_response = auth_handler.authenticate(req, session=session) or {}
+        # If auth url was provided then we perform an authentication, otherwise
+        # just ignore this step
+        if req.get('auth_url'):
+            auth_handler = auth.get_auth_handler(auth_type)
+            auth_response = auth_handler.authenticate(req, session=session)
+        else:
+            auth_response = {}
 
         req.update(auth_response)
 
