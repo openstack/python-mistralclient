@@ -141,6 +141,7 @@ class BaseClientTests(base.BaseTestCase):
         auth.get_access = mock.Mock(return_value=mock_access)
 
         client.client(
+            auth_url=AUTH_HTTP_URL_v3,
             username='user',
             api_key='password',
             user_domain_name='Default',
@@ -303,3 +304,16 @@ class BaseClientTests(base.BaseTestCase):
         profiler = osprofiler.profiler.get()
 
         self.assertEqual(profiler.hmac_key, PROFILER_HMAC_KEY)
+
+    @mock.patch('mistralclient.auth.get_auth_handler')
+    def test_mistral_no_auth(self, get_auth_handler_mock):
+        # Test that we don't authenticate if auth url wasn't provided
+
+        client.client(
+            username='mistral',
+            project_name='mistral',
+            api_key='password',
+            service_type='workflowv2'
+        )
+
+        self.assertEqual(0, get_auth_handler_mock.call_count)
