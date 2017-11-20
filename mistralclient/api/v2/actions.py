@@ -74,7 +74,7 @@ class ActionManager(base.ResourceManager):
         if marker:
             qparams['marker'] = marker
 
-        if limit:
+        if limit and limit > 0:
             qparams['limit'] = limit
 
         if sort_keys:

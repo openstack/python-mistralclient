@@ -182,6 +182,18 @@ class TestActionsV2(base.BaseClientV2Test):
         self.assertEqual(['created_at'], last_request.qs['sort_keys'])
         self.assertEqual(['asc'], last_request.qs['sort_dirs'])
 
+    def test_list_with_no_limit(self):
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE,
+                               json={'actions': [ACTION]})
+
+        action_list = self.actions.list(limit=-1)
+
+        self.assertEqual(1, len(action_list))
+
+        last_request = self.requests_mock.last_request
+
+        self.assertNotIn('limit', last_request.qs)
+
     def test_get(self):
         self.requests_mock.get(self.TEST_URL + URL_TEMPLATE_NAME % 'action',
                                json=ACTION)

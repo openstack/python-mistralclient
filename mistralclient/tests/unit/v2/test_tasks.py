@@ -59,6 +59,18 @@ class TestTasksV2(base.BaseClientV2Test):
         self.tasks.list(fields=["id,name"])
         self.assertTrue(self.requests_mock.called_once)
 
+    def test_list_with_no_limit(self):
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE,
+                               json={'tasks': [TASK]})
+
+        task_list = self.tasks.list(limit=-1)
+
+        self.assertEqual(1, len(task_list))
+
+        last_request = self.requests_mock.last_request
+
+        self.assertNotIn('limit', last_request.qs)
+
     def test_get(self):
         url = self.TEST_URL + URL_TEMPLATE_ID % TASK['id']
         self.requests_mock.get(url, json=TASK)

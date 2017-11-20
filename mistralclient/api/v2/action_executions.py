@@ -76,7 +76,7 @@ class ActionExecutionManager(base.ResourceManager):
 
         qparams = {}
 
-        if limit:
+        if limit and limit > 0:
             qparams['limit'] = limit
 
         query_string = ("?%s" % urlparse.urlencode(list(qparams.items()))
