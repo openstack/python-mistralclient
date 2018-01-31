@@ -14,6 +14,7 @@ Using mistralclient
    cli/cli_usage_with_openstack
    cli/cli_usage_with_keycloak
    cli/cli_usage_without_auth
+   cli/cli_usage_source_execution
    class_reference
 
 For information about using the mistral command-line client, see

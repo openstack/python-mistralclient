@@ -52,6 +52,8 @@ SUB_WF_EXEC = {
     }
 }
 
+SOURCE_EXEC = EXEC
+SOURCE_EXEC['source_execution_id'] = EXEC['workflow_id']
 URL_TEMPLATE = '/executions'
 URL_TEMPLATE_ID = '/executions/%s'
 
@@ -65,7 +67,7 @@ class TestExecutionsV2(base.BaseClientV2Test):
         body = {
             'workflow_name': EXEC['workflow_name'],
             'description': '',
-            'input': json.dumps(EXEC['input']),
+            'input': json.dumps(EXEC['input'])
         }
 
         ex = self.executions.create(
@@ -91,7 +93,7 @@ class TestExecutionsV2(base.BaseClientV2Test):
         body = {
             'workflow_id': EXEC['workflow_id'],
             'description': '',
-            'input': json.dumps(EXEC['input']),
+            'input': json.dumps(EXEC['input'])
         }
 
         ex = self.executions.create(
@@ -103,6 +105,29 @@ class TestExecutionsV2(base.BaseClientV2Test):
 
         self.assertDictEqual(
             executions.Execution(self.executions, EXEC).to_dict(),
+            ex.to_dict()
+        )
+
+        self.assertDictEqual(body, self.requests_mock.last_request.json())
+
+    def test_create_with_source_execution_id(self):
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE,
+                                json=SOURCE_EXEC,
+                                status_code=201)
+
+        body = {
+            'description': '',
+            'source_execution_id': SOURCE_EXEC['source_execution_id']
+        }
+
+        ex = self.executions.create(
+            source_execution_id=SOURCE_EXEC['source_execution_id']
+        )
+
+        self.assertIsNotNone(ex)
+
+        self.assertDictEqual(
+            executions.Execution(self.executions, SOURCE_EXEC).to_dict(),
             ex.to_dict()
         )
 
