@@ -16,8 +16,6 @@
     check:
       jobs:
         - python-mistralclient-devstack-dsvm
-        - openstack-tox-cover:
-            voting: false
     gate:
       jobs:
         - python-mistralclient-devstack-dsvm
