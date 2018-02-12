@@ -59,9 +59,10 @@ class Client(object):
         else:
             auth_response = {}
 
-        # If the session was None and we're using keystone auth, it will be
-        # created by the auth_handler.
-        session = auth_response.pop('session', None)
+        if session is None:
+            # If the session was None and we're using keystone auth, it will be
+            # created by the auth_handler.
+            session = auth_response.pop('session', None)
 
         req.update(auth_response)
 
