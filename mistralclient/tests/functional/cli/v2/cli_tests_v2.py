@@ -788,17 +788,17 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
         self.assertEqual(wrapping_task_id, wf_exec['Task Execution ID'])
 
     def test_executions_list_with_pagination(self):
-        wf_ex1 = self.execution_create(
+        self.execution_create(
             params='{0} -d "a"'.format(self.direct_wf['Name'])
         )
 
-        wf_ex2 = self.execution_create(
+        self.execution_create(
             params='{0} -d "b"'.format(self.direct_wf['Name'])
         )
 
-        wf_execs = self.mistral_cli(True, 'execution-list')
+        all_wf_execs = self.mistral_cli(True, 'execution-list')
 
-        self.assertEqual(2, len(wf_execs))
+        self.assertEqual(2, len(all_wf_execs))
 
         wf_execs = self.mistral_cli(
             True,
@@ -808,8 +808,8 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
 
         self.assertEqual(1, len(wf_execs))
 
-        wf_ex1_id = self.get_field_value(wf_ex1, 'ID')
-        wf_ex2_id = self.get_field_value(wf_ex2, 'ID')
+        wf_ex1_id = all_wf_execs[0]['ID']
+        wf_ex2_id = all_wf_execs[1]['ID']
 
         wf_execs = self.mistral_cli(
             True,
