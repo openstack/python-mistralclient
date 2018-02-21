@@ -21,7 +21,6 @@ import mock
 
 from mistralclient.api.v2 import tasks
 from mistralclient.commands.v2 import tasks as task_cmd
-from mistralclient.commands.v2.tasks import TaskFormatter
 from mistralclient.tests.unit import base
 
 TASK_DICT = {
@@ -62,7 +61,7 @@ class TestCLITasksV2(base.BaseCommandTest):
         self.assertEqual([EXPECTED_TASK_RESULT], result[1])
         self.assertEqual(
             self.client.tasks.list.call_args[1]["fields"],
-            TaskFormatter.COLUMN_FIELD_NAMES
+            task_cmd.TaskFormatter.COLUMN_FIELD_NAMES
         )
 
     def test_list_with_workflow_execution(self):

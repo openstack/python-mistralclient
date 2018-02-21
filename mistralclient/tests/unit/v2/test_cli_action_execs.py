@@ -18,7 +18,7 @@ import copy
 import json
 import sys
 
-from six import StringIO
+import six
 
 import mock
 
@@ -160,7 +160,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
 
         # Redirect the stderr so it doesn't show during tox
         _stderr = sys.stderr
-        sys.stderr = StringIO()
+        sys.stderr = six.StringIO()
 
         for state in states:
             self.assertRaises(
