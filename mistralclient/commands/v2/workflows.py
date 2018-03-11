@@ -34,6 +34,7 @@ def format(workflow=None, lister=False):
         'Project ID',
         'Tags',
         'Input',
+        'Scope',
         'Created at',
         'Updated at'
     )
@@ -48,6 +49,7 @@ def format(workflow=None, lister=False):
             workflow.project_id,
             base.wrap(', '.join(tags)) or '<none>',
             workflow.input if not lister else base.cut(workflow.input),
+            workflow.scope,
             workflow.created_at
         )
 
