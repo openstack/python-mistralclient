@@ -43,7 +43,8 @@ class SimpleMistralCLITests(base.MistralCLIAuth):
 
         self.assertTableStruct(
             workflows,
-            ['ID', 'Name', 'Tags', 'Input', 'Created at', 'Updated at']
+            ['ID', 'Name', 'Tags', 'Input', 'Scope', 'Created at',
+             'Updated at']
         )
 
     def test_executions_list(self):
@@ -560,7 +561,8 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
 
         self.assertTableStruct(
             workflows,
-            ['ID', 'Name', 'Tags', 'Input', 'Created at', 'Updated at']
+            ['ID', 'Name', 'Tags', 'Input', 'Scope', 'Created at',
+             'Updated at']
         )
 
         # We know that we have more than one workflow by default.
@@ -576,7 +578,8 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
 
         self.assertTableStruct(
             workflows,
-            ['ID', 'Name', 'Tags', 'Input', 'Created at', 'Updated at']
+            ['ID', 'Name', 'Tags', 'Input', 'Scope', 'Created at',
+             'Updated at']
         )
 
         self.assertEqual(1, len(workflows))

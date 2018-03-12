@@ -29,6 +29,7 @@ WORKFLOW_DICT = {
     'project_id': '12345',
     'tags': ['a', 'b'],
     'input': 'param',
+    'scope': 'private',
     'created_at': '1',
     'updated_at': '1'
 }
@@ -56,13 +57,17 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.Create, app_args=['1.txt'])
 
         self.assertEqual(
-            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', 'private',
+              '1', '1')],
             result[1]
         )
 
     @mock.patch('argparse.open', create=True)
     def test_create_public(self, mock_open):
-        self.client.workflows.create.return_value = [WORKFLOW]
+        wf_public_dict = WORKFLOW_DICT.copy()
+        wf_public_dict['scope'] = 'public'
+        workflow_public = workflows.Workflow(mock, wf_public_dict)
+        self.client.workflows.create.return_value = [workflow_public]
 
         result = self.call(
             workflow_cmd.Create,
@@ -70,7 +75,8 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', 'public',
+              '1', '1')],
             result[1]
         )
 
@@ -93,7 +99,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
 
         self.assertEqual(
             [('1-2-3-4', 'a', '', '12345', 'a, b', cmd_base.cut(long_input),
-              '1', '1')],
+              'private', '1', '1')],
             result[1]
         )
 
@@ -104,7 +110,8 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.Update, app_args=['1.txt'])
 
         self.assertEqual(
-            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', 'private',
+              '1', '1')],
             result[1]
         )
 
@@ -118,7 +125,8 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', 'private',
+              '1', '1')],
             result[1]
         )
 
@@ -137,7 +145,8 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', 'private',
+              '1', '1')],
             result[1]
         )
 
@@ -147,7 +156,8 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.List)
 
         self.assertEqual(
-            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', '1', '1')],
+            [('1-2-3-4', 'a', '', '12345', 'a, b', 'param', 'private',
+              '1', '1')],
             result[1]
         )
 
@@ -157,7 +167,8 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
         result = self.call(workflow_cmd.Get, app_args=['name'])
 
         self.assertEqual(
-            ('1-2-3-4', 'a', '', '12345', 'a, b', 'param', '1', '1'),
+            ('1-2-3-4', 'a', '', '12345', 'a, b', 'param', 'private',
+             '1', '1'),
             result[1]
         )
 
