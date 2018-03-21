@@ -3,6 +3,13 @@ version: '2.0'
 
 name: wb
 
+actions:
+  ac1:
+    input:
+      - str1
+      - str2
+    base: std.echo output="<% $.str1 %><% $.str2 %>"
+
 workflows:
   wf1:
     type: direct
