@@ -61,7 +61,7 @@ class TestCLITasksV2(base.BaseCommandTest):
         self.assertEqual([EXPECTED_TASK_RESULT], result[1])
         self.assertEqual(
             self.client.tasks.list.call_args[1]["fields"],
-            task_cmd.TaskFormatter.COLUMN_FIELD_NAMES
+            task_cmd.TaskFormatter.fields()
         )
 
     def test_list_with_workflow_execution(self):

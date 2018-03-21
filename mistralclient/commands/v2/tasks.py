@@ -27,7 +27,7 @@ from mistralclient import utils
 LOG = logging.getLogger(__name__)
 
 
-class TaskFormatter(object):
+class TaskFormatter(base.MistralFormatter):
     COLUMNS = [
         ('id',                      'ID'),
         ('name',                    'Name'),
@@ -39,13 +39,6 @@ class TaskFormatter(object):
         ('created_at',              'Created at'),
         ('updated_at',              'Updated at'),
     ]
-
-    COLUMN_FIELD_NAMES = list(zip(*COLUMNS))[0]
-    COLUMN_HEADING_NAMES = list(zip(*COLUMNS))[1]
-
-    @staticmethod
-    def format_list(task=None):
-        return TaskFormatter.format(task, lister=True)
 
     @staticmethod
     def format(task=None, lister=False):
@@ -67,10 +60,10 @@ class TaskFormatter(object):
         else:
             data = (tuple('' for _ in range(len(TaskFormatter.COLUMNS))),)
 
-        return TaskFormatter.COLUMN_HEADING_NAMES, data
+        return TaskFormatter.headings(), data
 
 
-class List(base.MistralLister):
+class List(base.MistralExecutionLister):
     """List all tasks."""
 
     def get_parser(self, prog_name):
@@ -81,43 +74,21 @@ class List(base.MistralLister):
             nargs='?',
             help='Workflow execution ID associated with list of Tasks.'
         )
-        parser.add_argument(
-            '--filter',
-            dest='filters',
-            action='append',
-            help='Filters. Can be repeated.'
-        )
-        parser.add_argument(
-            '--limit',
-            type=int,
-            help='Maximum number of tasks to return in a single result. '
-                 'limit is set to %s by default. Use --limit -1 to fetch the '
-                 'full result set.' % base.DEFAULT_LIMIT,
-            nargs='?'
-        )
-
         return parser
 
     def _get_format_function(self):
         return TaskFormatter.format_list
 
     def _get_resources(self, parsed_args):
-        if parsed_args.limit is None:
-            parsed_args.limit = base.DEFAULT_LIMIT
-
-            LOG.info(
-                "limit is set to %s by default. Set "
-                "the limit explicitly using \'--limit\', if required. "
-                "Use \'--limit\' -1 to fetch the full result set.",
-                base.DEFAULT_LIMIT
-            )
-
         mistral_client = self.app.client_manager.workflow_engine
 
         return mistral_client.tasks.list(
             parsed_args.workflow_execution,
+            marker=parsed_args.marker,
             limit=parsed_args.limit,
-            fields=TaskFormatter.COLUMN_FIELD_NAMES,
+            sort_keys=parsed_args.sort_keys,
+            sort_dirs=parsed_args.sort_dirs,
+            fields=TaskFormatter.fields(),
             **base.get_filters(parsed_args)
         )
 

@@ -13,14 +13,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import six
-
 from keystoneauth1 import exceptions
 from mistralclient.api import base
 from mistralclient import utils
-
-
-urlparse = six.moves.urllib.parse
 
 
 class Workflow(base.Resource):
@@ -80,29 +75,18 @@ class WorkflowManager(base.ResourceManager):
                 for resource_data in base.extract_json(resp, 'workflows')]
 
     def list(self, namespace='', marker='', limit=None, sort_keys='',
-             sort_dirs='', **filters):
-        qparams = {}
-
+             sort_dirs='', fields='', **filters):
         if namespace:
-            qparams['namespace'] = namespace
+            filters['namespace'] = namespace
 
-        if marker:
-            qparams['marker'] = marker
-
-        if limit and limit > 0:
-            qparams['limit'] = limit
-
-        if sort_keys:
-            qparams['sort_keys'] = sort_keys
-
-        if sort_dirs:
-            qparams['sort_dirs'] = sort_dirs
-
-        for name, val in filters.items():
-            qparams[name] = val
-
-        query_string = ("?%s" % urlparse.urlencode(list(qparams.items()))
-                        if qparams else "")
+        query_string = self._build_query_params(
+            marker=marker,
+            limit=limit,
+            sort_keys=sort_keys,
+            sort_dirs=sort_dirs,
+            fields=fields,
+            filters=filters
+        )
 
         return self._list(
             '/workflows%s' % query_string,

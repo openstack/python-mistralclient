@@ -29,54 +29,54 @@ from mistralclient import utils
 LOG = logging.getLogger(__name__)
 
 
-def format_list(execution=None):
-    return format(execution, lister=True)
+class ExecutionFormatter(base.MistralFormatter):
+    COLUMNS = [
+        ('id', 'ID'),
+        ('workflow_id', 'Workflow ID'),
+        ('workflow_name', 'Workflow name'),
+        ('workflow_namespace', 'Workflow namespace'),
+        ('description', 'Description'),
+        ('task_execution_id', 'Task Execution ID'),
+        ('root_execution_id', 'Root Execution ID'),
+        ('state', 'State'),
+        ('state_info', 'State info'),
+        ('created_at', 'Created at'),
+        ('updated_at', 'Updated at'),
+    ]
+
+    @staticmethod
+    def format(execution=None, lister=False):
+        # TODO(nmakhotkin) Add parent task id when it's implemented in API.
+
+        if execution:
+            state_info = (execution.state_info if not lister
+                          else base.cut(execution.state_info))
+
+            data = (
+                execution.id,
+                execution.workflow_id,
+                execution.workflow_name,
+                execution.workflow_namespace,
+                execution.description,
+                execution.task_execution_id or '<none>',
+                execution.root_execution_id or '<none>',
+                execution.state,
+                state_info,
+                execution.created_at,
+                execution.updated_at or '<none>'
+            )
+        else:
+            data = (tuple('' for _ in
+                          range(len(ExecutionFormatter.COLUMNS))),)
+
+        return ExecutionFormatter.headings(), data
 
 
-def format(execution=None, lister=False):
-    columns = (
-        'ID',
-        'Workflow ID',
-        'Workflow name',
-        'Workflow namespace',
-        'Description',
-        'Task Execution ID',
-        'Root Execution ID',
-        'State',
-        'State info',
-        'Created at',
-        'Updated at'
-    )
-    # TODO(nmakhotkin) Add parent task id when it's implemented in API.
-
-    if execution:
-        state_info = (execution.state_info if not lister
-                      else base.cut(execution.state_info))
-
-        data = (
-            execution.id,
-            execution.workflow_id,
-            execution.workflow_name,
-            execution.workflow_namespace,
-            execution.description,
-            execution.task_execution_id or '<none>',
-            execution.root_execution_id or '<none>',
-            execution.state,
-            state_info,
-            execution.created_at,
-            execution.updated_at or '<none>'
-        )
-    else:
-        data = (tuple('' for _ in range(len(columns))),)
-
-    return columns, data
-
-
-class List(base.MistralLister):
+class List(base.MistralExecutionLister):
     """List all executions."""
 
     def _get_format_function(self):
-        return format_list
+        return ExecutionFormatter.format_list
 
     def get_parser(self, parsed_args):
         parser = super(List, self).get_parser(parsed_args)
@@ -86,58 +86,10 @@ class List(base.MistralLister):
             help="Parent task execution ID associated with workflow "
                  "execution list.",
         )
-        parser.add_argument(
-            '--marker',
-            type=str,
-            help='The last execution uuid of the previous page, displays list '
-                 'of executions after "marker".',
-            default='',
-            nargs='?'
-        )
-        parser.add_argument(
-            '--limit',
-            type=int,
-            help='Maximum number of executions to return in a single result. '
-                 'limit is set to %s by default. Use --limit -1 to fetch the '
-                 'full result set.' % base.DEFAULT_LIMIT,
-            nargs='?'
-        )
-        parser.add_argument(
-            '--sort_keys',
-            help='Comma-separated list of sort keys to sort results by. '
-                 'Default: created_at. '
-                 'Example: mistral execution-list --sort_keys=id,description',
-            default='created_at',
-            nargs='?'
-        )
-        parser.add_argument(
-            '--sort_dirs',
-            help='Comma-separated list of sort directions. Default: asc. '
-                 'Example: mistral execution-list --sort_keys=id,description '
-                 '--sort_dirs=asc,desc',
-            default='asc',
-            nargs='?'
-        )
-        parser.add_argument(
-            '--filter',
-            dest='filters',
-            action='append',
-            help='Filters. Can be repeated.'
-        )
 
         return parser
 
     def _get_resources(self, parsed_args):
-        if parsed_args.limit is None:
-            parsed_args.limit = base.DEFAULT_LIMIT
-
-            LOG.info(
-                "limit is set to %s by default. Set "
-                "the limit explicitly using \'--limit\', if required. "
-                "Use \'--limit\' -1 to fetch the full result set.",
-                base.DEFAULT_LIMIT
-            )
-
         mistral_client = self.app.client_manager.workflow_engine
 
         return mistral_client.executions.list(
@@ -146,6 +98,7 @@ class List(base.MistralLister):
             limit=parsed_args.limit,
             sort_keys=parsed_args.sort_keys,
             sort_dirs=parsed_args.sort_dirs,
+            fields=ExecutionFormatter.fields(),
             **base.get_filters(parsed_args)
         )
 
@@ -164,7 +117,7 @@ class Get(command.ShowOne):
         mistral_client = self.app.client_manager.workflow_engine
         execution = mistral_client.executions.get(parsed_args.execution)
 
-        return format(execution)
+        return ExecutionFormatter.format(execution)
 
 
 class Create(command.ShowOne):
@@ -235,7 +188,7 @@ class Create(command.ShowOne):
             **params
         )
 
-        return format(execution)
+        return ExecutionFormatter.format(execution)
 
 
 class Delete(command.Command):
@@ -322,7 +275,7 @@ class Update(command.ShowOne):
             env=env
         )
 
-        return format(execution)
+        return ExecutionFormatter.format(execution)
 
 
 class GetInput(command.Command):

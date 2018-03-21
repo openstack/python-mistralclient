@@ -25,72 +25,54 @@ from mistralclient import utils
 LOG = logging.getLogger(__name__)
 
 
-def format_list(action_ex=None):
-    columns = (
-        'ID',
-        'Name',
-        'Workflow name',
-        'Workflow namespace',
-        'Task name',
-        'Task ID',
-        'State',
-        'Accepted',
-        'Created at',
-        'Updated at'
-    )
+class ActionExecutionFormatter(base.MistralFormatter):
+    COLUMNS = [
+        ('id', 'ID'),
+        ('name', 'Name'),
+        ('workflow_name', 'Workflow name'),
+        ('workflow_namespace', 'Workflow namespace'),
+        ('task_name', 'Task name'),
+        ('task_execution_id', 'Task ID'),
+        ('state', 'State'),
+        ('state_info', 'State info'),
+        ('accepted', 'Accepted'),
+        ('created_at', 'Created at'),
+        ('updated_at', 'Updated at'),
+    ]
 
-    if action_ex:
-        data = (
-            action_ex.id,
-            action_ex.name,
-            action_ex.workflow_name,
-            action_ex.workflow_namespace,
-            action_ex.task_name if hasattr(action_ex, 'task_name') else None,
-            action_ex.task_execution_id,
-            action_ex.state,
-            action_ex.accepted,
-            action_ex.created_at,
-            action_ex.updated_at or '<none>'
-        )
-    else:
-        data = (tuple('' for _ in range(len(columns))),)
+    LIST_COLUMN_FIELD_NAMES = [c[0] for c in COLUMNS if c[0] != 'state_info']
+    LIST_COLUMN_HEADING_NAMES = [c[1] for c in COLUMNS if c[0] != 'state_info']
 
-    return columns, data
+    @staticmethod
+    def format(action_ex=None, lister=False):
+        if lister:
+            columns = ActionExecutionFormatter.LIST_COLUMN_HEADING_NAMES
+        else:
+            columns = ActionExecutionFormatter.headings()
+        if action_ex:
+            if hasattr(action_ex, 'task_name'):
+                task_name = action_ex.task_name
+            else:
+                task_name = None
+            data = (
+                action_ex.id,
+                action_ex.name,
+                action_ex.workflow_name,
+                action_ex.workflow_namespace,
+                task_name,
+                action_ex.task_execution_id,
+                action_ex.state,)
+            if not lister:
+                data += (action_ex.state_info,)
+            data += (
+                action_ex.accepted,
+                action_ex.created_at,
+                action_ex.updated_at or '<none>'
+            )
+        else:
+            data = (tuple('' for _ in range(len(columns))),)
 
-
-def format(action_ex=None):
-    columns = (
-        'ID',
-        'Name',
-        'Workflow name',
-        'Workflow namespace',
-        'Task name',
-        'Task ID',
-        'State',
-        'State info',
-        'Accepted',
-        'Created at',
-        'Updated at',
-    )
-
-    if action_ex:
-        data = (
-            action_ex.id,
-            action_ex.name,
-            action_ex.workflow_name,
-            action_ex.workflow_namespace,
-            action_ex.task_name if hasattr(action_ex, 'task_name') else None,
-            action_ex.task_execution_id,
-            action_ex.state,
-            action_ex.state_info,
-            action_ex.accepted,
-            action_ex.created_at,
-            action_ex.updated_at or '<none>'
-        )
-    else:
-        data = (tuple('' for _ in range(len(columns))),)
-
-    return columns, data
+        return columns, data
 
 
 class Create(command.ShowOne):
@@ -166,18 +148,18 @@ class Create(command.ShowOne):
         )
 
         if not parsed_args.run_sync and parsed_args.save_result:
-            return format(action_ex)
+            return ActionExecutionFormatter.format(action_ex)
         else:
             self.app.stdout.write("%s\n" % action_ex.output)
 
             return None, None
 
 
-class List(base.MistralLister):
+class List(base.MistralExecutionLister):
     """List all Action executions."""
 
     def _get_format_function(self):
-        return format_list
+        return ActionExecutionFormatter.format_list
 
     def get_parser(self, prog_name):
         parser = super(List, self).get_parser(prog_name)
@@ -187,33 +169,21 @@ class List(base.MistralLister):
             nargs='?',
             help='Task execution ID.'
         )
-        parser.add_argument(
-            '--limit',
-            type=int,
-            help='Maximum number of action-executions to return in a single '
-                 'result. limit is set to %s by default. Use --limit -1 to '
-                 'fetch the full result set.' % base.DEFAULT_LIMIT,
-            nargs='?'
-        )
 
         return parser
 
     def _get_resources(self, parsed_args):
-        if parsed_args.limit is None:
-            parsed_args.limit = base.DEFAULT_LIMIT
-
-            LOG.info(
-                "limit is set to %s by default. Set "
-                "the limit explicitly using \'--limit\', if required. "
-                "Use \'--limit\' -1 to fetch the full result set.",
-                base.DEFAULT_LIMIT
-            )
-
         mistral_client = self.app.client_manager.workflow_engine
 
         return mistral_client.action_executions.list(
             parsed_args.task_execution_id,
+            marker=parsed_args.marker,
             limit=parsed_args.limit,
+            sort_keys=parsed_args.sort_keys,
+            sort_dirs=parsed_args.sort_dirs,
+            # TODO(bobh) - Uncomment when the fix for bug 1800322 merges
+            # fields=ActionExecutionFormatter.LIST_COLUMN_FIELD_NAMES,
+            **base.get_filters(parsed_args)
         )
 
 
@@ -234,7 +204,7 @@ class Get(command.ShowOne):
             parsed_args.action_execution
         )
 
-        return format(execution)
+        return ActionExecutionFormatter.format(execution)
 
 
 class Update(command.ShowOne):
@@ -270,7 +240,7 @@ class Update(command.ShowOne):
             output
         )
 
-        return format(execution)
+        return ActionExecutionFormatter.format(execution)
 
 
 class GetOutput(command.Command):

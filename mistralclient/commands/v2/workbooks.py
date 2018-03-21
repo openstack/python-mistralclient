@@ -21,45 +21,54 @@ from mistralclient.commands.v2 import base
 from mistralclient import utils
 
 
-def format(workbook=None):
-    columns = (
-        'Name',
-        'Namespace',
-        'Tags',
-        'Scope',
-        'Created at',
-        'Updated at'
-    )
+class WorkbookFormatter(base.MistralFormatter):
+    COLUMNS = [
+        ('name', 'Name'),
+        ('namespace', 'Namespace'),
+        ('tags', 'Tags'),
+        ('scope', 'Scope'),
+        ('created_at', 'Created at'),
+        ('updated_at', 'Updated at')
+    ]
 
-    if workbook:
-        data = (
-            workbook.name,
-            workbook.namespace,
-            base.wrap(', '.join(workbook.tags or '')) or '<none>',
-            workbook.scope,
-            workbook.created_at,
-        )
+    @staticmethod
+    def format(workbook=None, lister=False):
+        if workbook:
+            data = (
+                workbook.name,
+                workbook.namespace,
+                base.wrap(', '.join(workbook.tags or '')) or '<none>',
+                workbook.scope,
+                workbook.created_at,
+            )
 
-        if hasattr(workbook, 'updated_at'):
-            data += (workbook.updated_at,)
+            if hasattr(workbook, 'updated_at'):
+                data += (workbook.updated_at,)
+            else:
+                data += (None,)
+
         else:
-            data += (None,)
+            data = (tuple('' for _ in range(len(WorkbookFormatter.COLUMNS))),)
 
-    else:
-        data = (tuple('' for _ in range(len(columns))),)
-
-    return columns, data
+        return WorkbookFormatter.headings(), data
 
 
 class List(base.MistralLister):
     """List all workbooks."""
 
     def _get_format_function(self):
-        return format
+        return WorkbookFormatter.format
 
     def _get_resources(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-        return mistral_client.workbooks.list()
+        return mistral_client.workbooks.list(
+            marker=parsed_args.marker,
+            limit=parsed_args.limit,
+            sort_keys=parsed_args.sort_keys,
+            sort_dirs=parsed_args.sort_dirs,
+            fields=WorkbookFormatter.fields(),
+            **base.get_filters(parsed_args)
+        )
 
 
 class Get(command.ShowOne):
@@ -86,7 +95,7 @@ class Get(command.ShowOne):
             parsed_args.namespace
         )
 
-        return format(workbook)
+        return WorkbookFormatter.format(workbook)
 
 
 class Create(command.ShowOne):
@@ -125,7 +134,7 @@ class Create(command.ShowOne):
             scope=scope
         )
 
-        return format(workbook)
+        return WorkbookFormatter.format(workbook)
 
 
 class Delete(command.Command):
@@ -190,7 +199,7 @@ class Update(command.ShowOne):
             scope=scope
         )
 
-        return format(workbook)
+        return WorkbookFormatter.format(workbook)
 
 
 class GetDefinition(command.Command):
@@ -212,8 +221,8 @@ class GetDefinition(command.Command):
 
 class Validate(command.ShowOne):
     """Validate workbook."""
-
-    def _format(self, result=None):
+    @staticmethod
+    def _format(result=None):
         columns = ('Valid', 'Error')
 
         if result:

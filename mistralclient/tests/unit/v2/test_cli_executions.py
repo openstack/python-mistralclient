@@ -225,7 +225,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         )
 
     def test_list(self):
-        self.client.executions.list.return_value = [EXEC, SUB_WF_EXEC]
+        self.client.executions.list.return_value = [SUB_WF_EXEC, EXEC]
 
         result = self.call(execution_cmd.List)
 
@@ -239,9 +239,10 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
 
         self.call(execution_cmd.List)
         self.client.executions.list.assert_called_once_with(
+            fields=execution_cmd.ExecutionFormatter.fields(),
             limit=100,
             marker='',
-            sort_dirs='asc',
+            sort_dirs='desc',
             sort_keys='created_at',
             task=None
         )
@@ -249,18 +250,35 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         self.call(
             execution_cmd.List,
             app_args=[
+                '--oldest'
+            ]
+        )
+
+        self.client.executions.list.assert_called_with(
+            fields=execution_cmd.ExecutionFormatter.fields(),
+            limit=100,
+            marker='',
+            sort_keys='created_at',
+            sort_dirs='asc',
+            task=None
+        )
+
+        self.call(
+            execution_cmd.List,
+            app_args=[
                 '--limit', '5',
-                '--sort_dirs', 'id, Workflow',
-                '--sort_keys', 'desc',
+                '--sort_keys', 'id, Workflow',
+                '--sort_dirs', 'desc',
                 '--marker', 'abc'
             ]
         )
 
         self.client.executions.list.assert_called_with(
+            fields=execution_cmd.ExecutionFormatter.fields(),
             limit=5,
             marker='abc',
-            sort_dirs='id, Workflow',
-            sort_keys='desc',
+            sort_keys='id, Workflow',
+            sort_dirs='desc',
             task=None
         )
 
