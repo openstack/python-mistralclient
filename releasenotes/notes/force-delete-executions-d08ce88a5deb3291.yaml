@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Adding a --force optional parameter to delete excetutions. Without it only
+    finished executions can be deleted. If --force is passed the execution
+    will be deleted but mistral will generate some errors as expected objects
+    in memory no longer exist
