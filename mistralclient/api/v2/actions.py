@@ -14,6 +14,7 @@
 
 import six
 
+from keystoneauth1 import exceptions
 from mistralclient.api import base
 from mistralclient import utils
 
@@ -34,11 +35,14 @@ class ActionManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        resp = self.http_client.post(
-            '/actions?scope=%s' % scope,
-            definition,
-            headers={'content-type': 'text/plain'}
-        )
+        try:
+            resp = self.http_client.post(
+                '/actions?scope=%s' % scope,
+                definition,
+                headers={'content-type': 'text/plain'}
+            )
+        except exceptions.HttpError as ex:
+            self._raise_api_exception(ex.response)
 
         if resp.status_code != 201:
             self._raise_api_exception(resp)
@@ -55,11 +59,14 @@ class ActionManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        resp = self.http_client.put(
-            '%s?scope=%s' % (url_pre, scope),
-            definition,
-            headers={'content-type': 'text/plain'}
-        )
+        try:
+            resp = self.http_client.put(
+                '%s?scope=%s' % (url_pre, scope),
+                definition,
+                headers={'content-type': 'text/plain'}
+            )
+        except exceptions.HttpError as ex:
+            self._raise_api_exception(ex.response)
 
         if resp.status_code != 200:
             self._raise_api_exception(resp)
@@ -111,11 +118,14 @@ class ActionManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        resp = self.http_client.post(
-            '/actions/validate',
-            definition,
-            headers={'content-type': 'text/plain'}
-        )
+        try:
+            resp = self.http_client.post(
+                '/actions/validate',
+                definition,
+                headers={'content-type': 'text/plain'}
+            )
+        except exceptions.HttpError as ex:
+            self._raise_api_exception(ex.response)
 
         if resp.status_code != 200:
             self._raise_api_exception(resp)

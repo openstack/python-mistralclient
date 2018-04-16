@@ -38,15 +38,11 @@ class ActionExecutionManager(base.ResourceManager):
         if params:
             data['params'] = json.dumps(params)
 
-        resp = self.http_client.post(
+        return self._create(
             '/action_executions',
-            json.dumps(data)
+            data,
+            dump_json=True
         )
-
-        if resp.status_code != 201:
-            self._raise_api_exception(resp)
-
-        return self.resource_class(self, base.get_json(resp))
 
     def update(self, id, state=None, output=None):
         self._ensure_not_empty(id=id)
