@@ -9,11 +9,11 @@ Mistral
 =======
 
 .. image:: https://img.shields.io/pypi/v/python-mistralclient.svg
-    :target: https://pypi.python.org/pypi/python-mistralclient/
+    :target: https://pypi.org/project/python-mistralclient/
     :alt: Latest Version
 
 .. image:: https://img.shields.io/pypi/dm/python-mistralclient.svg
-    :target: https://pypi.python.org/pypi/python-mistralclient/
+    :target: https://pypi.org/project/python-mistralclient/
     :alt: Downloads
 
 Mistral is a workflow service. Most business processes consist of multiple
@@ -91,7 +91,7 @@ Useful Links
 * `Specs`_
 * `How to Contribute`_
 
-.. _PyPi: https://pypi.python.org/pypi/python-mistralclient
+.. _PyPi: https://pypi.org/project/python-mistralclient
 .. _Launchpad project: https://launchpad.net/python-mistralclient
 .. _Blueprints: https://blueprints.launchpad.net/python-mistralclient
 .. _Bugs: https://bugs.launchpad.net/python-mistralclient
