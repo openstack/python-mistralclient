@@ -13,6 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from keystoneauth1 import exceptions
 from mistralclient.api import base
 from mistralclient import utils
 
@@ -31,11 +32,14 @@ class WorkbookManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        resp = self.http_client.post(
-            '/workbooks',
-            definition,
-            headers={'content-type': 'text/plain'}
-        )
+        try:
+            resp = self.http_client.post(
+                '/workbooks',
+                definition,
+                headers={'content-type': 'text/plain'}
+            )
+        except exceptions.HttpError as ex:
+            self._raise_api_exception(ex.response)
 
         if resp.status_code != 201:
             self._raise_api_exception(resp)
@@ -49,11 +53,14 @@ class WorkbookManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        resp = self.http_client.put(
-            '/workbooks',
-            definition,
-            headers={'content-type': 'text/plain'}
-        )
+        try:
+            resp = self.http_client.put(
+                '/workbooks',
+                definition,
+                headers={'content-type': 'text/plain'}
+            )
+        except exceptions.HttpError as ex:
+            self._raise_api_exception(ex.response)
 
         if resp.status_code != 200:
             self._raise_api_exception(resp)
@@ -80,11 +87,14 @@ class WorkbookManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        resp = self.http_client.post(
-            '/workbooks/validate',
-            definition,
-            headers={'content-type': 'text/plain'}
-        )
+        try:
+            resp = self.http_client.post(
+                '/workbooks/validate',
+                definition,
+                headers={'content-type': 'text/plain'}
+            )
+        except exceptions.HttpError as ex:
+            self._raise_api_exception(ex.response)
 
         if resp.status_code != 200:
             self._raise_api_exception(resp)

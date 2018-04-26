@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    Some cli mistral calls when failed would return unhelpful messages like
+    error(400) that is not what the mistral api is returning. This changes
+    those messages to the useful messages sent by the api.
+    The affected are the run-action, the crud for actions, workflows, and
+    workbooks.

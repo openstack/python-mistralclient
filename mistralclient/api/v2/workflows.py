@@ -15,6 +15,7 @@
 
 import six
 
+from keystoneauth1 import exceptions
 from mistralclient.api import base
 from mistralclient import utils
 
@@ -36,11 +37,14 @@ class WorkflowManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        resp = self.http_client.post(
-            '/workflows?scope=%s&namespace=%s' % (scope, namespace),
-            definition,
-            headers={'content-type': 'text/plain'}
-        )
+        try:
+            resp = self.http_client.post(
+                '/workflows?scope=%s&namespace=%s' % (scope, namespace),
+                definition,
+                headers={'content-type': 'text/plain'}
+            )
+        except exceptions.HttpError as ex:
+            self._raise_api_exception(ex.response)
 
         if resp.status_code != 201:
             self._raise_api_exception(resp)
@@ -57,11 +61,14 @@ class WorkflowManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        resp = self.http_client.put(
-            '%s?namespace=%s&scope=%s' % (url_pre, namespace, scope),
-            definition,
-            headers={'content-type': 'text/plain'}
-        )
+        try:
+            resp = self.http_client.put(
+                '%s?namespace=%s&scope=%s' % (url_pre, namespace, scope),
+                definition,
+                headers={'content-type': 'text/plain'}
+            )
+        except exceptions.HttpError as ex:
+            self._raise_api_exception(ex.response)
 
         if resp.status_code != 200:
             self._raise_api_exception(resp)
@@ -126,11 +133,14 @@ class WorkflowManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        resp = self.http_client.post(
-            '/workflows/validate',
-            definition,
-            headers={'content-type': 'text/plain'}
-        )
+        try:
+            resp = self.http_client.post(
+                '/workflows/validate',
+                definition,
+                headers={'content-type': 'text/plain'}
+            )
+        except exceptions.HttpError as ex:
+            self._raise_api_exception(ex.response)
 
         if resp.status_code != 200:
             self._raise_api_exception(resp)
