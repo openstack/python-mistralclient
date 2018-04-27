@@ -113,7 +113,13 @@ class ExecutionManager(base.ResourceManager):
 
         return self._get('/executions/%s' % id)
 
-    def delete(self, id):
+    def delete(self, id, force=None):
         self._ensure_not_empty(id=id)
+        qparams = {}
 
-        self._delete('/executions/%s' % id)
+        qparams['force'] = bool(force)
+
+        query_string = ("?%s" % urlparse.urlencode(list(qparams.items()))
+                        if qparams else "")
+
+        self._delete('/executions/%s%s' % (id, query_string))

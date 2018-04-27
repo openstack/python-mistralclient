@@ -248,13 +248,21 @@ class Delete(command.Command):
             help='Id of execution identifier(s).'
         )
 
+        parser.add_argument(
+            '--force',
+            default=False,
+            action='store_true',
+            help='Force the deletion of an execution. Might cause a cascade '
+                 ' of errors if used for running executions.'
+        )
+
         return parser
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-
+        force = parsed_args.force
         utils.do_action_on_many(
-            lambda s: mistral_client.executions.delete(s),
+            lambda s: mistral_client.executions.delete(s, force=force),
             parsed_args.execution,
             "Request to delete execution %s has been accepted.",
             "Unable to delete the specified execution(s)."

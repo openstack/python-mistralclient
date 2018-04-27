@@ -282,13 +282,24 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
     def test_delete(self):
         self.call(execution_cmd.Delete, app_args=['id'])
 
-        self.client.executions.delete.assert_called_once_with('id')
+        self.client.executions.delete.assert_called_once_with(
+            'id',
+            force=False
+        )
+
+    def test_delete_with_force(self):
+        self.call(execution_cmd.Delete, app_args=['id', '--force'])
+
+        self.client.executions.delete.assert_called_once_with(
+            'id',
+            force=True
+        )
 
     def test_delete_with_multi_names(self):
         self.call(execution_cmd.Delete, app_args=['id1', 'id2'])
 
         self.assertEqual(2, self.client.executions.delete.call_count)
         self.assertEqual(
-            [mock.call('id1'), mock.call('id2')],
+            [mock.call('id1', force=False), mock.call('id2', force=False)],
             self.client.executions.delete.call_args_list
         )

@@ -254,6 +254,12 @@ class TestExecutionsV2(base.BaseClientV2Test):
             ex.to_dict()
         )
 
+    def test_delete_with_force(self):
+        url = self.TEST_URL + URL_TEMPLATE_ID % EXEC['id']
+        self.requests_mock.delete(url, status_code=204)
+
+        self.executions.delete(EXEC['id'], force=True)
+
     def test_delete(self):
         url = self.TEST_URL + URL_TEMPLATE_ID % EXEC['id']
         self.requests_mock.delete(url, status_code=204)
