@@ -96,12 +96,22 @@ class Get(show.ShowOne):
         parser = super(Get, self).get_parser(prog_name)
 
         parser.add_argument('workflow', help='Workflow ID or name.')
+        parser.add_argument(
+            '--namespace',
+            nargs='?',
+            default='',
+            help="Namespace to get the workflow from.",
+        )
 
         return parser
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-        wf = mistral_client.workflows.get(parsed_args.workflow)
+
+        wf = mistral_client.workflows.get(
+            parsed_args.workflow,
+            parsed_args.namespace
+        )
 
         return format(wf)
 
@@ -141,6 +151,7 @@ class Create(base.MistralLister):
 
     def _get_resources(self, parsed_args):
         scope = 'public' if parsed_args.public else 'private'
+
         mistral_client = self.app.client_manager.workflow_engine
 
         return mistral_client.workflows.create(
@@ -166,8 +177,7 @@ class Delete(command.Command):
             '--namespace',
             nargs='?',
             default=None,
-            help="Parent task execution ID associated with workflow "
-                 "execution list.",
+            help="Namespace to delete the workflow from.",
         )
 
         return parser
@@ -201,8 +211,7 @@ class Update(base.MistralLister):
             '--namespace',
             nargs='?',
             default='',
-            help="Parent task execution ID associated with workflow "
-                 "execution list.",
+            help="Namespace of the workflow.",
         )
 
         parser.add_argument(
@@ -218,6 +227,7 @@ class Update(base.MistralLister):
 
     def _get_resources(self, parsed_args):
         scope = 'public' if parsed_args.public else 'private'
+
         mistral_client = self.app.client_manager.workflow_engine
 
         return mistral_client.workflows.update(
@@ -235,12 +245,22 @@ class GetDefinition(command.Command):
         parser = super(GetDefinition, self).get_parser(prog_name)
 
         parser.add_argument('identifier', help='Workflow ID or name.')
+        parser.add_argument(
+            '--namespace',
+            nargs='?',
+            default='',
+            help="Namespace to get the workflow from.",
+        )
 
         return parser
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-        wf = mistral_client.workflows.get(parsed_args.identifier)
+
+        wf = mistral_client.workflows.get(
+            parsed_args.identifier,
+            parsed_args.namespace
+        )
 
         self.app.stdout.write(wf.definition or "\n")
 
@@ -271,6 +291,7 @@ class Validate(show.ShowOne):
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
+
         result = mistral_client.workflows.validate(
             parsed_args.definition.read()
         )
