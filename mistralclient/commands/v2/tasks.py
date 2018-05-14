@@ -33,7 +33,7 @@ class TaskFormatter(object):
         ('name',                    'Name'),
         ('workflow_name',           'Workflow name'),
         ('workflow_namespace',      'Workflow namespace'),
-        ('workflow_execution_id',   'Execution ID'),
+        ('workflow_execution_id',   'Workflow Execution ID'),
         ('state',                   'State'),
         ('state_info',              'State info'),
         ('created_at',              'Created at'),
