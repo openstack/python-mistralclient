@@ -61,7 +61,7 @@ class SimpleMistralCLITests(base.MistralCLIAuth):
 
         self.assertTableStruct(
             tasks,
-            ['ID', 'Name', 'Workflow name', 'Execution ID', 'State']
+            ['ID', 'Name', 'Workflow name', 'Workflow Execution ID', 'State']
         )
 
     def test_cron_trigger_list(self):
@@ -1101,7 +1101,8 @@ class TaskCLITests(base_v2.MistralClientTestBase):
             fetched_task,
             'Workflow namespace'
         )
-        task_execution_id = self.get_field_value(fetched_task, 'Execution ID')
+        task_execution_id = self.get_field_value(fetched_task,
+                                                 'Workflow Execution ID')
 
         self.assertEqual(created_task_id, fetched_task_id)
         self.assertEqual('', fetched_task_wf_namespace)
@@ -1127,7 +1128,8 @@ class TaskCLITests(base_v2.MistralClientTestBase):
             fetched_task,
             'Workflow namespace'
         )
-        task_execution_id = self.get_field_value(fetched_task, 'Execution ID')
+        task_execution_id = self.get_field_value(fetched_task,
+                                                 'Workflow Execution ID')
 
         self.assertEqual(created_task_id, fetched_task_id)
         self.assertEqual(namespace, created_wf_namespace)
@@ -1148,7 +1150,7 @@ class TaskCLITests(base_v2.MistralClientTestBase):
 
         self.assertTableStruct(
             tasks,
-            ['ID', 'Name', 'Workflow name', 'Execution ID', 'State']
+            ['ID', 'Name', 'Workflow name', 'Workflow Execution ID', 'State']
         )
 
         self.assertEqual(2, len(tasks))
@@ -1163,7 +1165,7 @@ class TaskCLITests(base_v2.MistralClientTestBase):
 
         self.assertTableStruct(
             tasks,
-            ['ID', 'Name', 'Workflow name', 'Execution ID', 'State']
+            ['ID', 'Name', 'Workflow name', 'Workflow Execution ID', 'State']
         )
 
         self.assertEqual(1, len(tasks))
