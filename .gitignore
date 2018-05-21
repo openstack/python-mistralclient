@@ -28,6 +28,8 @@ pip-log.txt
 cover/*
 .tox
 nosetests.xml
+.stestr/
+.testrepository/
 functional_creds.conf
 AUTHORS
 ChangeLog

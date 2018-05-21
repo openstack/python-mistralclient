@@ -14,6 +14,7 @@
 import collections
 import copy
 import json
+import os.path
 
 import pkg_resources as pkg
 from six.moves.urllib import parse
@@ -61,6 +62,7 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
             'mistralclient',
             'tests/unit/resources/env_v2.json'
         )
+        path = os.path.abspath(path)
 
         # Convert the file path to file URI
         uri = parse.urljoin('file:', request.pathname2url(path))

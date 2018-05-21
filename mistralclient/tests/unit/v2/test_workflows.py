@@ -12,6 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import os.path
 import pkg_resources as pkg
 from six.moves.urllib import parse
 from six.moves.urllib import request
@@ -119,6 +120,7 @@ class TestWorkflowsV2(base.BaseClientV2Test):
             'mistralclient',
             'tests/unit/resources/wf_v2.yaml'
         )
+        path = os.path.abspath(path)
 
         # Convert the file path to file URI
         uri = parse.urljoin('file:', request.pathname2url(path))
