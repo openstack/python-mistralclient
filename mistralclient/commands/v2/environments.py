@@ -115,36 +115,6 @@ class Get(command.ShowOne):
         return format(environment)
 
 
-class GetDefinition(command.ShowOne):
-    """Show specific environment definition."""
-
-    def get_parser(self, prog_name):
-        parser = super(GetDefinition, self).get_parser(prog_name)
-
-        parser.add_argument(
-            'environment',
-            help='Environment name'
-        )
-
-        return parser
-
-    def take_action(self, parsed_args):
-        mistral_client = self.app.client_manager.workflow_engine
-        env = mistral_client.environments.get(parsed_args.environment)
-
-        columns = ('name',
-                   'description',
-                   'scope',
-                   'variables')
-
-        data = (env.name,
-                env.description,
-                env.scope,
-                json.dumps(env.variables))
-
-        return columns, data
-
-
 class Create(command.ShowOne):
     """Create new environment."""
 

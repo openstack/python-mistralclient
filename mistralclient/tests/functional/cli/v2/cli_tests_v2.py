@@ -1530,21 +1530,6 @@ class EnvironmentCLITests(base_v2.MistralClientTestBase):
         self.assertEqual(env_name, fetched_env_name)
         self.assertEqual(env_desc, fetched_env_desc)
 
-    def test_environment_get_definition(self):
-        env = self.environment_create('env.yaml')
-
-        env_name = self.get_field_value(env, 'Name')
-        env_desc = self.get_field_value(env, 'Description')
-
-        env = self.mistral_admin('environment-get-definition', params=env_name)
-
-        fetched_env_name = self.get_field_value(env, 'name')
-        fetched_env_desc = self.get_field_value(env, 'description')
-
-        self.assertTableStruct(env, ['Field', 'Value'])
-        self.assertEqual(env_name, fetched_env_name)
-        self.assertEqual(env_desc, fetched_env_desc)
-
 
 class ActionExecutionCLITests(base_v2.MistralClientTestBase):
     """Test suite checks commands to work with action executions."""
@@ -2197,21 +2182,6 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
             exceptions.CommandFailed,
             self.mistral_admin,
             'environment-get',
-            params='nonexist'
-        )
-
-    def test_env_get_definition_without_param(self):
-        self.assertRaises(
-            exceptions.CommandFailed,
-            self.mistral_admin,
-            'environment-get-definition'
-        )
-
-    def test_env_get_definition_nonexistent(self):
-        self.assertRaises(
-            exceptions.CommandFailed,
-            self.mistral_admin,
-            'environment-get-definition',
             params='nonexist'
         )
 

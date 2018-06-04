@@ -706,8 +706,6 @@ class MistralShell(app.App):
             mistralclient.commands.v2.environments.Update,
             'environment-list': mistralclient.commands.v2.environments.List,
             'environment-get': mistralclient.commands.v2.environments.Get,
-            'environment-get-definition':
-            mistralclient.commands.v2.environments.GetDefinition,
             'run-action': mistralclient.commands.v2.action_executions.Create,
             'action-execution-list':
             mistralclient.commands.v2.action_executions.List,

@@ -447,17 +447,6 @@ class EnvironmentIsolationCLITests(base_v2.MistralClientTestBase):
             params=env_name
         )
 
-    def test_get_env_definition_from_another_tenant(self):
-        env = self.environment_create(self.env_file)
-        env_name = self.get_field_value(env, "Name")
-
-        self.assertRaises(
-            exceptions.CommandFailed,
-            self.mistral_alt_user,
-            "environment-get-definition",
-            params=env_name
-        )
-
     def test_delete_env_from_another_tenant(self):
         env = self.environment_create(self.env_file)
         env_name = self.get_field_value(env, "Name")
