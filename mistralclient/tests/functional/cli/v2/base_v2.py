@@ -245,7 +245,7 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
             self.mistral_cli,
             admin,
             'execution-delete',
-            params=exec_id
+            params="{} --force".format(exec_id)
         )
 
         return ex

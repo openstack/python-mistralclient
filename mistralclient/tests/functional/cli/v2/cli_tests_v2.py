@@ -660,7 +660,8 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
         self.assertIn(wf_name, [ex['Workflow name'] for ex in execs])
         self.assertIn(namespace, [ex['Workflow namespace'] for ex in execs])
 
-        self.mistral_admin('execution-delete', params=exec_id)
+        params = "{} --force".format(exec_id)
+        self.mistral_admin('execution-delete', params=params)
 
     def test_execution_create_delete(self):
 
@@ -688,7 +689,8 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
         self.assertIn(exec_id, [ex['ID'] for ex in execs])
         self.assertIn(wf_name, [ex['Workflow name'] for ex in execs])
 
-        self.mistral_admin('execution-delete', params=exec_id)
+        params = "{} --force".format(exec_id)
+        self.mistral_admin('execution-delete', params=params)
 
     def test_execution_create_with_input_and_start_task(self):
         execution = self.execution_create(
