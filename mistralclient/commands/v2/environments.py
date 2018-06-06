@@ -106,11 +106,31 @@ class Get(command.ShowOne):
             help='Environment name'
         )
 
+        parser.add_argument(
+            '--export',
+            default=False,
+            action='store_true',
+            help='Export the environment suitable for import'
+        )
+
         return parser
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
         environment = mistral_client.environments.get(parsed_args.environment)
+
+        if parsed_args.export:
+            columns = ('name',
+                       'description',
+                       'scope',
+                       'variables')
+
+            data = (environment.name,
+                    environment.description,
+                    environment.scope,
+                    json.dumps(environment.variables))
+
+            return columns, data
 
         return format(environment)
 
