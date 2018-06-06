@@ -48,6 +48,11 @@ EXPECTED_RESULT = (ENVIRONMENT_DICT['name'],
                    ENVIRONMENT_DICT['created_at'],
                    ENVIRONMENT_DICT['updated_at'])
 
+EXPECTED_EXPORT_RESULT = (ENVIRONMENT_DICT['name'],
+                          ENVIRONMENT_DICT['description'],
+                          ENVIRONMENT_DICT['scope'],
+                          json.dumps(ENVIRONMENT_DICT['variables']))
+
 
 class TestCLIEnvironmentsV2(base.BaseCommandTest):
 
@@ -109,6 +114,13 @@ class TestCLIEnvironmentsV2(base.BaseCommandTest):
         result = self.call(environment_cmd.Get, app_args=['name'])
 
         self.assertEqual(EXPECTED_RESULT, result[1])
+
+    def test_get_with_export(self):
+        self.client.environments.get.return_value = ENVIRONMENT
+
+        result = self.call(environment_cmd.Get, app_args=['--export', 'name'])
+
+        self.assertEqual(EXPECTED_EXPORT_RESULT, result[1])
 
     def test_delete(self):
         self.call(environment_cmd.Delete, app_args=['name'])
