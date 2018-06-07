@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    mistralclient 3.5.0 introduced a new --force option to delete executions
+    that are still running. However, this had the unintended impact of passing
+    force=false when it wasn't provided. This is incompatible with previous
+    releases of the Mistral API which reject requests as they don't recognise
+    "force".

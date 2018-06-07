@@ -117,7 +117,8 @@ class ExecutionManager(base.ResourceManager):
         self._ensure_not_empty(id=id)
         qparams = {}
 
-        qparams['force'] = bool(force)
+        if force:
+            qparams['force'] = True
 
         query_string = ("?%s" % urlparse.urlencode(list(qparams.items()))
                         if qparams else "")
