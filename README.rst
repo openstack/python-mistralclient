@@ -12,10 +12,6 @@ Mistral
     :target: https://pypi.org/project/python-mistralclient/
     :alt: Latest Version
 
-.. image:: https://img.shields.io/pypi/dm/python-mistralclient.svg
-    :target: https://pypi.org/project/python-mistralclient/
-    :alt: Downloads
-
 Mistral is a workflow service. Most business processes consist of multiple
 distinct interconnected steps that need to be executed in a particular
 order in a distributed environment. A user can describe such a process as a set
