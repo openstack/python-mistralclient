@@ -39,6 +39,7 @@ def make_client(instance):
 
     mistral_url = instance.get_endpoint_for_service_type(
         'workflowv2',
+        region_name=instance.region_name,
         interface='publicURL'
     )
 
