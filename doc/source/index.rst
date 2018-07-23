@@ -13,7 +13,7 @@ Using mistralclient
 
    cli/cli_usage_with_openstack
    cli/cli_usage_with_keycloak
-   cli/cli_usage_without_auth
+   cli/cli_usage_targeting_workflows
    cli/cli_usage_source_execution
    class_reference
 

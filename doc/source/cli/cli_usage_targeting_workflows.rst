@@ -1,12 +1,10 @@
-Using Mistral without Authentication
-====================================
+Using Mistral to execute Workflows on an arbitrary cloud
+========================================================
 
 It is possible to execute a workflow on any arbitrary cloud without additional
-configuration on the Mistral server side. If authentication is turned off in
-the Mistral server (Pecan's `auth_enable = False` option in `mistral.conf`),
-there is no need to set the `keystone_authtoken` section. It is possible to
-have Mistral use an external OpenStack cloud even when it isn't deployed in
-an OpenStack environment (i.e. no Keystone integration).
+configuration on the Mistral server side. It is possible to have Mistral use
+an external OpenStack cloud even when it isn't deployed in an OpenStack
+environment (i.e. no Keystone integration).
 
 This setup is particularly useful when Mistral is used in standalone mode,
 where the Mistral service is not part of the OpenStack cloud and runs
@@ -40,3 +38,13 @@ The OS-TARGET-* parameters can be set in environment variables as:
     $ export OS_TARGET_TENANT_NAME=tenant
     $ export OS_TARGET_PASSWORD=secret
     $ export OS_TARGET_REGION_NAME=region
+
+Note on the --os-target_cacert parameter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The `--os-target_cacert` parameter can be used to set a CA certificate for
+SSL communication with the target cloud's Keystone service. The CA certificate
+file is **NOT** transferred to the Mistral server. It is the responsibility of
+the user to ensure that the SSL Certificate is accessible for the Mistral
+Executor and SSL communication is possible with the target cloud. For testing
+purposes it is suggested to use the `--target_insecure` parameter.
