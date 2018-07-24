@@ -25,7 +25,7 @@ class Workbook(base.Resource):
 class WorkbookManager(base.ResourceManager):
     resource_class = Workbook
 
-    def create(self, definition):
+    def create(self, definition, scope='private'):
         self._ensure_not_empty(definition=definition)
 
         # If the specified definition is actually a file, read in the
@@ -34,7 +34,7 @@ class WorkbookManager(base.ResourceManager):
 
         try:
             resp = self.http_client.post(
-                '/workbooks',
+                '/workbooks?scope=%s' % scope,
                 definition,
                 headers={'content-type': 'text/plain'}
             )
@@ -46,7 +46,7 @@ class WorkbookManager(base.ResourceManager):
 
         return self.resource_class(self, base.extract_json(resp, None))
 
-    def update(self, definition):
+    def update(self, definition, scope='private'):
         self._ensure_not_empty(definition=definition)
 
         # If the specified definition is actually a file, read in the
@@ -55,7 +55,7 @@ class WorkbookManager(base.ResourceManager):
 
         try:
             resp = self.http_client.put(
-                '/workbooks',
+                '/workbooks?scope=%s' % scope,
                 definition,
                 headers={'content-type': 'text/plain'}
             )

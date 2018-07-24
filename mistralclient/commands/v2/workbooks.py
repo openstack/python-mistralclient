@@ -25,6 +25,7 @@ def format(workbook=None):
     columns = (
         'Name',
         'Tags',
+        'Scope',
         'Created at',
         'Updated at'
     )
@@ -33,6 +34,7 @@ def format(workbook=None):
         data = (
             workbook.name,
             base.wrap(', '.join(workbook.tags or '')) or '<none>',
+            workbook.scope,
             workbook.created_at,
         )
 
@@ -89,13 +91,21 @@ class Create(command.ShowOne):
             type=argparse.FileType('r'),
             help='Workbook definition file'
         )
+        parser.add_argument(
+            '--public',
+            action='store_true',
+            help='With this flag workbook will be marked as "public".'
+        )
 
         return parser
 
     def take_action(self, parsed_args):
+        scope = 'public' if parsed_args.public else 'private'
+
         mistral_client = self.app.client_manager.workflow_engine
         workbook = mistral_client.workbooks.create(
-            parsed_args.definition.read()
+            parsed_args.definition.read(),
+            scope=scope
         )
 
         return format(workbook)
@@ -132,13 +142,21 @@ class Update(command.ShowOne):
             type=argparse.FileType('r'),
             help='Workbook definition file'
         )
+        parser.add_argument(
+            '--public',
+            action='store_true',
+            help='With this flag workbook will be marked as "public".'
+        )
 
         return parser
 
     def take_action(self, parsed_args):
+        scope = 'public' if parsed_args.public else 'private'
+
         mistral_client = self.app.client_manager.workflow_engine
         workbook = mistral_client.workbooks.update(
-            parsed_args.definition.read()
+            parsed_args.definition.read(),
+            scope=scope
         )
 
         return format(workbook)

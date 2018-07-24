@@ -111,11 +111,16 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
         else:
             return self.mistral_alt_user(cmd, params)
 
-    def workbook_create(self, wb_def, admin=True):
+    def workbook_create(self, wb_def, admin=True, scope='private'):
+        params = '{0}'.format(wb_def)
+
+        if scope == 'public':
+            params += ' --public'
+
         wb = self.mistral_cli(
             admin,
             'workbook-create',
-            params='{0}'.format(wb_def)
+            params=params
         )
 
         wb_name = self.get_field_value(wb, "Name")

@@ -103,6 +103,32 @@ class WorkbookIsolationCLITests(base_v2.MistralClientTestBase):
             params=name
         )
 
+    def test_create_public_workbook(self):
+        wb = self.workbook_create(self.wb_def, scope='public')
+        name = self.get_field_value(wb, "Name")
+
+        same_wb = self.mistral_alt_user(
+            "workbook-get",
+            params=name
+        )
+
+        self.assertEqual(
+            name,
+            self.get_field_value(same_wb, "Name")
+        )
+
+        # The workflows should be public too
+        self.mistral_alt_user(
+            "workflow-get",
+            params="wb.wf1"
+        )
+
+        # The actions should be public too
+        self.mistral_alt_user(
+            "action-get",
+            params="wb.ac1"
+        )
+
     def test_delete_wb_from_another_tenant(self):
         wb = self.workbook_create(self.wb_def)
         name = self.get_field_value(wb, "Name")
