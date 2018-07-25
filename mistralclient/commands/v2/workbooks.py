@@ -24,6 +24,7 @@ from mistralclient import utils
 def format(workbook=None):
     columns = (
         'Name',
+        'Namespace',
         'Tags',
         'Scope',
         'Created at',
@@ -33,6 +34,7 @@ def format(workbook=None):
     if workbook:
         data = (
             workbook.name,
+            workbook.namespace,
             base.wrap(', '.join(workbook.tags or '')) or '<none>',
             workbook.scope,
             workbook.created_at,
@@ -66,16 +68,23 @@ class Get(command.ShowOne):
     def get_parser(self, prog_name):
         parser = super(Get, self).get_parser(prog_name)
 
+        parser.add_argument('workbook', help='Workbook name')
+
         parser.add_argument(
-            'workbook',
-            help='Workbook name'
+            '--namespace',
+            nargs='?',
+            default='',
+            help="Namespace to get the workbook from."
         )
 
         return parser
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-        workbook = mistral_client.workbooks.get(parsed_args.workbook)
+        workbook = mistral_client.workbooks.get(
+            parsed_args.workbook,
+            parsed_args.namespace
+        )
 
         return format(workbook)
 
@@ -97,6 +106,13 @@ class Create(command.ShowOne):
             help='With this flag workbook will be marked as "public".'
         )
 
+        parser.add_argument(
+            '--namespace',
+            nargs='?',
+            default='',
+            help="Namespace to create the workbook within."
+        )
+
         return parser
 
     def take_action(self, parsed_args):
@@ -105,6 +121,7 @@ class Create(command.ShowOne):
         mistral_client = self.app.client_manager.workflow_engine
         workbook = mistral_client.workbooks.create(
             parsed_args.definition.read(),
+            namespace=parsed_args.namespace,
             scope=scope
         )
 
@@ -118,13 +135,20 @@ class Delete(command.Command):
         parser = super(Delete, self).get_parser(prog_name)
 
         parser.add_argument('workbook', nargs='+', help='Name of workbook(s).')
+        parser.add_argument(
+            '--namespace',
+            nargs='?',
+            default=None,
+            help="Namespace to delete the workbook(s) from."
+        )
 
         return parser
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
         utils.do_action_on_many(
-            lambda s: mistral_client.workbooks.delete(s),
+            lambda s: mistral_client.workbooks.delete(s,
+                                                      parsed_args.namespace),
             parsed_args.workbook,
             "Request to delete workbook %s has been accepted.",
             "Unable to delete the specified workbook(s)."
@@ -143,6 +167,12 @@ class Update(command.ShowOne):
             help='Workbook definition file'
         )
         parser.add_argument(
+            '--namespace',
+            nargs='?',
+            default=None,
+            help="Namespace to update the workbook in."
+        )
+        parser.add_argument(
             '--public',
             action='store_true',
             help='With this flag workbook will be marked as "public".'
@@ -156,6 +186,7 @@ class Update(command.ShowOne):
         mistral_client = self.app.client_manager.workflow_engine
         workbook = mistral_client.workbooks.update(
             parsed_args.definition.read(),
+            namespace=parsed_args.namespace,
             scope=scope
         )
 

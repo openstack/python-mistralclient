@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Add namespace parameter to workbook commands. Namespace parameter allows
+    to create multiple workbooks with same name under different namespaces.

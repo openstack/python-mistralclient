@@ -25,7 +25,22 @@ class Workbook(base.Resource):
 class WorkbookManager(base.ResourceManager):
     resource_class = Workbook
 
-    def create(self, definition, scope='private'):
+    def _get_workbooks_url(self, resource=None, namespace=None, scope=None):
+        path = '/workbooks'
+
+        if resource:
+            path += '/%s' % resource
+
+        if scope and namespace:
+            path += '?scope=%s&namespace=%s' % (scope, namespace)
+        elif scope:
+            path += '?scope=%s' % scope
+        elif namespace:
+            path += '?namespace=%s' % namespace
+
+        return path
+
+    def create(self, definition, namespace='', scope='private'):
         self._ensure_not_empty(definition=definition)
 
         # If the specified definition is actually a file, read in the
@@ -34,7 +49,7 @@ class WorkbookManager(base.ResourceManager):
 
         try:
             resp = self.http_client.post(
-                '/workbooks?scope=%s' % scope,
+                self._get_workbooks_url(None, namespace, scope),
                 definition,
                 headers={'content-type': 'text/plain'}
             )
@@ -46,7 +61,7 @@ class WorkbookManager(base.ResourceManager):
 
         return self.resource_class(self, base.extract_json(resp, None))
 
-    def update(self, definition, scope='private'):
+    def update(self, definition, namespace='', scope='private'):
         self._ensure_not_empty(definition=definition)
 
         # If the specified definition is actually a file, read in the
@@ -55,7 +70,7 @@ class WorkbookManager(base.ResourceManager):
 
         try:
             resp = self.http_client.put(
-                '/workbooks?scope=%s' % scope,
+                self._get_workbooks_url(None, namespace, scope),
                 definition,
                 headers={'content-type': 'text/plain'}
             )
@@ -67,18 +82,23 @@ class WorkbookManager(base.ResourceManager):
 
         return self.resource_class(self, base.extract_json(resp, None))
 
-    def list(self):
-        return self._list('/workbooks', response_key='workbooks')
+    def list(self, namespace=''):
+        return self._list(
+            self._get_workbooks_url(None, namespace),
+            response_key='workbooks'
+        )
 
-    def get(self, name):
+    def get(self, name, namespace=''):
         self._ensure_not_empty(name=name)
 
-        return self._get('/workbooks/%s' % name)
+        return self._get(
+            self._get_workbooks_url(name, namespace)
+        )
 
-    def delete(self, name):
+    def delete(self, name, namespace=''):
         self._ensure_not_empty(name=name)
 
-        self._delete('/workbooks/%s' % name)
+        self._delete(self._get_workbooks_url(name, namespace))
 
     def validate(self, definition):
         self._ensure_not_empty(definition=definition)

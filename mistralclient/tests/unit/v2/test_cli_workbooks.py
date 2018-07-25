@@ -22,6 +22,7 @@ from mistralclient.tests.unit import base
 
 WORKBOOK_DICT = {
     'name': 'a',
+    'namespace': '',
     'tags': ['a', 'b'],
     'scope': 'private',
     'created_at': '1',
@@ -55,7 +56,7 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
 
         result = self.call(workbook_cmd.Create, app_args=['wb.yaml'])
 
-        self.assertEqual(('a', 'a, b', 'private', '1', '1'), result[1])
+        self.assertEqual(('a', '', 'a, b', 'private', '1', '1'), result[1])
 
     @mock.patch('argparse.open', create=True)
     def test_create_public(self, mock_open):
@@ -69,7 +70,7 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
             app_args=['wb.yaml', '--public']
         )
 
-        self.assertEqual(('a', 'a, b', 'public', '1', '1'), result[1])
+        self.assertEqual(('a', '', 'a, b', 'public', '1', '1'), result[1])
 
         self.assertEqual(
             'public',
@@ -82,7 +83,7 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
 
         result = self.call(workbook_cmd.Update, app_args=['definition'])
 
-        self.assertEqual(('a', 'a, b', 'private', '1', '1'), result[1])
+        self.assertEqual(('a', '', 'a, b', 'private', '1', '1'), result[1])
 
     @mock.patch('argparse.open', create=True)
     def test_update_public(self, mock_open):
@@ -96,7 +97,7 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
             app_args=['definition', '--public']
         )
 
-        self.assertEqual(('a', 'a, b', 'public', '1', '1'), result[1])
+        self.assertEqual(('a', '', 'a, b', 'public', '1', '1'), result[1])
 
         self.assertEqual(
             'public',
@@ -108,26 +109,26 @@ class TestCLIWorkbooksV2(base.BaseCommandTest):
 
         result = self.call(workbook_cmd.List)
 
-        self.assertEqual([('a', 'a, b', 'private', '1', '1')], result[1])
+        self.assertEqual([('a', '', 'a, b', 'private', '1', '1')], result[1])
 
     def test_get(self):
         self.client.workbooks.get.return_value = WORKBOOK
 
         result = self.call(workbook_cmd.Get, app_args=['name'])
 
-        self.assertEqual(('a', 'a, b', 'private', '1', '1'), result[1])
+        self.assertEqual(('a', '', 'a, b', 'private', '1', '1'), result[1])
 
     def test_delete(self):
         self.call(workbook_cmd.Delete, app_args=['name'])
 
-        self.client.workbooks.delete.assert_called_once_with('name')
+        self.client.workbooks.delete.assert_called_once_with('name', None)
 
     def test_delete_with_multi_names(self):
         self.call(workbook_cmd.Delete, app_args=['name1', 'name2'])
 
         self.assertEqual(2, self.client.workbooks.delete.call_count)
         self.assertEqual(
-            [mock.call('name1'), mock.call('name2')],
+            [mock.call('name1', None), mock.call('name2', None)],
             self.client.workbooks.delete.call_args_list
         )
 
