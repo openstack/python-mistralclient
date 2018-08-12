@@ -97,13 +97,17 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
                   **kwargs):
 
         if project_name and project_id:
-            raise RuntimeError(
-                'Only one of project_name or project_id should be set'
+            project_name = None
+            LOG.warning(
+                "Only one of project_name or project_id should be set,"
+                "project_name will be ignored"
             )
 
         if username and user_id:
-            raise RuntimeError(
-                'Only one of username or user_id should be set'
+            username = None
+            LOG.warning(
+                "Only one of username or user_id should be set,"
+                "username will be ignored"
             )
 
         auth = {}
