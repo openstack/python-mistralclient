@@ -13,6 +13,13 @@
       - openstack/python-mistralclient
 
 - project:
+    templates:
+      - openstack-python-jobs
+      - openstack-python35-jobs
+      - check-requirements
+      - openstackclient-plugin-jobs
+      - publish-openstack-sphinx-docs
+      - release-notes-jobs
     check:
       jobs:
         - python-mistralclient-devstack-dsvm
