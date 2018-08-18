@@ -7,16 +7,16 @@
         mistral: https://git.openstack.org/openstack/mistral
         heat: https://git.openstack.org/openstack/heat
       devstack_services:
-        heat: True
-        h-api: True
-        h-api-cfn: True
-        h-api-cw: True
-        h-eng: True
+        heat: true
+        h-api: true
+        h-api-cfn: true
+        h-api-cw: true
+        h-eng: true
       tox_envlist: functional
       tox_environment:
         IDENTITY_API_VERSION: 3
         PYTHONUNBUFFERED: 'true'
-        MISTRAL_USE_MOD_WSGI: True
+        MISTRAL_USE_MOD_WSGI: true
         MISTRAL_RPC_IMPLEMENTATION: oslo
         MYSQL_ROOT_PW: secretdatabase
     required-projects:
@@ -25,6 +25,13 @@
       - openstack/python-mistralclient
 
 - project:
+    templates:
+      - openstack-python-jobs
+      - openstack-python35-jobs
+      - check-requirements
+      - openstackclient-plugin-jobs
+      - publish-openstack-sphinx-docs
+      - release-notes-jobs
     check:
       jobs:
         - python-mistralclient-functional-devstack
