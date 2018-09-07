@@ -249,7 +249,7 @@ class Update(command.ShowOne):
         parser.add_argument(
             '--state',
             dest='state',
-            choices=['IDLE', 'RUNNING', 'SUCCESS', 'ERROR', 'CANCELLED'],
+            choices=['PAUSED', 'RUNNING', 'SUCCESS', 'ERROR', 'CANCELLED'],
             help='Action execution state')
         parser.add_argument(
             '--output',
