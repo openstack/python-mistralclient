@@ -125,7 +125,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
         )
 
     def test_update(self):
-        states = ['IDLE', 'RUNNING', 'SUCCESS', 'ERROR', 'CANCELLED']
+        states = ['PAUSED', 'RUNNING', 'SUCCESS', 'ERROR', 'CANCELLED']
 
         for state in states:
             action_ex_dict = copy.deepcopy(ACTION_EX_DICT)
@@ -156,7 +156,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
             self.assertEqual(expected_result, result[1])
 
     def test_update_invalid_state(self):
-        states = ['PAUSED', 'WAITING', 'DELAYED']
+        states = ['IDLE', 'WAITING', 'DELAYED']
 
         # Redirect the stderr so it doesn't show during tox
         _stderr = sys.stderr
