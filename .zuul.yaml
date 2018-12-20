@@ -26,10 +26,11 @@
 
 - project:
     templates:
+      - check-requirements
+      - openstack-lower-constraints-jobs
       - openstack-python-jobs
       - openstack-python35-jobs
       - openstack-python36-jobs
-      - check-requirements
       - openstackclient-plugin-jobs
       - publish-openstack-docs-pti
       - release-notes-jobs-python3
@@ -44,10 +45,8 @@
         # If you need any support to debug these jobs in case of
         # failures, please reach us on #tripleo IRC channel.
         - tripleo-ci-centos-7-scenario003-multinode-oooq-container
-        - openstack-tox-lower-constraints
     gate:
       jobs:
         - python-mistralclient-functional-devstack
         - tripleo-ci-centos-7-scenario003-multinode-oooq-container
-        - openstack-tox-lower-constraints
 
