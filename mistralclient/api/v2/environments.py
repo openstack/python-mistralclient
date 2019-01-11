@@ -13,7 +13,6 @@
 #    limitations under the License.
 
 import json
-
 import six
 
 from mistralclient.api import base
@@ -71,8 +70,19 @@ class EnvironmentManager(base.ResourceManager):
 
         return self._update('/environments', kwargs)
 
-    def list(self):
-        return self._list('/environments', response_key='environments')
+    def list(self, marker='', limit=None, sort_keys='', sort_dirs='',
+             fields='', **filters):
+        query_string = self._build_query_params(
+            marker=marker,
+            limit=limit,
+            sort_keys=sort_keys,
+            sort_dirs=sort_dirs,
+            fields=fields,
+            filters=filters
+        )
+
+        return self._list('/environments%s' % query_string,
+                          response_key='environments')
 
     def get(self, name):
         self._ensure_not_empty(name=name)

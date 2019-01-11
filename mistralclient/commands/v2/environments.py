@@ -21,78 +21,63 @@ from mistralclient.commands.v2 import base
 from mistralclient import utils
 
 
-def format_list(environment=None):
-    columns = (
-        'Name',
-        'Description',
-        'Scope',
-        'Created at',
-        'Updated at'
-    )
+class EnvironmentFormatter(base.MistralFormatter):
+    COLUMNS = [
+        ('name', 'Name'),
+        ('description', 'Description'),
+        ('variables', 'Variables'),
+        ('scope', 'Scope'),
+        ('created_at', 'Created at'),
+        ('updated_at', 'Updated at'),
+    ]
+    LIST_COLUMN_FIELD_NAMES = [c[0] for c in COLUMNS if c[0] != 'variables']
+    LIST_COLUMN_HEADING_NAMES = [c[1] for c in COLUMNS if c[0] != 'variables']
 
-    if environment:
-        data = (
-            environment.name,
-            environment.description,
-            environment.scope,
-            environment.created_at,
-        )
-
-        if hasattr(environment, 'updated_at'):
-            data += (environment.updated_at or '<none>',)
+    @staticmethod
+    def format(environment=None, lister=False):
+        if lister:
+            columns = EnvironmentFormatter.LIST_COLUMN_HEADING_NAMES
         else:
-            data += (None,)
+            columns = EnvironmentFormatter.headings()
 
-    else:
-        data = (tuple('<none>' for _ in range(len(columns))),)
-
-    return columns, data
-
-
-def format(environment=None):
-    columns = (
-        'Name',
-        'Description',
-        'Variables',
-        'Scope',
-        'Created at',
-        'Updated at'
-    )
-
-    if environment:
-        data = (environment.name,)
-
-        if hasattr(environment, 'description'):
-            data += (environment.description or '<none>',)
+        if environment:
+            data = (
+                environment.name,)
+            if hasattr(environment, 'description'):
+                data += (environment.description or '<none>',)
+            else:
+                data += (None,)
+            if not lister:
+                data += (json.dumps(environment.variables, indent=4),)
+            data += (
+                environment.scope,
+                environment.created_at,)
+            if hasattr(environment, 'updated_at'):
+                data += (environment.updated_at or '<none>',)
+            else:
+                data += (None,)
         else:
-            data += (None,)
+            data = (tuple('' for _ in range(len(columns))),)
 
-        data += (
-            json.dumps(environment.variables, indent=4),
-            environment.scope,
-            environment.created_at,
-        )
-
-        if hasattr(environment, 'updated_at'):
-            data += (environment.updated_at or '<none>',)
-        else:
-            data += (None,)
-
-    else:
-        data = (tuple('' for _ in range(len(columns))),)
-
-    return columns, data
+        return columns, data
 
 
 class List(base.MistralLister):
     """List all environments."""
 
     def _get_format_function(self):
-        return format_list
+        return EnvironmentFormatter.format_list
 
     def _get_resources(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-        return mistral_client.environments.list()
+        return mistral_client.environments.list(
+            marker=parsed_args.marker,
+            limit=parsed_args.limit,
+            sort_keys=parsed_args.sort_keys,
+            sort_dirs=parsed_args.sort_dirs,
+            fields=EnvironmentFormatter.fields(),
+            **base.get_filters(parsed_args)
+        )
 
 
 class Get(command.ShowOne):
@@ -132,7 +117,7 @@ class Get(command.ShowOne):
 
             return columns, data
 
-        return format(environment)
+        return EnvironmentFormatter.format(environment)
 
 
 class Create(command.ShowOne):
@@ -155,7 +140,7 @@ class Create(command.ShowOne):
         mistral_client = self.app.client_manager.workflow_engine
         environment = mistral_client.environments.create(**data)
 
-        return format(environment)
+        return EnvironmentFormatter.format(environment)
 
 
 class Delete(command.Command):
@@ -203,4 +188,4 @@ class Update(command.ShowOne):
         mistral_client = self.app.client_manager.workflow_engine
         environment = mistral_client.environments.update(**data)
 
-        return format(environment)
+        return EnvironmentFormatter.format(environment)

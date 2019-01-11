@@ -22,62 +22,53 @@ from mistralclient.commands.v2 import base
 from mistralclient import utils
 
 
-def format_list(workflow=None):
-    return format(workflow, lister=True)
+class WorkflowFormatter(base.MistralFormatter):
+    COLUMNS = [
+        ('id', 'ID'),
+        ('name', 'Name'),
+        ('namespace', 'Namespace'),
+        ('project_id', 'Project ID'),
+        ('tags', 'Tags'),
+        ('input', 'Input'),
+        ('scope', 'Scope'),
+        ('created_at', 'Created at'),
+        ('updated_at', 'Updated at')
+    ]
 
+    @staticmethod
+    def format(workflow=None, lister=False):
+        if workflow:
+            tags = getattr(workflow, 'tags', None) or []
 
-def format(workflow=None, lister=False):
-    columns = (
-        'ID',
-        'Name',
-        'Namespace',
-        'Project ID',
-        'Tags',
-        'Input',
-        'Scope',
-        'Created at',
-        'Updated at'
-    )
+            data = (
+                workflow.id,
+                workflow.name,
+                workflow.namespace,
+                workflow.project_id,
+                base.wrap(', '.join(tags)) or '<none>',
+                workflow.input if not lister else base.cut(workflow.input),
+                workflow.scope,
+                workflow.created_at
+            )
 
-    if workflow:
-        tags = getattr(workflow, 'tags', None) or []
-
-        data = (
-            workflow.id,
-            workflow.name,
-            workflow.namespace,
-            workflow.project_id,
-            base.wrap(', '.join(tags)) or '<none>',
-            workflow.input if not lister else base.cut(workflow.input),
-            workflow.scope,
-            workflow.created_at
-        )
-
-        if hasattr(workflow, 'updated_at'):
-            data += (workflow.updated_at,)
+            if hasattr(workflow, 'updated_at'):
+                data += (workflow.updated_at,)
+            else:
+                data += (None,)
         else:
-            data += (None,)
-    else:
-        data = (tuple('' for _ in range(len(columns))),)
+            data = (tuple('' for _ in range(len(WorkflowFormatter.COLUMNS))),)
 
-    return columns, data
+        return WorkflowFormatter.headings(), data
 
 
 class List(base.MistralLister):
     """List all workflows."""
 
     def _get_format_function(self):
-        return format_list
+        return WorkflowFormatter.format_list
 
     def get_parser(self, prog_name):
         parser = super(List, self).get_parser(prog_name)
-
-        parser.add_argument(
-            '--filter',
-            dest='filters',
-            action='append',
-            help='Filters. Can be repeated.'
-        )
 
         return parser
 
@@ -85,6 +76,11 @@ class List(base.MistralLister):
         mistral_client = self.app.client_manager.workflow_engine
 
         return mistral_client.workflows.list(
+            marker=parsed_args.marker,
+            limit=parsed_args.limit,
+            sort_keys=parsed_args.sort_keys,
+            sort_dirs=parsed_args.sort_dirs,
+            fields=WorkflowFormatter.fields(),
             **base.get_filters(parsed_args)
         )
 
@@ -113,7 +109,7 @@ class Get(show.ShowOne):
             parsed_args.namespace
         )
 
-        return format(wf)
+        return WorkflowFormatter.format(wf)
 
 
 class Create(base.MistralLister):
@@ -142,7 +138,7 @@ class Create(base.MistralLister):
         return parser
 
     def _get_format_function(self):
-        return format_list
+        return WorkflowFormatter.format_list
 
     def _validate_parsed_args(self, parsed_args):
         if not parsed_args.definition:
@@ -223,7 +219,7 @@ class Update(base.MistralLister):
         return parser
 
     def _get_format_function(self):
-        return format_list
+        return WorkflowFormatter.format_list
 
     def _get_resources(self, parsed_args):
         scope = 'public' if parsed_args.public else 'private'
@@ -267,8 +263,8 @@ class GetDefinition(command.Command):
 
 class Validate(show.ShowOne):
     """Validate workflow."""
-
-    def _format(self, result=None):
+    @staticmethod
+    def _format(result=None):
         columns = ('Valid', 'Error')
 
         if result:

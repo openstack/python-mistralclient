@@ -22,63 +22,54 @@ from mistralclient.commands.v2 import base
 from mistralclient import utils
 
 
-def format_list(action=None):
-    return format(action, lister=True)
+class ActionFormatter(base.MistralFormatter):
+    COLUMNS = [
+        ('id', 'ID'),
+        ('name', 'Name'),
+        ('is_system', 'Is system'),
+        ('input', 'Input'),
+        ('description', 'Description'),
+        ('tags', 'Tags'),
+        ('created_at', 'Created at'),
+        ('updated_at', 'Updated at')
+    ]
 
+    @staticmethod
+    def format(action=None, lister=False):
+        if action:
+            tags = getattr(action, 'tags', None) or []
+            input_ = action.input if not lister else base.cut(action.input)
+            desc = (action.description if not lister
+                    else base.cut(action.description))
 
-def format(action=None, lister=False):
-    columns = (
-        'ID',
-        'Name',
-        'Is system',
-        'Input',
-        'Description',
-        'Tags',
-        'Created at',
-        'Updated at'
-    )
+            data = (
+                action.id,
+                action.name,
+                action.is_system,
+                input_,
+                desc,
+                base.wrap(', '.join(tags)) or '<none>',
+                action.created_at,
+            )
+            if hasattr(action, 'updated_at'):
+                data += (action.updated_at,)
+            else:
+                data += (None,)
 
-    if action:
-        tags = getattr(action, 'tags', None) or []
-        input = action.input if not lister else base.cut(action.input)
-        desc = (action.description if not lister
-                else base.cut(action.description))
-
-        data = (
-            action.id,
-            action.name,
-            action.is_system,
-            input,
-            desc,
-            base.wrap(', '.join(tags)) or '<none>',
-            action.created_at,
-        )
-
-        if hasattr(action, 'updated_at'):
-            data += (action.updated_at,)
         else:
-            data += (None,)
-    else:
-        data = (tuple('' for _ in range(len(columns))),)
+            data = (tuple('' for _ in range(len(ActionFormatter.COLUMNS))),)
 
-    return columns, data
+        return ActionFormatter.headings(), data
 
 
 class List(base.MistralLister):
     """List all actions."""
 
     def _get_format_function(self):
-        return format_list
+        return ActionFormatter.format_list
 
     def get_parser(self, prog_name):
         parser = super(List, self).get_parser(prog_name)
-
-        parser.add_argument(
-            '--filter',
-            dest='filters',
-            action='append',
-            help='Filters. Can be repeated.'
-        )
 
         return parser
 
@@ -86,6 +77,11 @@ class List(base.MistralLister):
         mistral_client = self.app.client_manager.workflow_engine
 
         return mistral_client.actions.list(
+            marker=parsed_args.marker,
+            limit=parsed_args.limit,
+            sort_keys=parsed_args.sort_keys,
+            sort_dirs=parsed_args.sort_dirs,
+            fields=ActionFormatter.fields(),
             **base.get_filters(parsed_args)
         )
 
@@ -104,7 +100,7 @@ class Get(command.ShowOne):
         mistral_client = self.app.client_manager.workflow_engine
         action = mistral_client.actions.get(parsed_args.action)
 
-        return format(action)
+        return ActionFormatter.format(action)
 
 
 class Create(base.MistralLister):
@@ -131,7 +127,7 @@ class Create(base.MistralLister):
             raise RuntimeError("Provide action definition file.")
 
     def _get_format_function(self):
-        return format_list
+        return ActionFormatter.format_list
 
     def _get_resources(self, parsed_args):
         scope = 'public' if parsed_args.public else 'private'
@@ -190,7 +186,7 @@ class Update(base.MistralLister):
         return parser
 
     def _get_format_function(self):
-        return format_list
+        return ActionFormatter.format_list
 
     def _get_resources(self, parsed_args):
         scope = 'public' if parsed_args.public else 'private'
@@ -223,8 +219,8 @@ class GetDefinition(command.Command):
 
 class Validate(command.ShowOne):
     """Validate action."""
-
-    def _format(self, result=None):
+    @staticmethod
+    def _format(result=None):
         columns = ('Valid', 'Error')
 
         if result:

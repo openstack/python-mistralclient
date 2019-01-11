@@ -1,0 +1,11 @@
+---
+critical:
+  - |
+    The default behavior of the action-execution-list, execution-list and
+    task-list commands has been changed.  Instead of returning the oldest
+    N records (default 100 or --limit specified value) by default,
+    they now return the most recent N records, when no other sort_dir,
+    sort_key or marker values are provided.  If the user specifies --oldest
+    or any of the --marker, --sort_key or --sort_dir options, the new
+    behavior is disabled and the commands will work according to the
+    user-supplied options.

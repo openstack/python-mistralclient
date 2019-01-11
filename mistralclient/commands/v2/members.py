@@ -19,46 +19,44 @@ from mistralclient.commands.v2 import base
 from mistralclient import exceptions
 
 
-def format_list(member=None):
-    return format(member, lister=True)
+class MemberFormatter(base.MistralFormatter):
+    COLUMNS = [
+        ('resource_id', 'Resource ID'),
+        ('resource_type', 'Resource Type'),
+        ('project_id', 'Resource Owner'),
+        ('member_id', 'Member ID'),
+        ('status', 'Status'),
+        ('created_at', 'Created at'),
+        ('updated_at', 'Updated at')
+    ]
 
+    @staticmethod
+    def format(member=None, lister=False):
+        if member:
+            data = (
+                member.resource_id,
+                member.resource_type,
+                member.project_id,
+                member.member_id,
+                member.status,
+                member.created_at,
+            )
 
-def format(member=None, lister=False):
-    columns = (
-        'Resource ID',
-        'Resource Type',
-        'Resource Owner',
-        'Member ID',
-        'Status',
-        'Created at',
-        'Updated at'
-    )
-
-    if member:
-        data = (
-            member.resource_id,
-            member.resource_type,
-            member.project_id,
-            member.member_id,
-            member.status,
-            member.created_at,
-        )
-
-        if hasattr(member, 'updated_at'):
-            data += (member.updated_at,)
+            if hasattr(member, 'updated_at'):
+                data += (member.updated_at,)
+            else:
+                data += (None,)
         else:
-            data += (None,)
-    else:
-        data = (tuple('' for _ in range(len(columns))),)
+            data = (tuple('' for _ in range(len(MemberFormatter.COLUMNS))),)
 
-    return columns, data
+        return MemberFormatter.headings(), data
 
 
 class List(base.MistralLister):
     """List all members."""
 
     def _get_format_function(self):
-        return format_list
+        return MemberFormatter.format_list
 
     def get_parser(self, parsed_args):
         parser = super(List, self).get_parser(parsed_args)
@@ -114,7 +112,7 @@ class Get(command.ShowOne):
             parsed_args.member_id,
         )
 
-        return format(member)
+        return MemberFormatter.format(member)
 
 
 class Create(command.ShowOne):
@@ -146,7 +144,7 @@ class Create(command.ShowOne):
             parsed_args.member_id,
         )
 
-        return format(member)
+        return MemberFormatter.format(member)
 
 
 class Delete(command.Command):
@@ -232,4 +230,4 @@ class Update(command.ShowOne):
             status=parsed_args.status
         )
 
-        return format(member)
+        return MemberFormatter.format(member)

@@ -19,54 +19,60 @@ from mistralclient.commands.v2 import base
 from mistralclient import utils
 
 
-def format_list(trigger=None):
-    return format(trigger, lister=True)
+class EventTriggerFormatter(base.MistralFormatter):
+    COLUMNS = [
+        ('id', 'ID'),
+        ('name', 'Name'),
+        ('workflow_id', 'Workflow ID'),
+        ('workflow_params', 'Params'),
+        ('exchange', 'Exchange'),
+        ('topic', 'Topic'),
+        ('event', 'Event'),
+        ('created_at', 'Created at'),
+        ('updated_at', 'Updated at')
+    ]
 
+    @staticmethod
+    def format(trigger=None, lister=False):
+        if trigger:
+            data = (
+                trigger.id,
+                trigger.name,
+                trigger.workflow_id,
+                trigger.workflow_params,
+                trigger.exchange,
+                trigger.topic,
+                trigger.event,
+                trigger.created_at,
+            )
 
-def format(trigger=None, lister=False):
-    columns = (
-        'ID',
-        'Name',
-        'Workflow ID',
-        'Params',
-        'Exchange',
-        'Topic',
-        'Event',
-        'Created at',
-        'Updated at'
-    )
-
-    if trigger:
-        data = (
-            trigger.id,
-            trigger.name,
-            trigger.workflow_id,
-            trigger.workflow_params,
-            trigger.exchange,
-            trigger.topic,
-            trigger.event,
-            trigger.created_at,
-        )
-
-        if hasattr(trigger, 'updated_at'):
-            data += (trigger.updated_at,)
+            if hasattr(trigger, 'updated_at'):
+                data += (trigger.updated_at,)
+            else:
+                data += (None,)
         else:
-            data += (None,)
-    else:
-        data = (tuple('' for _ in range(len(columns))),)
+            data = (tuple('' for _ in
+                          range(len(EventTriggerFormatter.COLUMNS))),)
 
-    return columns, data
+        return EventTriggerFormatter.headings(), data
 
 
 class List(base.MistralLister):
     """List all event triggers."""
 
     def _get_format_function(self):
-        return format_list
+        return EventTriggerFormatter.format_list
 
     def _get_resources(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-        return mistral_client.event_triggers.list()
+        return mistral_client.event_triggers.list(
+            marker=parsed_args.marker,
+            limit=parsed_args.limit,
+            sort_keys=parsed_args.sort_keys,
+            sort_dirs=parsed_args.sort_dirs,
+            fields=EventTriggerFormatter.fields(),
+            **base.get_filters(parsed_args)
+        )
 
 
 class Get(command.ShowOne):
@@ -82,9 +88,8 @@ class Get(command.ShowOne):
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
 
-        return format(mistral_client.event_triggers.get(
-            parsed_args.event_trigger
-        ))
+        return EventTriggerFormatter.format(mistral_client.event_triggers.get(
+                                            parsed_args.event_trigger))
 
 
 class Create(command.ShowOne):
@@ -140,7 +145,7 @@ class Create(command.ShowOne):
             wf_params,
         )
 
-        return format(trigger)
+        return EventTriggerFormatter.format(trigger)
 
 
 class Delete(command.Command):

@@ -22,60 +22,67 @@ from mistralclient.commands.v2 import base
 from mistralclient import utils
 
 
-def format_list(trigger=None):
-    return format(trigger, lister=True)
-
-
-def format(trigger=None, lister=False):
-    columns = (
-        'Name',
-        'Workflow',
-        'Params',
-        'Pattern',
+class CronTriggerFormatter(base.MistralFormatter):
+    COLUMNS = [
+        ('name', 'Name'),
+        ('workflow_name', 'Workflow'),
+        ('workflow_params', 'Params'),
+        ('pattern', 'Pattern'),
         # TODO(rakhmerov): Uncomment when passwords are handled properly.
         # TODO(rakhmerov): Add 'Workflow input' column.
-        'Next execution time',
-        'Remaining executions',
-        'Created at',
-        'Updated at'
-    )
+        ('next_execution_time', 'Next execution time'),
+        ('remaining_executions', 'Remaining executions'),
+        ('created_at', 'Created at'),
+        ('updated_at', 'Updated at')
+    ]
 
-    if trigger:
-        # TODO(rakhmerov): Add following here:
-        # TODO(rakhmerov): wf_input = trigger.workflow_input if not lister
-        # TODO(rakhmerov:):    else base.cut(trigger.workflow_input)
+    @staticmethod
+    def format(trigger=None, lister=False):
+        if trigger:
+            # TODO(rakhmerov): Add following here:
+            # TODO(rakhmerov): wf_input = trigger.workflow_input if not lister
+            # TODO(rakhmerov:):    else base.cut(trigger.workflow_input)
 
-        data = (
-            trigger.name,
-            trigger.workflow_name,
-            trigger.workflow_params,
-            trigger.pattern,
-            # TODO(rakhmerov): Uncomment when passwords are handled properly.
-            # TODo(rakhmerov): Add 'wf_input' here.
-            trigger.next_execution_time,
-            trigger.remaining_executions,
-            trigger.created_at,
-        )
+            data = (
+                trigger.name,
+                trigger.workflow_name,
+                trigger.workflow_params,
+                trigger.pattern,
+                # TODO(rakhmerov): Uncomment when passwords are handled
+                #  properly.
+                # TODo(rakhmerov): Add 'wf_input' here.
+                trigger.next_execution_time,
+                trigger.remaining_executions,
+                trigger.created_at,
+            )
 
-        if hasattr(trigger, 'updated_at'):
-            data += (trigger.updated_at,)
+            if hasattr(trigger, 'updated_at'):
+                data += (trigger.updated_at,)
+            else:
+                data += (None,)
         else:
-            data += (None,)
-    else:
-        data = (tuple('' for _ in range(len(columns))),)
+            data = (tuple('' for _ in
+                          range(len(CronTriggerFormatter.COLUMNS))),)
 
-    return columns, data
+        return CronTriggerFormatter.headings(), data
 
 
 class List(base.MistralLister):
     """List all cron triggers."""
 
     def _get_format_function(self):
-        return format_list
+        return CronTriggerFormatter.format_list
 
     def _get_resources(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-        return mistral_client.cron_triggers.list()
+        return mistral_client.cron_triggers.list(
+            marker=parsed_args.marker,
+            limit=parsed_args.limit,
+            sort_keys=parsed_args.sort_keys,
+            sort_dirs=parsed_args.sort_dirs,
+            fields=CronTriggerFormatter.fields(),
+            **base.get_filters(parsed_args)
+        )
 
 
 class Get(command.ShowOne):
@@ -91,7 +98,7 @@ class Get(command.ShowOne):
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
 
-        return format(mistral_client.cron_triggers.get(
+        return CronTriggerFormatter.format(mistral_client.cron_triggers.get(
             parsed_args.cron_trigger
         ))
 
@@ -189,7 +196,7 @@ class Create(command.ShowOne):
             parsed_args.count
         )
 
-        return format(trigger)
+        return CronTriggerFormatter.format(trigger)
 
 
 class Delete(command.Command):

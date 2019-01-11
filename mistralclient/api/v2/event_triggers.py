@@ -47,8 +47,19 @@ class EventTriggerManager(base.ResourceManager):
 
         return self._create('/event_triggers', data)
 
-    def list(self):
-        return self._list('/event_triggers', response_key='event_triggers')
+    def list(self, marker='', limit=None, sort_keys='', sort_dirs='',
+             fields='', **filters):
+        query_string = self._build_query_params(
+            marker=marker,
+            limit=limit,
+            sort_keys=sort_keys,
+            sort_dirs=sort_dirs,
+            fields=fields,
+            filters=filters
+        )
+
+        return self._list('/event_triggers%s' % query_string,
+                          response_key='event_triggers')
 
     def get(self, id):
         self._ensure_not_empty(id=id)

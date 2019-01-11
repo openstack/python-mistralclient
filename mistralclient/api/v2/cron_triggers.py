@@ -54,8 +54,19 @@ class CronTriggerManager(base.ResourceManager):
 
         return self._create('/cron_triggers', data)
 
-    def list(self):
-        return self._list('/cron_triggers', response_key='cron_triggers')
+    def list(self, marker='', limit=None, sort_keys='', fields='',
+             sort_dirs='', **filters):
+        query_string = self._build_query_params(
+            marker=marker,
+            limit=limit,
+            sort_keys=sort_keys,
+            sort_dirs=sort_dirs,
+            fields=fields,
+            filters=filters
+        )
+
+        return self._list('/cron_triggers%s' % query_string,
+                          response_key='cron_triggers')
 
     def get(self, name):
         self._ensure_not_empty(name=name)

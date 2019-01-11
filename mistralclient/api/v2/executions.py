@@ -14,14 +14,11 @@
 #    limitations under the License.
 
 import json
-
-from oslo_utils import uuidutils
 import six
 
+from oslo_utils import uuidutils
+
 from mistralclient.api import base
-
-
-urlparse = six.moves.urllib.parse
 
 
 class Execution(base.Resource):
@@ -79,29 +76,18 @@ class ExecutionManager(base.ResourceManager):
         return self._update('/executions/%s' % id, data)
 
     def list(self, task=None, marker='', limit=None, sort_keys='',
-             sort_dirs='', **filters):
-        qparams = {}
-
+             sort_dirs='', fields='', **filters):
         if task:
-            qparams['task_execution_id'] = task
+            filters['task_execution_id'] = task
 
-        if marker:
-            qparams['marker'] = marker
-
-        if limit and limit > 0:
-            qparams['limit'] = limit
-
-        if sort_keys:
-            qparams['sort_keys'] = sort_keys
-
-        if sort_dirs:
-            qparams['sort_dirs'] = sort_dirs
-
-        for name, val in filters.items():
-            qparams[name] = val
-
-        query_string = ("?%s" % urlparse.urlencode(list(qparams.items()))
-                        if qparams else "")
+        query_string = self._build_query_params(
+            marker=marker,
+            limit=limit,
+            sort_keys=sort_keys,
+            sort_dirs=sort_dirs,
+            fields=fields,
+            filters=filters
+        )
 
         return self._list(
             '/executions%s' % query_string,
@@ -116,11 +102,9 @@ class ExecutionManager(base.ResourceManager):
     def delete(self, id, force=None):
         self._ensure_not_empty(id=id)
         qparams = {}
-
         if force:
             qparams['force'] = True
 
-        query_string = ("?%s" % urlparse.urlencode(list(qparams.items()))
-                        if qparams else "")
+        query_string = self._build_query_params(filters=qparams)
 
         self._delete('/executions/%s%s' % (id, query_string))

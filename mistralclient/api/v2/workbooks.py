@@ -82,11 +82,19 @@ class WorkbookManager(base.ResourceManager):
 
         return self.resource_class(self, base.extract_json(resp, None))
 
-    def list(self, namespace=''):
-        return self._list(
-            self._get_workbooks_url(None, namespace),
-            response_key='workbooks'
+    def list(self, namespace='', marker='', limit=None, sort_keys='',
+             sort_dirs='', fields='', **filters):
+        query_string = self._build_query_params(
+            marker=marker,
+            limit=limit,
+            sort_keys=sort_keys,
+            sort_dirs=sort_dirs,
+            filters=filters,
+            namespace=namespace
         )
+
+        return self._list('/workbooks{}'.format(query_string),
+                          response_key='workbooks')
 
     def get(self, name, namespace=''):
         self._ensure_not_empty(name=name)
