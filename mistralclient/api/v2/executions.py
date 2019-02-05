@@ -31,12 +31,11 @@ class ExecutionManager(base.ResourceManager):
     def create(self, workflow_identifier='', namespace='',
                workflow_input=None, description='', source_execution_id=None,
                **params):
-        ident = workflow_identifier or source_execution_id
-        self._ensure_not_empty(workflow_identifier=ident)
+        self._ensure_not_empty(
+            workflow_identifier=workflow_identifier or source_execution_id
+        )
 
-        data = {
-            'description': description,
-        }
+        data = {'description': description}
 
         if uuidutils.is_uuid_like(source_execution_id):
             data.update({'source_execution_id': source_execution_id})
@@ -101,10 +100,31 @@ class ExecutionManager(base.ResourceManager):
 
     def delete(self, id, force=None):
         self._ensure_not_empty(id=id)
-        qparams = {}
-        if force:
-            qparams['force'] = True
 
-        query_string = self._build_query_params(filters=qparams)
+        query_params = {}
+
+        if force:
+            query_params['force'] = True
+
+        query_string = self._build_query_params(filters=query_params)
 
         self._delete('/executions/%s%s' % (id, query_string))
+
+    def get_report(self, id, errors_only=True, max_depth=None):
+        self._ensure_not_empty(id=id)
+
+        query_params = {}
+
+        if errors_only:
+            query_params['errors_only'] = True
+
+        if max_depth is not None:
+            query_params['max_depth'] = max_depth
+
+        query_string = self._build_query_params(filters=query_params)
+
+        resp = self.http_client.get(
+            '/executions/%s/report%s' % (id, query_string)
+        )
+
+        return resp.json()
