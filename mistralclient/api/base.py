@@ -13,8 +13,9 @@
 #    limitations under the License.
 
 import copy
-import json
 import six
+
+from oslo_serialization import jsonutils
 
 from keystoneauth1 import exceptions
 
@@ -126,7 +127,7 @@ class ResourceManager(object):
 
     def _create(self, url, data, response_key=None, dump_json=True):
         if dump_json:
-            data = json.dumps(data)
+            data = jsonutils.dumps(data)
 
         try:
             resp = self.http_client.post(url, data)
@@ -140,7 +141,7 @@ class ResourceManager(object):
 
     def _update(self, url, data, response_key=None, dump_json=True):
         if dump_json:
-            data = json.dumps(data)
+            data = jsonutils.dumps(data)
 
         try:
             resp = self.http_client.put(url, data)
@@ -208,7 +209,7 @@ def get_json(response):
     if callable(json_field_or_function):
         return response.json()
     else:
-        return json.loads(response.content)
+        return jsonutils.loads(response.content)
 
 
 class APIException(Exception):

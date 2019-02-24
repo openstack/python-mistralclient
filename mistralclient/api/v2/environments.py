@@ -12,8 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import json
 import six
+
+from oslo_serialization import jsonutils
 
 from mistralclient.api import base
 from mistralclient import utils
@@ -26,7 +27,7 @@ class Environment(base.Resource):
         """Override loading of the "variables" attribute from text to dict."""
         for k, v in self._data.items():
             if k == 'variables' and isinstance(v, six.string_types):
-                v = json.loads(v)
+                v = jsonutils.loads(v)
 
             try:
                 setattr(self, k, v)
@@ -50,7 +51,7 @@ class EnvironmentManager(base.ResourceManager):
 
         # Convert dict to text for the variables attribute.
         if isinstance(kwargs['variables'], dict):
-            kwargs['variables'] = json.dumps(kwargs['variables'])
+            kwargs['variables'] = jsonutils.dumps(kwargs['variables'])
 
         return self._create('/environments', kwargs)
 
@@ -66,7 +67,7 @@ class EnvironmentManager(base.ResourceManager):
 
         # Convert dict to text for the variables attribute.
         if kwargs.get('variables') and isinstance(kwargs['variables'], dict):
-            kwargs['variables'] = json.dumps(kwargs['variables'])
+            kwargs['variables'] = jsonutils.dumps(kwargs['variables'])
 
         return self._update('/environments', kwargs)
 

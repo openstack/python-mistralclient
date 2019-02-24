@@ -13,9 +13,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import json
 import six
 
+from oslo_serialization import jsonutils
 from oslo_utils import uuidutils
 
 from mistralclient.api import base
@@ -53,10 +53,10 @@ class ExecutionManager(base.ResourceManager):
             if isinstance(workflow_input, six.string_types):
                 data.update({'input': workflow_input})
             else:
-                data.update({'input': json.dumps(workflow_input)})
+                data.update({'input': jsonutils.dumps(workflow_input)})
 
         if params:
-            data.update({'params': json.dumps(params)})
+            data.update({'params': jsonutils.dumps(params)})
 
         return self._create('/executions', data)
 

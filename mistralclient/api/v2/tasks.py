@@ -13,7 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import json
+from oslo_serialization import jsonutils
 
 from mistralclient.api import base
 
@@ -60,6 +60,6 @@ class TaskManager(base.ResourceManager):
         }
 
         if env:
-            body['env'] = json.dumps(env)
+            body['env'] = jsonutils.dumps(env)
 
         return self._update(url, body)

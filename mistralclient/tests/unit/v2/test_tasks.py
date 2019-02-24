@@ -13,7 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import json
+from oslo_serialization import jsonutils
 
 from mistralclient.api.v2 import tasks
 from mistralclient.tests.unit.v2 import base
@@ -133,6 +133,6 @@ class TestTasksV2(base.BaseClientV2Test):
             'reset': True,
             'state': 'RUNNING',
             'id': TASK['id'],
-            'env': json.dumps({'k1': 'foobar'})
+            'env': jsonutils.dumps({'k1': 'foobar'})
         }
         self.assertDictEqual(body, self.requests_mock.last_request.json())

@@ -13,7 +13,8 @@
 #    limitations under the License.
 
 import argparse
-import json
+
+from oslo_serialization import jsonutils
 
 from osc_lib.command import command
 
@@ -48,7 +49,7 @@ class EnvironmentFormatter(base.MistralFormatter):
             else:
                 data += (None,)
             if not lister:
-                data += (json.dumps(environment.variables, indent=4),)
+                data += (jsonutils.dumps(environment.variables, indent=4),)
             data += (
                 environment.scope,
                 environment.created_at,)
@@ -113,7 +114,7 @@ class Get(command.ShowOne):
             data = (environment.name,
                     environment.description,
                     environment.scope,
-                    json.dumps(environment.variables))
+                    jsonutils.dumps(environment.variables))
 
             return columns, data
 

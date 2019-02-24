@@ -15,7 +15,7 @@
 #    under the License.
 #
 
-import json
+from oslo_serialization import jsonutils
 
 import mock
 
@@ -39,9 +39,9 @@ TASK_RESULT = {"test": "is", "passed": "successfully"}
 TASK_PUBLISHED = {"bar1": "val1", "var2": 2}
 
 TASK_WITH_RESULT_DICT = TASK_DICT.copy()
-TASK_WITH_RESULT_DICT.update({'result': json.dumps(TASK_RESULT)})
+TASK_WITH_RESULT_DICT.update({'result': jsonutils.dumps(TASK_RESULT)})
 TASK_WITH_PUBLISHED_DICT = TASK_DICT.copy()
-TASK_WITH_PUBLISHED_DICT.update({'published': json.dumps(TASK_PUBLISHED)})
+TASK_WITH_PUBLISHED_DICT.update({'published': jsonutils.dumps(TASK_PUBLISHED)})
 
 TASK = tasks.Task(mock, TASK_DICT)
 TASK_WITH_RESULT = tasks.Task(mock, TASK_WITH_RESULT_DICT)
@@ -85,7 +85,7 @@ class TestCLITasksV2(base.BaseCommandTest):
 
         self.assertDictEqual(
             TASK_RESULT,
-            json.loads(self.app.stdout.write.call_args[0][0])
+            jsonutils.loads(self.app.stdout.write.call_args[0][0])
         )
 
     def test_get_published(self):
@@ -95,7 +95,7 @@ class TestCLITasksV2(base.BaseCommandTest):
 
         self.assertDictEqual(
             TASK_PUBLISHED,
-            json.loads(self.app.stdout.write.call_args[0][0])
+            jsonutils.loads(self.app.stdout.write.call_args[0][0])
         )
 
     def test_rerun(self):

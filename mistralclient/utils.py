@@ -13,9 +13,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import json
 import os
 import yaml
+
+from oslo_serialization import jsonutils
 
 from six.moves.urllib import parse
 from six.moves.urllib import request
@@ -46,7 +47,7 @@ def load_content(content):
     try:
         data = yaml.safe_load(content)
     except Exception:
-        data = json.loads(content)
+        data = jsonutils.loads(content)
 
     return data
 
@@ -83,7 +84,8 @@ def get_contents_if_file(contents_or_file_name):
 
 def load_json(input_string):
     try:
-        with open(input_string) as fh:
-            return json.load(fh)
+        # binary mode is needed due to bug/1515231
+        with open(input_string, 'r+b') as fh:
+            return jsonutils.load(fh)
     except IOError:
-        return json.loads(input_string)
+        return jsonutils.loads(input_string)

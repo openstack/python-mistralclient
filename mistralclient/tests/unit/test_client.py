@@ -13,11 +13,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import json
 import os
 import tempfile
 
 import mock
+from oslo_serialization import jsonutils
 from oslo_utils import uuidutils
 from oslotest import base
 import osprofiler.profiler
@@ -40,7 +40,7 @@ class BaseClientTests(base.BaseTestCase):
         keystone_client_instance.auth_token = uuidutils.generate_uuid()
         keystone_client_instance.project_id = uuidutils.generate_uuid()
         keystone_client_instance.user_id = uuidutils.generate_uuid()
-        keystone_client_instance.auth_ref = str(json.dumps({}))
+        keystone_client_instance.auth_ref = str(jsonutils.dumps({}))
         return keystone_client_instance
 
     @mock.patch('keystoneauth1.session.Session')

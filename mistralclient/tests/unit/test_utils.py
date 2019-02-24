@@ -12,17 +12,17 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import json
 import os.path
 import tempfile
 import yaml
 
 from mistralclient import utils
+from oslo_serialization import jsonutils
 from oslotest import base
 
 
 ENV_DICT = {'k1': 'abc', 'k2': 123, 'k3': True}
-ENV_STR = json.dumps(ENV_DICT)
+ENV_STR = jsonutils.dumps(ENV_DICT)
 ENV_YAML = yaml.safe_dump(ENV_DICT, default_flow_style=False)
 
 

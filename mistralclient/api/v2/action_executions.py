@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import json
+from oslo_serialization import jsonutils
 
 from mistralclient.api import base
 
@@ -30,10 +30,10 @@ class ActionExecutionManager(base.ResourceManager):
         data = {'name': name}
 
         if input:
-            data['input'] = json.dumps(input)
+            data['input'] = jsonutils.dumps(input)
 
         if params:
-            data['params'] = json.dumps(params)
+            data['params'] = jsonutils.dumps(params)
 
         return self._create(
             '/action_executions',
