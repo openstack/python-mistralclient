@@ -390,9 +390,11 @@ class GetReport(command.Command):
 
         if t_ex['state'] == 'ERROR':
             state_info = t_ex['state_info']
-            state_info = state_info[0:200] + '...'
 
-            self.print_line('(error info: %s)' % state_info, level)
+            if state_info:
+                state_info = state_info[0:100].replace('\n', ' ') + '...'
+
+                self.print_line('(error info: %s)' % state_info, level)
 
         if 'action_executions' in t_ex:
             for a_ex in t_ex['action_executions']:
@@ -408,6 +410,14 @@ class GetReport(command.Command):
             (a_ex['name'], a_ex['state'], a_ex['id']),
             level
         )
+
+        if a_ex['state'] == 'ERROR':
+            state_info = a_ex['state_info']
+
+            if state_info:
+                state_info = state_info[0:100] + '...'
+
+                self.print_line('(error info: %s)' % state_info, level)
 
     def print_statistics(self, stat):
         self.print_line(
