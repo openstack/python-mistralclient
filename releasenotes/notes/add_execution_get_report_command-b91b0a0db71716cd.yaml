@@ -1,0 +1,12 @@
+---
+features:
+  - |
+    Added the new CLI command "execution-get-report" that prints information
+    about the entire workflow execution tree, including its task executions,
+    action executions and nested workflow executions. The command currently
+    has filters "--errors-only" that allows to find only ERROR paths of the
+    execution tree (enabled by default), "--no-errors-only" that allows to
+    print all tree regardless of the elements' state, "--max-depth" that
+    allows to limit the depth of the tree that needs to be printed.
+    This command should be especially useful for debugging failure situations
+    when it's not easy to manually track down to the root cause.
