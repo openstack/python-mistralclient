@@ -74,7 +74,15 @@ class ResourceManager(object):
         self.http_client = http_client
 
     def find(self, **kwargs):
-        return [i for i in self._list() if _check_items(i, kwargs.items())]
+        return [i for i in self.list() if _check_items(i, kwargs.items())]
+
+    def list(self):
+        """This is an abstract method
+
+        This is added here so that the find method gains some clarity.
+        It must be implemented by the child class in order to find to work
+        """
+        raise NotImplementedError("abstract method list must be implemented")
 
     @staticmethod
     def _build_query_params(marker=None, limit=None, sort_keys=None,
