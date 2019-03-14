@@ -45,9 +45,9 @@
         # run in Pike and beyond.
         # If you need any support to debug these jobs in case of
         # failures, please reach us on #tripleo IRC channel.
-        - tripleo-ci-centos-7-scenario003-standalone
+        - tripleo-ci-centos-7-containers-multinode
     gate:
       jobs:
         - python-mistralclient-functional-devstack
-        - tripleo-ci-centos-7-scenario003-standalone
+        - tripleo-ci-centos-7-containers-multinode
 
