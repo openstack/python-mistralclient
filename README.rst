@@ -35,7 +35,7 @@ Installation
 
 First of all, clone the repo and go to the repo directory::
 
-    $ git clone git://git.openstack.org/openstack/python-mistralclient.git
+    $ git clone https://git.openstack.org/openstack/python-mistralclient.git
     $ cd python-mistralclient
 
 Then just run::
