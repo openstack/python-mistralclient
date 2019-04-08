@@ -14,9 +14,10 @@
 
 import copy
 import datetime
-import json
 import os
 import tempfile
+
+from oslo_serialization import jsonutils
 
 import mock
 import yaml
@@ -43,7 +44,7 @@ ENVIRONMENT_DICT = {
 ENVIRONMENT = environments.Environment(mock, ENVIRONMENT_DICT)
 EXPECTED_RESULT = (ENVIRONMENT_DICT['name'],
                    ENVIRONMENT_DICT['description'],
-                   json.dumps(ENVIRONMENT_DICT['variables'], indent=4),
+                   jsonutils.dumps(ENVIRONMENT_DICT['variables'], indent=4),
                    ENVIRONMENT_DICT['scope'],
                    ENVIRONMENT_DICT['created_at'],
                    ENVIRONMENT_DICT['updated_at'])
@@ -51,7 +52,7 @@ EXPECTED_RESULT = (ENVIRONMENT_DICT['name'],
 EXPECTED_EXPORT_RESULT = (ENVIRONMENT_DICT['name'],
                           ENVIRONMENT_DICT['description'],
                           ENVIRONMENT_DICT['scope'],
-                          json.dumps(ENVIRONMENT_DICT['variables']))
+                          jsonutils.dumps(ENVIRONMENT_DICT['variables']))
 
 
 class TestCLIEnvironmentsV2(base.BaseCommandTest):
@@ -67,7 +68,7 @@ class TestCLIEnvironmentsV2(base.BaseCommandTest):
             self.assertEqual(EXPECTED_RESULT, result[1])
 
     def test_create_from_json(self):
-        self._test_create(json.dumps(ENVIRONMENT_DICT, indent=4))
+        self._test_create(jsonutils.dumps(ENVIRONMENT_DICT, indent=4))
 
     def test_create_from_yaml(self):
         yml = yaml.dump(ENVIRONMENT_DICT, default_flow_style=False)
@@ -87,7 +88,7 @@ class TestCLIEnvironmentsV2(base.BaseCommandTest):
         env = copy.deepcopy(ENVIRONMENT_DICT)
         del env['created_at']
         del env['updated_at']
-        self._test_update(json.dumps(env, indent=4))
+        self._test_update(jsonutils.dumps(env, indent=4))
 
     def test_update_from_yaml(self):
         env = copy.deepcopy(ENVIRONMENT_DICT)

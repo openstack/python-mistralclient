@@ -12,8 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import json
-
+from oslo_serialization import jsonutils
 from oslo_utils import uuidutils
 
 from mistralclient.api import base
@@ -47,10 +46,10 @@ class CronTriggerManager(base.ResourceManager):
             data.update({'workflow_name': workflow_identifier})
 
         if workflow_input:
-            data.update({'workflow_input': json.dumps(workflow_input)})
+            data.update({'workflow_input': jsonutils.dumps(workflow_input)})
 
         if workflow_params:
-            data.update({'workflow_params': json.dumps(workflow_params)})
+            data.update({'workflow_params': jsonutils.dumps(workflow_params)})
 
         return self._create('/cron_triggers', data)
 

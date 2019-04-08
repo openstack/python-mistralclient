@@ -14,8 +14,9 @@
 #    under the License.
 #
 
-import json
 import logging
+
+from oslo_serialization import jsonutils
 
 from osc_lib.command import command
 
@@ -259,8 +260,8 @@ class GetOutput(command.Command):
         output = mistral_client.action_executions.get(parsed_args.id).output
 
         try:
-            output = json.loads(output)
-            output = json.dumps(output, indent=4) + "\n"
+            output = jsonutils.loads(output)
+            output = jsonutils.dumps(output, indent=4) + "\n"
         except Exception:
             LOG.debug("Task result is not JSON.")
 
@@ -284,8 +285,8 @@ class GetInput(command.Command):
         result = mistral_client.action_executions.get(parsed_args.id).input
 
         try:
-            result = json.loads(result)
-            result = json.dumps(result, indent=4) + "\n"
+            result = jsonutils.loads(result)
+            result = jsonutils.dumps(result, indent=4) + "\n"
         except Exception:
             LOG.debug("Task result is not JSON.")
 

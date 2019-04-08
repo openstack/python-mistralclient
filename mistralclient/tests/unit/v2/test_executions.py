@@ -13,7 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import json
+from oslo_serialization import jsonutils
 
 from mistralclient.api import base as api_base
 from mistralclient.api.v2 import executions
@@ -67,7 +67,7 @@ class TestExecutionsV2(base.BaseClientV2Test):
         body = {
             'workflow_name': EXEC['workflow_name'],
             'description': '',
-            'input': json.dumps(EXEC['input'])
+            'input': jsonutils.dumps(EXEC['input'])
         }
 
         ex = self.executions.create(
@@ -93,7 +93,7 @@ class TestExecutionsV2(base.BaseClientV2Test):
         body = {
             'workflow_id': EXEC['workflow_id'],
             'description': '',
-            'input': json.dumps(EXEC['input'])
+            'input': jsonutils.dumps(EXEC['input'])
         }
 
         ex = self.executions.create(

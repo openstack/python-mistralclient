@@ -15,12 +15,13 @@
 #
 
 import copy
-import json
 import sys
 
 import six
 
 import mock
+
+from oslo_serialization import jsonutils
 
 from mistralclient.api.v2 import action_executions as action_ex
 from mistralclient.commands.v2 import action_executions as action_ex_cmd
@@ -44,10 +45,11 @@ ACTION_EX_RESULT = {"test": "is", "passed": "successfully"}
 ACTION_EX_INPUT = {"param1": "val1", "param2": 2}
 
 ACTION_EX_WITH_OUTPUT_DICT = ACTION_EX_DICT.copy()
-ACTION_EX_WITH_OUTPUT_DICT.update({'output': json.dumps(ACTION_EX_RESULT)})
+ACTION_EX_WITH_OUTPUT_DICT.update(
+    {'output': jsonutils.dumps(ACTION_EX_RESULT)})
 
 ACTION_EX_WITH_INPUT_DICT = ACTION_EX_DICT.copy()
-ACTION_EX_WITH_INPUT_DICT.update({'input': json.dumps(ACTION_EX_INPUT)})
+ACTION_EX_WITH_INPUT_DICT.update({'input': jsonutils.dumps(ACTION_EX_INPUT)})
 
 ACTION_EX = action_ex.ActionExecution(mock, ACTION_EX_DICT)
 ACTION_EX_WITH_OUTPUT = action_ex.ActionExecution(
@@ -72,7 +74,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
 
         self.assertDictEqual(
             ACTION_EX_RESULT,
-            json.loads(self.app.stdout.write.call_args[0][0])
+            jsonutils.loads(self.app.stdout.write.call_args[0][0])
         )
 
     def test_create_save_result(self):
@@ -105,7 +107,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
 
         self.assertDictEqual(
             ACTION_EX_RESULT,
-            json.loads(self.app.stdout.write.call_args[0][0])
+            jsonutils.loads(self.app.stdout.write.call_args[0][0])
         )
 
     def test_create_run_sync_and_save_result(self):
@@ -121,7 +123,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
 
         self.assertDictEqual(
             ACTION_EX_RESULT,
-            json.loads(self.app.stdout.write.call_args[0][0])
+            jsonutils.loads(self.app.stdout.write.call_args[0][0])
         )
 
     def test_update(self):
@@ -202,7 +204,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
 
         self.assertDictEqual(
             ACTION_EX_RESULT,
-            json.loads(self.app.stdout.write.call_args[0][0])
+            jsonutils.loads(self.app.stdout.write.call_args[0][0])
         )
 
     def test_get_input(self):
@@ -212,7 +214,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
 
         self.assertDictEqual(
             ACTION_EX_INPUT,
-            json.loads(self.app.stdout.write.call_args[0][0])
+            jsonutils.loads(self.app.stdout.write.call_args[0][0])
         )
 
     def test_delete(self):

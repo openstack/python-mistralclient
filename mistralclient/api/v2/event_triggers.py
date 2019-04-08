@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import json
+from oslo_serialization import jsonutils
 
 from mistralclient.api import base
 
@@ -40,10 +40,10 @@ class EventTriggerManager(base.ResourceManager):
         }
 
         if workflow_input:
-            data.update({'workflow_input': json.dumps(workflow_input)})
+            data.update({'workflow_input': jsonutils.dumps(workflow_input)})
 
         if workflow_params:
-            data.update({'workflow_params': json.dumps(workflow_params)})
+            data.update({'workflow_params': jsonutils.dumps(workflow_params)})
 
         return self._create('/event_triggers', data)
 

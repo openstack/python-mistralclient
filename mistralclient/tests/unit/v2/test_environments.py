@@ -11,10 +11,12 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
+
 import collections
 import copy
-import json
 import os.path
+
+from oslo_serialization import jsonutils
 
 import pkg_resources as pkg
 from six.moves.urllib import parse
@@ -52,7 +54,8 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
         self.assertIsNotNone(env)
 
         expected_data = copy.deepcopy(data)
-        expected_data['variables'] = json.dumps(expected_data['variables'])
+        expected_data['variables'] = jsonutils.dumps(
+            expected_data['variables'])
 
         self.assertEqual(expected_data, self.requests_mock.last_request.json())
 
@@ -81,7 +84,8 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
         self.assertIsNotNone(env)
 
         expected_data = copy.deepcopy(data)
-        expected_data['variables'] = json.dumps(expected_data['variables'])
+        expected_data['variables'] = jsonutils.dumps(
+            expected_data['variables'])
 
         self.assertEqual(expected_data, self.requests_mock.last_request.json())
 
@@ -104,7 +108,8 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
         self.assertIsNotNone(env)
 
         expected_data = copy.deepcopy(data)
-        expected_data['variables'] = json.dumps(expected_data['variables'])
+        expected_data['variables'] = jsonutils.dumps(
+            expected_data['variables'])
 
         self.assertEqual(expected_data, self.requests_mock.last_request.json())
 
@@ -127,7 +132,8 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
         self.assertIsNotNone(env)
 
         expected_data = copy.deepcopy(data)
-        expected_data['variables'] = json.dumps(expected_data['variables'])
+        expected_data['variables'] = jsonutils.dumps(
+            expected_data['variables'])
 
         self.assertEqual(expected_data, self.requests_mock.last_request.json())
 
