@@ -4,8 +4,8 @@
     timeout: 9000
     vars:
       devstack_plugins:
-        mistral: https://git.openstack.org/openstack/mistral
-        heat: https://git.openstack.org/openstack/heat
+        mistral: https://opendev.org/openstack/mistral
+        heat: https://opendev.org/openstack/heat
       devstack_services:
         heat: true
         h-api: true
