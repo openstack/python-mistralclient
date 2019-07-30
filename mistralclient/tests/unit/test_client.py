@@ -32,7 +32,7 @@ MISTRAL_HTTPS_URL = MISTRAL_HTTP_URL.replace('http', 'https')
 PROFILER_HMAC_KEY = 'SECRET_HMAC_KEY'
 
 
-class BaseClientTests(base.BaseTestCase):
+class BaseClientTest(base.BaseTestCase):
 
     @staticmethod
     def setup_keystone_mock(session_mock):
