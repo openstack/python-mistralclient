@@ -12,7 +12,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from keystoneauth1 import exceptions
 from mistralclient.api import base
 from mistralclient import utils
 
@@ -31,20 +30,14 @@ class ActionManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        try:
-            resp = self.http_client.post(
-                '/actions?scope=%s' % scope,
-                definition,
-                headers={'content-type': 'text/plain'}
-            )
-        except exceptions.HttpError as ex:
-            self._raise_api_exception(ex.response)
-
-        if resp.status_code != 201:
-            self._raise_api_exception(resp)
-
-        return [self.resource_class(self, resource_data)
-                for resource_data in base.extract_json(resp, 'actions')]
+        return self._create(
+            '/actions?scope=%s' % scope,
+            definition,
+            response_key='actions',
+            dump_json=False,
+            headers={'content-type': 'text/plain'},
+            is_iter_resp=True
+        )
 
     def update(self, definition, scope='private', id=None):
         self._ensure_not_empty(definition=definition)
@@ -55,20 +48,14 @@ class ActionManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        try:
-            resp = self.http_client.put(
-                '%s?scope=%s' % (url_pre, scope),
-                definition,
-                headers={'content-type': 'text/plain'}
-            )
-        except exceptions.HttpError as ex:
-            self._raise_api_exception(ex.response)
-
-        if resp.status_code != 200:
-            self._raise_api_exception(resp)
-
-        return [self.resource_class(self, resource_data)
-                for resource_data in base.extract_json(resp, 'actions')]
+        return self._update(
+            '%s?scope=%s' % (url_pre, scope),
+            definition,
+            response_key='actions',
+            dump_json=False,
+            headers={'content-type': 'text/plain'},
+            is_iter_resp=True
+        )
 
     def list(self, marker='', limit=None, sort_keys='', sort_dirs='',
              fields='', **filters):
@@ -104,16 +91,9 @@ class ActionManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        try:
-            resp = self.http_client.post(
-                '/actions/validate',
-                definition,
-                headers={'content-type': 'text/plain'}
-            )
-        except exceptions.HttpError as ex:
-            self._raise_api_exception(ex.response)
-
-        if resp.status_code != 200:
-            self._raise_api_exception(resp)
-
-        return base.extract_json(resp, None)
+        return self._validate(
+            '/actions/validate',
+            definition,
+            dump_json=False,
+            headers={'content-type': 'text/plain'}
+        )
