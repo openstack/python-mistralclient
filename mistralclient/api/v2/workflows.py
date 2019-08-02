@@ -13,7 +13,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from keystoneauth1 import exceptions
 from mistralclient.api import base
 from mistralclient import utils
 
@@ -32,20 +31,14 @@ class WorkflowManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        try:
-            resp = self.http_client.post(
-                '/workflows?scope=%s&namespace=%s' % (scope, namespace),
-                definition,
-                headers={'content-type': 'text/plain'}
-            )
-        except exceptions.HttpError as ex:
-            self._raise_api_exception(ex.response)
-
-        if resp.status_code != 201:
-            self._raise_api_exception(resp)
-
-        return [self.resource_class(self, resource_data)
-                for resource_data in base.extract_json(resp, 'workflows')]
+        return self._create(
+            '/workflows?scope=%s&namespace=%s' % (scope, namespace),
+            definition,
+            response_key='workflows',
+            dump_json=False,
+            headers={'content-type': 'text/plain'},
+            is_iter_resp=True
+        )
 
     def update(self, definition, namespace='', scope='private', id=None):
         self._ensure_not_empty(definition=definition)
@@ -56,23 +49,21 @@ class WorkflowManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        try:
-            resp = self.http_client.put(
-                '%s?namespace=%s&scope=%s' % (url_pre, namespace, scope),
-                definition,
-                headers={'content-type': 'text/plain'}
-            )
-        except exceptions.HttpError as ex:
-            self._raise_api_exception(ex.response)
-
-        if resp.status_code != 200:
-            self._raise_api_exception(resp)
+        is_iter_resp = True
+        response_key = 'workflows'
 
         if id:
-            return self.resource_class(self, base.extract_json(resp, None))
+            is_iter_resp = False
+            response_key = None
 
-        return [self.resource_class(self, resource_data)
-                for resource_data in base.extract_json(resp, 'workflows')]
+        return self._update(
+            '%s?namespace=%s&scope=%s' % (url_pre, namespace, scope),
+            definition,
+            response_key=response_key,
+            dump_json=False,
+            headers={'content-type': 'text/plain'},
+            is_iter_resp=is_iter_resp,
+        )
 
     def list(self, namespace='', marker='', limit=None, sort_keys='',
              sort_dirs='', fields='', **filters):
@@ -117,16 +108,9 @@ class WorkflowManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        try:
-            resp = self.http_client.post(
-                '/workflows/validate',
-                definition,
-                headers={'content-type': 'text/plain'}
-            )
-        except exceptions.HttpError as ex:
-            self._raise_api_exception(ex.response)
-
-        if resp.status_code != 200:
-            self._raise_api_exception(resp)
-
-        return base.extract_json(resp, None)
+        return self._validate(
+            '/workflows/validate',
+            definition,
+            dump_json=False,
+            headers={'content-type': 'text/plain'}
+        )

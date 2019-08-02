@@ -128,42 +128,54 @@ class ResourceManager(object):
                     (self.resource_class.__name__, name)
                 )
 
-    def _copy_if_defined(self, data, **kwargs):
-        for name, value in kwargs.items():
-            if value is not None:
-                data[name] = value
+    def _validate(self, url, data, response_key=None, dump_json=True,
+                  headers=None, is_iter_resp=False):
+        return self._create(url, data, response_key, dump_json,
+                            headers, is_iter_resp, resp_status_ok=200,
+                            as_class=False)
 
-    def _create(self, url, data, response_key=None, dump_json=True):
+    def _create(self, url, data, response_key=None, dump_json=True,
+                headers=None, is_iter_resp=False, resp_status_ok=201,
+                as_class=True):
         if dump_json:
             data = jsonutils.dumps(data)
 
         try:
-            resp = self.http_client.post(url, data)
+            resp = self.http_client.post(url, data, headers)
         except exceptions.HttpError as ex:
             self._raise_api_exception(ex.response)
 
-        if resp.status_code != 201:
+        if resp.status_code != resp_status_ok:
             self._raise_api_exception(resp)
 
-        return self.resource_class(self, extract_json(resp, response_key))
+        resource = extract_json(resp, response_key)
+        if is_iter_resp:
+            return [self.resource_class(self, resource_data)
+                    for resource_data in resource]
+        return self.resource_class(self, resource) if as_class else resource
 
-    def _update(self, url, data, response_key=None, dump_json=True):
+    def _update(self, url, data, response_key=None, dump_json=True,
+                headers=None, is_iter_resp=False):
         if dump_json:
             data = jsonutils.dumps(data)
 
         try:
-            resp = self.http_client.put(url, data)
+            resp = self.http_client.put(url, data, headers)
         except exceptions.HttpError as ex:
             self._raise_api_exception(ex.response)
 
         if resp.status_code != 200:
             self._raise_api_exception(resp)
 
-        return self.resource_class(self, extract_json(resp, response_key))
+        resource = extract_json(resp, response_key)
+        if is_iter_resp:
+            return [self.resource_class(self, resource_data)
+                    for resource_data in resource]
+        return self.resource_class(self, resource)
 
-    def _list(self, url, response_key=None):
+    def _list(self, url, response_key=None, headers=None):
         try:
-            resp = self.http_client.get(url)
+            resp = self.http_client.get(url, headers)
         except exceptions.HttpError as ex:
             self._raise_api_exception(ex.response)
 
@@ -173,9 +185,9 @@ class ResourceManager(object):
         return [self.resource_class(self, resource_data)
                 for resource_data in extract_json(resp, response_key)]
 
-    def _get(self, url, response_key=None):
+    def _get(self, url, response_key=None, headers=None):
         try:
-            resp = self.http_client.get(url)
+            resp = self.http_client.get(url, headers)
         except exceptions.HttpError as ex:
             self._raise_api_exception(ex.response)
 
@@ -184,19 +196,17 @@ class ResourceManager(object):
         else:
             self._raise_api_exception(resp)
 
-    def _delete(self, url):
+    def _delete(self, url, headers=None):
         try:
-            resp = self.http_client.delete(url)
+            resp = self.http_client.delete(url, headers)
         except exceptions.HttpError as ex:
             self._raise_api_exception(ex.response)
 
         if resp.status_code != 204:
             self._raise_api_exception(resp)
 
-    def _plurify_resource_name(self):
-        return self.resource_class.resource_name + 's'
-
-    def _raise_api_exception(self, resp):
+    @staticmethod
+    def _raise_api_exception(resp):
         try:
             error_data = (resp.headers.get("Server-Error-Message", None) or
                           get_json(resp).get("faultstring"))

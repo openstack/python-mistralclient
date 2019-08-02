@@ -13,7 +13,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from keystoneauth1 import exceptions
 from mistralclient.api import base
 from mistralclient import utils
 
@@ -47,19 +46,12 @@ class WorkbookManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        try:
-            resp = self.http_client.post(
-                self._get_workbooks_url(None, namespace, scope),
-                definition,
-                headers={'content-type': 'text/plain'}
-            )
-        except exceptions.HttpError as ex:
-            self._raise_api_exception(ex.response)
-
-        if resp.status_code != 201:
-            self._raise_api_exception(resp)
-
-        return self.resource_class(self, base.extract_json(resp, None))
+        return self._create(
+            self._get_workbooks_url(None, namespace, scope),
+            definition,
+            dump_json=False,
+            headers={'content-type': 'text/plain'}
+        )
 
     def update(self, definition, namespace='', scope='private'):
         self._ensure_not_empty(definition=definition)
@@ -68,19 +60,12 @@ class WorkbookManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        try:
-            resp = self.http_client.put(
-                self._get_workbooks_url(None, namespace, scope),
-                definition,
-                headers={'content-type': 'text/plain'}
-            )
-        except exceptions.HttpError as ex:
-            self._raise_api_exception(ex.response)
-
-        if resp.status_code != 200:
-            self._raise_api_exception(resp)
-
-        return self.resource_class(self, base.extract_json(resp, None))
+        return self._update(
+            self._get_workbooks_url(None, namespace, scope),
+            definition,
+            dump_json=False,
+            headers={'content-type': 'text/plain'}
+        )
 
     def list(self, namespace='', marker='', limit=None, sort_keys='',
              sort_dirs='', fields='', **filters):
@@ -115,16 +100,9 @@ class WorkbookManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
 
-        try:
-            resp = self.http_client.post(
-                '/workbooks/validate',
-                definition,
-                headers={'content-type': 'text/plain'}
-            )
-        except exceptions.HttpError as ex:
-            self._raise_api_exception(ex.response)
-
-        if resp.status_code != 200:
-            self._raise_api_exception(resp)
-
-        return base.extract_json(resp, None)
+        return self._validate(
+            '/workbooks/validate',
+            definition,
+            dump_json=False,
+            headers={'content-type': 'text/plain'}
+        )
