@@ -389,6 +389,9 @@ class GetReport(command.Command):
             level
         )
 
+        if 'retry_count' in t_ex:
+            self.print_line('(retry count: %s)' % t_ex['retry_count'], level)
+
         if t_ex['state'] == 'ERROR':
             state_info = t_ex['state_info']
 
