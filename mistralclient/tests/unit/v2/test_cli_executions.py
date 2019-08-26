@@ -22,26 +22,27 @@ import pkg_resources as pkg
 import six
 import sys
 
+from oslo_serialization import jsonutils
+
 from mistralclient.api.v2 import executions
 from mistralclient.commands.v2 import executions as execution_cmd
 from mistralclient.tests.unit import base
 
-EXEC = executions.Execution(
-    mock,
-    {
-        'id': '123',
-        'workflow_id': '123e4567-e89b-12d3-a456-426655440000',
-        'workflow_name': 'some',
-        'workflow_namespace': '',
-        'root_execution_id': '',
-        'description': '',
-        'state': 'RUNNING',
-        'state_info': None,
-        'created_at': '1',
-        'updated_at': '1',
-        'task_execution_id': None
-    }
-)
+EXEC_DICT = {
+    'id': '123',
+    'workflow_id': '123e4567-e89b-12d3-a456-426655440000',
+    'workflow_name': 'some',
+    'workflow_namespace': '',
+    'root_execution_id': '',
+    'description': '',
+    'state': 'RUNNING',
+    'state_info': None,
+    'created_at': '1',
+    'updated_at': '1',
+    'task_execution_id': None
+}
+
+EXEC = executions.Execution(mock, EXEC_DICT)
 
 SUB_WF_EXEC = executions.Execution(
     mock,
@@ -87,6 +88,12 @@ SUB_WF_EX_RESULT = (
     '1',
     '1'
 )
+
+EXEC_PUBLISHED = {"bar1": "val1", "var2": 2}
+EXEC_WITH_PUBLISHED_DICT = EXEC_DICT.copy()
+EXEC_WITH_PUBLISHED_DICT.update(
+    {'published_global': jsonutils.dumps(EXEC_PUBLISHED)})
+EXEC_WITH_PUBLISHED = executions.Execution(mock, EXEC_WITH_PUBLISHED_DICT)
 
 
 class TestCLIExecutionsV2(base.BaseCommandTest):
@@ -325,4 +332,14 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         self.assertEqual(
             [mock.call('id1', force=False), mock.call('id2', force=False)],
             self.client.executions.delete.call_args_list
+        )
+
+    def test_get_published(self):
+        self.client.executions.get.return_value = EXEC_WITH_PUBLISHED
+
+        self.call(execution_cmd.GetPublished, app_args=['id'])
+
+        self.assertDictEqual(
+            EXEC_PUBLISHED,
+            jsonutils.loads(self.app.stdout.write.call_args[0][0])
         )
