@@ -476,3 +476,29 @@ class GetReport(command.Command):
         )
 
         self.print_report(report_json)
+
+
+class GetPublished(command.Command):
+    """Show workflow global published variables."""
+
+    def get_parser(self, prog_name):
+        parser = super(GetPublished, self).get_parser(prog_name)
+        parser.add_argument(
+            'id',
+            help='Workflow ID')
+
+        return parser
+
+    def take_action(self, parsed_args):
+        mistral_client = self.app.client_manager.workflow_engine
+        res = mistral_client.executions.get(parsed_args.id)
+        published = res.published_global \
+            if hasattr(res, 'published_global') else None
+
+        try:
+            published = jsonutils.loads(published)
+            published = jsonutils.dumps(published, indent=4) + "\n"
+        except Exception:
+            LOG.debug("Task result is not JSON.")
+
+        self.app.stdout.write(published or "\n")
