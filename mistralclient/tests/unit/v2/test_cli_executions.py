@@ -249,6 +249,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
             fields=execution_cmd.ExecutionFormatter.fields(),
             limit=100,
             marker='',
+            nulls='',
             sort_dirs='desc',
             sort_keys='created_at',
             task=None
@@ -265,6 +266,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
             fields=execution_cmd.ExecutionFormatter.fields(),
             limit=100,
             marker='',
+            nulls='',
             sort_keys='created_at',
             sort_dirs='asc',
             task=None
@@ -284,6 +286,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
             fields=execution_cmd.ExecutionFormatter.fields(),
             limit=5,
             marker='abc',
+            nulls='',
             sort_keys='id, Workflow',
             sort_dirs='desc',
             task=None

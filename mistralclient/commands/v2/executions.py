@@ -87,13 +87,21 @@ class List(base.MistralExecutionLister):
             help="Parent task execution ID associated with workflow "
                  "execution list.",
         )
+        parser.add_argument(
+            '--rootsonly',
+            help="return only root executions",
+            action='store_true',
+        )
 
         return parser
 
     def _get_resources(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
 
+        none_fields = 'root_execution_id' if parsed_args.rootsonly else ''
+
         return mistral_client.executions.list(
+            nulls=none_fields,
             task=parsed_args.task,
             marker=parsed_args.marker,
             limit=parsed_args.limit,

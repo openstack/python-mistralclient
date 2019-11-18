@@ -905,6 +905,22 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
         self.assertEqual(wf_ex1_id, wf_execs[0]['ID'])
         self.assertEqual('a', wf_execs[0]['Description'])
 
+    def test_executions_list_with_rootsonly(self):
+        wrapping_wf = self.workflow_create(self.wf_wrapping_wf)
+        wrapping_wf_ex = self.execution_create(wrapping_wf[-1]['Name'])
+
+        wrapping_wf_ex_id = self.get_field_value(wrapping_wf_ex, 'ID')
+
+        wf_execs = self.mistral_cli(
+            True,
+            'execution-list',
+            params="--rootsonly"
+        )
+
+        self.assertEqual(1, len(wf_execs))
+        wf_exec = wf_execs[0]
+        self.assertEqual(wrapping_wf_ex_id, wf_exec['ID'])
+
 
 class CronTriggerCLITests(base_v2.MistralClientTestBase):
     """Test suite checks commands to work with cron-triggers."""
