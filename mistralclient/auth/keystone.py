@@ -167,7 +167,7 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
                 try:
                     mistral_url = session.get_endpoint(
                         service_type=service_type,
-                        endpoint_type=endpoint_type,
+                        interface=endpoint_type,
                         region_name=region_name
                     )
                 except Exception:
