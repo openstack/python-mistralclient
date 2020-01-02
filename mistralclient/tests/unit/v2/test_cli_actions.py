@@ -1,4 +1,5 @@
 # Copyright 2014 Mirantis, Inc.
+# Copyright 2020 Nokia Software.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -31,7 +32,8 @@ ACTION_DICT = {
     'description': 'My cool action',
     'tags': ['test'],
     'created_at': '1',
-    'updated_at': '1'
+    'updated_at': '1',
+    'namespace': 'test_namespace'
 }
 
 ACTION_DEF = """
@@ -58,7 +60,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
         result = self.call(action_cmd.Create, app_args=['1.txt'])
 
         self.assertEqual(
-            [('1234-4567-7894-7895', 'a', True, "param1",
+            [('1234-4567-7894-7895', 'a', 'test_namespace', True, "param1",
               'My cool action', 'test', '1', '1')],
             result[1]
         )
@@ -73,7 +75,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            [('1234-4567-7894-7895', 'a', True, "param1",
+            [('1234-4567-7894-7895', 'a', 'test_namespace', True, "param1",
               'My cool action', 'test', '1', '1')],
             result[1]
         )
@@ -99,8 +101,9 @@ class TestCLIActionsV2(base.BaseCommandTest):
         result = self.call(action_cmd.Create, app_args=['1.txt'])
 
         self.assertEqual(
-            [('1234-4567-7894-7895', 'a', True, cmd_base.cut(long_input),
-              'My cool action', 'test', '1', '1')],
+            [('1234-4567-7894-7895', 'a', 'test_namespace',
+              True, cmd_base.cut(long_input), 'My cool action',
+              'test', '1', '1')],
             result[1]
         )
 
@@ -111,7 +114,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
         result = self.call(action_cmd.Update, app_args=['my_action.yaml'])
 
         self.assertEqual(
-            [('1234-4567-7894-7895', 'a', True, "param1",
+            [('1234-4567-7894-7895', 'a', 'test_namespace', True, "param1",
               'My cool action', 'test', '1', '1')],
             result[1]
         )
@@ -126,7 +129,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            [('1234-4567-7894-7895', 'a', True, "param1",
+            [('1234-4567-7894-7895', 'a', 'test_namespace', True, "param1",
               'My cool action', 'test', '1', '1')],
             result[1]
         )
@@ -142,7 +145,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
         result = self.call(action_cmd.List)
 
         self.assertEqual(
-            [('1234-4567-7894-7895', 'a', True, "param1",
+            [('1234-4567-7894-7895', 'a', 'test_namespace', True, "param1",
               'My cool action', 'test', '1', '1')],
             result[1]
         )
@@ -153,7 +156,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
         result = self.call(action_cmd.Get, app_args=['name'])
 
         self.assertEqual(
-            ('1234-4567-7894-7895', 'a', True, "param1",
+            ('1234-4567-7894-7895', 'a', 'test_namespace', True, "param1",
              'My cool action', 'test', '1', '1'),
             result[1]
         )
@@ -161,14 +164,39 @@ class TestCLIActionsV2(base.BaseCommandTest):
     def test_delete(self):
         self.call(action_cmd.Delete, app_args=['name'])
 
-        self.client.actions.delete.assert_called_once_with('name')
+        self.client.actions.delete.assert_called_once_with('name',
+                                                           namespace='')
+
+    def test_delete_with_namespace(self):
+        self.call(action_cmd.Delete, app_args=['name',
+                                               '--namespace',
+                                               'test_namespace']
+                  )
+
+        self.client.actions.delete.assert_called_once_with(
+            'name',
+            namespace='test_namespace')
+
+    def test_delete_with_multi_names_and_namespace(self):
+        self.call(action_cmd.Delete, app_args=['name1',
+                                               'name2',
+                                               '--namespace',
+                                               'test_namespace'])
+
+        self.assertEqual(2, self.client.actions.delete.call_count)
+        self.assertEqual(
+            [mock.call('name1', namespace='test_namespace'),
+             mock.call('name2', namespace='test_namespace')],
+            self.client.actions.delete.call_args_list
+        )
 
     def test_delete_with_multi_names(self):
         self.call(action_cmd.Delete, app_args=['name1', 'name2'])
 
         self.assertEqual(2, self.client.actions.delete.call_count)
         self.assertEqual(
-            [mock.call('name1'), mock.call('name2')],
+            [mock.call('name1', namespace=''),
+             mock.call('name2', namespace='')],
             self.client.actions.delete.call_args_list
         )
 

@@ -1,5 +1,6 @@
 # Copyright 2014 - Mirantis, Inc.
 # Copyright 2016 - Brocade Communications Systems, Inc.
+# Copyright 2020 Nokia Software.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -120,6 +121,12 @@ class Create(command.ShowOne):
             dest='target',
             help='Action will be executed on <target> executor.'
         )
+        parser.add_argument(
+            '--namespace',
+            nargs='?',
+            default='',
+            help="Namespace of the action(s).",
+        )
 
         return parser
 
@@ -145,6 +152,7 @@ class Create(command.ShowOne):
         action_ex = mistral_client.action_executions.create(
             parsed_args.name,
             action_input,
+            namespace=parsed_args.namespace,
             **params
         )
 

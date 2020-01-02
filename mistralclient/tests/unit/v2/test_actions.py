@@ -1,4 +1,5 @@
 # Copyright 2015 Huawei Technologies Co., Ltd.
+# Copyright 2020 Nokia Software.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -75,6 +76,20 @@ class TestActionsV2(base.BaseClientV2Test):
         self.assertEqual('text/plain', last_request.headers['content-type'])
         self.assertEqual(ACTION_DEF, last_request.text)
 
+    def test_create_with_namespace(self):
+        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE,
+                                json={'actions': [ACTION]},
+                                status_code=201)
+
+        actions = self.actions.create(ACTION_DEF, namespace='test_namespace')
+
+        self.assertIsNotNone(actions)
+        self.assertEqual(ACTION_DEF, actions[0].definition)
+
+        last_request = self.requests_mock.last_request
+        self.assertEqual('text/plain', last_request.headers['content-type'])
+        self.assertEqual(ACTION_DEF, last_request.text)
+
     def test_create_with_file(self):
         self.requests_mock.post(self.TEST_URL + URL_TEMPLATE,
                                 json={'actions': [ACTION]},
@@ -106,7 +121,7 @@ class TestActionsV2(base.BaseClientV2Test):
 
         last_request = self.requests_mock.last_request
 
-        self.assertEqual('scope=private', last_request.query)
+        self.assertEqual('scope=private&namespace=', last_request.query)
         self.assertEqual('text/plain', last_request.headers['content-type'])
         self.assertEqual(ACTION_DEF, last_request.text)
 
@@ -121,7 +136,22 @@ class TestActionsV2(base.BaseClientV2Test):
 
         last_request = self.requests_mock.last_request
 
-        self.assertEqual('scope=private', last_request.query)
+        self.assertEqual('scope=private&namespace=', last_request.query)
+        self.assertEqual('text/plain', last_request.headers['content-type'])
+        self.assertEqual(ACTION_DEF, last_request.text)
+
+    def test_update_with_namespace(self):
+        self.requests_mock.put(self.TEST_URL + URL_TEMPLATE,
+                               json={'actions': [ACTION]})
+        actions = self.actions.update(ACTION_DEF, namespace='test_namespace')
+
+        self.assertIsNotNone(actions)
+        self.assertEqual(ACTION_DEF, actions[0].definition)
+
+        last_request = self.requests_mock.last_request
+
+        self.assertEqual('scope=private&namespace=test_namespace',
+                         last_request.query)
         self.assertEqual('text/plain', last_request.headers['content-type'])
         self.assertEqual(ACTION_DEF, last_request.text)
 
@@ -145,7 +175,7 @@ class TestActionsV2(base.BaseClientV2Test):
         self.assertEqual(ACTION_DEF, actions[0].definition)
 
         last_request = self.requests_mock.last_request
-        self.assertEqual('scope=private', last_request.query)
+        self.assertEqual('scope=private&namespace=', last_request.query)
         self.assertEqual('text/plain', last_request.headers['content-type'])
         self.assertEqual(ACTION_DEF, last_request.text)
 
@@ -197,7 +227,7 @@ class TestActionsV2(base.BaseClientV2Test):
         self.assertNotIn('limit', last_request.qs)
 
     def test_get(self):
-        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE_NAME % 'action',
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE_NAME % 'action/',
                                json=ACTION)
 
         action = self.actions.get('action')
@@ -208,11 +238,32 @@ class TestActionsV2(base.BaseClientV2Test):
             action.to_dict()
         )
 
+    def test_get_with_namespace(self):
+        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE_NAME
+                               % 'action/namespace',
+                               json=ACTION)
+
+        action = self.actions.get('action', 'namespace')
+
+        self.assertIsNotNone(action)
+        self.assertEqual(
+            actions.Action(self.actions, ACTION).to_dict(),
+            action.to_dict()
+        )
+
     def test_delete(self):
-        url = self.TEST_URL + URL_TEMPLATE_NAME % 'action'
+        url = self.TEST_URL + URL_TEMPLATE_NAME % 'action/'
         m = self.requests_mock.delete(url, status_code=204)
 
         self.actions.delete('action')
+
+        self.assertEqual(1, m.call_count)
+
+    def test_delete_with_namespace(self):
+        url = self.TEST_URL + URL_TEMPLATE_NAME % 'action/namespace'
+        m = self.requests_mock.delete(url, status_code=204)
+
+        self.actions.delete('action', 'namespace')
 
         self.assertEqual(1, m.call_count)
 

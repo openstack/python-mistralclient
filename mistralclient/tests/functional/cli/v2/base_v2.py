@@ -1,4 +1,5 @@
 # Copyright (c) 2014 Mirantis, Inc.
+# Copyright 2020 Nokia Software.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -192,11 +193,15 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
 
         return member
 
-    def action_create(self, act_def, admin=True, scope='private'):
+    def action_create(self, act_def, admin=True,
+                      scope='private', namespace=''):
         params = '{0}'.format(act_def)
 
         if scope == 'public':
             params += ' --public'
+
+        if namespace:
+            params += " --namespace " + namespace
 
         acts = self.mistral_cli(
             admin,

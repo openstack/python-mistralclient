@@ -1,4 +1,5 @@
 # Copyright 2014 - Mirantis, Inc.
+# Copyright 2020 Nokia Software.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -23,7 +24,7 @@ class Action(base.Resource):
 class ActionManager(base.ResourceManager):
     resource_class = Action
 
-    def create(self, definition, scope='private'):
+    def create(self, definition, scope='private', namespace=''):
         self._ensure_not_empty(definition=definition)
 
         # If the specified definition is actually a file, read in the
@@ -31,7 +32,7 @@ class ActionManager(base.ResourceManager):
         definition = utils.get_contents_if_file(definition)
 
         return self._create(
-            '/actions?scope=%s' % scope,
+            '/actions?scope=%s&namespace=%s' % (scope, namespace),
             definition,
             response_key='actions',
             dump_json=False,
@@ -39,17 +40,15 @@ class ActionManager(base.ResourceManager):
             is_iter_resp=True
         )
 
-    def update(self, definition, scope='private', id=None):
+    def update(self, definition, scope='private', id=None, namespace=''):
         self._ensure_not_empty(definition=definition)
-
-        url_pre = ('/actions/%s' % id) if id else '/actions'
-
+        params = '?scope=%s&namespace=%s' % (scope, namespace)
+        url = ('/actions/%s' % id if id else '/actions') + params
         # If the specified definition is actually a file, read in the
         # definition file
         definition = utils.get_contents_if_file(definition)
-
         return self._update(
-            '%s?scope=%s' % (url_pre, scope),
+            url,
             definition,
             response_key='actions',
             dump_json=False,
@@ -59,7 +58,6 @@ class ActionManager(base.ResourceManager):
 
     def list(self, marker='', limit=None, sort_keys='', sort_dirs='',
              fields='', **filters):
-
         query_string = self._build_query_params(
             marker=marker,
             limit=limit,
@@ -74,15 +72,15 @@ class ActionManager(base.ResourceManager):
             response_key='actions',
         )
 
-    def get(self, identifier):
+    def get(self, identifier, namespace=''):
         self._ensure_not_empty(identifier=identifier)
 
-        return self._get('/actions/%s' % identifier)
+        return self._get('/actions/%s/%s' % (identifier, namespace))
 
-    def delete(self, identifier):
+    def delete(self, identifier, namespace=''):
         self._ensure_not_empty(identifier=identifier)
 
-        self._delete('/actions/%s' % identifier)
+        self._delete('/actions/%s/%s' % (identifier, namespace))
 
     def validate(self, definition):
         self._ensure_not_empty(definition=definition)

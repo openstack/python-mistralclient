@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Add namespace parameter to action commands. Namespace parameter allows
+    to create multiple actions with same name under different namespaces.

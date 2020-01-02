@@ -1,4 +1,5 @@
 # Copyright (c) 2014 Mirantis, Inc.
+# Copyright 2020 Nokia Software.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -1377,6 +1378,16 @@ class ActionCLITests(base_v2.MistralClientTestBase):
         definition = self.mistral_admin(
             'action-get-definition',
             params='greeting'
+        )
+
+        self.assertNotIn('404 Not Found', definition)
+
+    def test_action_get_definition_with_namespace(self):
+        self.action_create(self.act_def)
+
+        definition = self.mistral_admin(
+            'action-get-definition',
+            params='greeting --namespace test_namespace'
         )
 
         self.assertNotIn('404 Not Found', definition)

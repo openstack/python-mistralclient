@@ -1,4 +1,5 @@
 # Copyright 2014 - Mirantis, Inc.
+# Copyright 2020 Nokia Software.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -24,7 +25,7 @@ class ActionExecution(base.Resource):
 class ActionExecutionManager(base.ResourceManager):
     resource_class = ActionExecution
 
-    def create(self, name, input=None, **params):
+    def create(self, name, input=None, namespace='', **params):
         self._ensure_not_empty(name=name)
 
         data = {'name': name}
@@ -34,6 +35,9 @@ class ActionExecutionManager(base.ResourceManager):
 
         if params:
             data['params'] = jsonutils.dumps(params)
+
+        if namespace:
+            data['workflow_namespace'] = namespace
 
         return self._create(
             '/action_executions',

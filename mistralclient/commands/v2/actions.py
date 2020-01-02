@@ -1,4 +1,5 @@
 # Copyright 2014 - Mirantis, Inc.
+# Copyright 2020 Nokia Software.
 # All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -26,12 +27,13 @@ class ActionFormatter(base.MistralFormatter):
     COLUMNS = [
         ('id', 'ID'),
         ('name', 'Name'),
+        ('namespace', 'Namespace'),
         ('is_system', 'Is system'),
         ('input', 'Input'),
         ('description', 'Description'),
         ('tags', 'Tags'),
         ('created_at', 'Created at'),
-        ('updated_at', 'Updated at')
+        ('updated_at', 'Updated at'),
     ]
 
     @staticmethod
@@ -45,6 +47,7 @@ class ActionFormatter(base.MistralFormatter):
             data = (
                 action.id,
                 action.name,
+                action.namespace,
                 action.is_system,
                 input_,
                 desc,
@@ -93,12 +96,20 @@ class Get(command.ShowOne):
         parser = super(Get, self).get_parser(prog_name)
 
         parser.add_argument('action', help='Action (name or ID)')
+        parser.add_argument(
+            '--namespace',
+            nargs='?',
+            default='',
+            help="Namespace to create the action within.",
+        )
 
         return parser
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-        action = mistral_client.actions.get(parsed_args.action)
+        action = mistral_client.actions.get(
+            parsed_args.action,
+            parsed_args.namespace)
 
         return ActionFormatter.format(action)
 
@@ -119,6 +130,12 @@ class Create(base.MistralLister):
             action='store_true',
             help='With this flag action will be marked as "public".'
         )
+        parser.add_argument(
+            '--namespace',
+            nargs='?',
+            default='',
+            help="Namespace to create the action within.",
+        )
 
         return parser
 
@@ -136,6 +153,7 @@ class Create(base.MistralLister):
 
         return mistral_client.actions.create(
             parsed_args.definition.read(),
+            namespace=parsed_args.namespace,
             scope=scope
         )
 
@@ -151,6 +169,12 @@ class Delete(command.Command):
             nargs='+',
             help='Name or ID of action(s).'
         )
+        parser.add_argument(
+            '--namespace',
+            nargs='?',
+            default='',
+            help="Namespace of the action(s).",
+        )
 
         return parser
 
@@ -158,7 +182,9 @@ class Delete(command.Command):
         mistral_client = self.app.client_manager.workflow_engine
 
         utils.do_action_on_many(
-            lambda s: mistral_client.actions.delete(s),
+            lambda s: mistral_client.actions.delete(
+                s,
+                namespace=parsed_args.namespace),
             parsed_args.action,
             "Request to delete action %s has been accepted.",
             "Unable to delete the specified action(s)."
@@ -181,6 +207,12 @@ class Update(base.MistralLister):
             '--public',
             action='store_true',
             help='With this flag action will be marked as "public".'
+        )
+        parser.add_argument(
+            '--namespace',
+            nargs='?',
+            default='',
+            help="Namespace of the action.",
         )
 
         return parser
@@ -207,18 +239,27 @@ class GetDefinition(command.Command):
         parser = super(GetDefinition, self).get_parser(prog_name)
 
         parser.add_argument('name', help='Action name')
+        parser.add_argument(
+            '--namespace',
+            nargs='?',
+            default='',
+            help="Namespace of the action.",
+        )
 
         return parser
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
-        definition = mistral_client.actions.get(parsed_args.name).definition
+        definition = mistral_client.actions.get(
+            parsed_args.name,
+            namespace=parsed_args.namespace).definition
 
         self.app.stdout.write(definition or "\n")
 
 
 class Validate(command.ShowOne):
     """Validate action."""
+
     @staticmethod
     def _format(result=None):
         columns = ('Valid', 'Error')
