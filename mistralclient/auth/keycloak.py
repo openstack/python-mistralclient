@@ -173,6 +173,7 @@ def get_system_ca_file():
             return ca
     LOG.warning("System ca file could not be found.")
 
+
 # An example of working curl request to keycloak
 # curl -d "client_id=admin-cli" -d "client_secret=secret"
 # -d "username=admin" -d "password=qwerty" -d "grant_type=password"
