@@ -15,6 +15,7 @@
 
 from oslo_serialization import jsonutils
 
+from mistralclient.api.v2.executions import Execution
 from mistralclient.api.v2 import tasks
 from mistralclient.tests.unit.v2 import base
 
@@ -30,9 +31,20 @@ TASK = {
     'result': {'some': 'result'}
 }
 
+SUB_WF_EXEC = {
+    'id': "456",
+    'workflow_id': '123e4567-e89b-12d3-a456-426655440000',
+    'workflow_name': 'my_sub_wf',
+    'workflow_namespace': '',
+    'task_execution_id': "1",
+    'description': '',
+    'state': 'RUNNING',
+    'input': {}
+}
 
 URL_TEMPLATE = '/tasks'
 URL_TEMPLATE_ID = '/tasks/%s'
+URL_TEMPLATE_SUB_EXECUTIONS = '/tasks/%s/executions%s'
 
 
 class TestTasksV2(base.BaseClientV2Test):
@@ -136,3 +148,17 @@ class TestTasksV2(base.BaseClientV2Test):
             'env': jsonutils.dumps({'k1': 'foobar'})
         }
         self.assertDictEqual(body, self.requests_mock.last_request.json())
+
+    def test_get_sub_executions(self):
+        url = self.TEST_URL + URL_TEMPLATE_SUB_EXECUTIONS \
+              % (TASK['id'], '?max_depth=-1&errors_only=')
+
+        self.requests_mock.get(url, json={'executions': [SUB_WF_EXEC]})
+
+        sub_execution_list = self.tasks.get_task_sub_executions(TASK['id'])
+
+        self.assertEqual(1, len(sub_execution_list))
+        self.assertDictEqual(
+            Execution(self.executions, SUB_WF_EXEC).to_dict(),
+            sub_execution_list[0].to_dict()
+        )

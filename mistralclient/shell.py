@@ -732,10 +732,14 @@ class MistralShell(app.App):
             mistralclient.commands.v2.executions.GetReport,
             'execution-get-published':
                 mistralclient.commands.v2.executions.GetPublished,
+            'execution-get-sub-executions':
+                mistralclient.commands.v2.executions.SubExecutionsLister,
             'task-list': mistralclient.commands.v2.tasks.List,
             'task-get': mistralclient.commands.v2.tasks.Get,
             'task-get-published': mistralclient.commands.v2.tasks.GetPublished,
             'task-get-result': mistralclient.commands.v2.tasks.GetResult,
+            'task-get-sub-executions':
+                mistralclient.commands.v2.tasks.SubExecutionsLister,
             'task-rerun': mistralclient.commands.v2.tasks.Rerun,
             'action-list': mistralclient.commands.v2.actions.List,
             'action-get': mistralclient.commands.v2.actions.Get,

@@ -173,7 +173,9 @@ class ResourceManager(object):
                     for resource_data in resource]
         return self.resource_class(self, resource)
 
-    def _list(self, url, response_key=None, headers=None):
+    def _list(self, url, response_key=None, headers=None,
+              returned_res_cls=None):
+
         try:
             resp = self.http_client.get(url, headers)
         except exceptions.HttpError as ex:
@@ -182,7 +184,9 @@ class ResourceManager(object):
         if resp.status_code != 200:
             self._raise_api_exception(resp)
 
-        return [self.resource_class(self, resource_data)
+        resource_class = returned_res_cls or self.resource_class
+
+        return [resource_class(self, resource_data)
                 for resource_data in extract_json(resp, response_key)]
 
     def _get(self, url, response_key=None, headers=None):

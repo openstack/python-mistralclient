@@ -53,7 +53,7 @@ SUB_WF_EXEC = executions.Execution(
         'workflow_namespace': '',
         'root_execution_id': 'ROOT_EXECUTION_ID',
         'description': '',
-        'state': 'RUNNING',
+        'state': 'ERROR',
         'state_info': None,
         'created_at': '1',
         'updated_at': '1',
@@ -83,12 +83,13 @@ SUB_WF_EX_RESULT = (
     '',
     'abc',
     'ROOT_EXECUTION_ID',
-    'RUNNING',
+    'ERROR',
     None,
     '1',
     '1'
 )
 
+EXECS_LIST = [EXEC, SUB_WF_EXEC]
 EXEC_PUBLISHED = {"bar1": "val1", "var2": 2}
 EXEC_WITH_PUBLISHED_DICT = EXEC_DICT.copy()
 EXEC_WITH_PUBLISHED_DICT.update(
@@ -239,6 +240,61 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
         self.assertEqual(
             [EX_RESULT, SUB_WF_EX_RESULT],
             result[1]
+        )
+
+    def test_sub_executions(self):
+        self.client.executions.get_ex_sub_executions.return_value = \
+            EXECS_LIST
+
+        result = self.call(
+            execution_cmd.SubExecutionsLister,
+            app_args=[EXEC_DICT['id']]
+        )
+
+        self.assertEqual([EX_RESULT, SUB_WF_EX_RESULT], result[1])
+        self.assertEqual(
+            1,
+            self.client.executions.get_ex_sub_executions.call_count
+        )
+        self.assertEqual(
+            [mock.call(EXEC_DICT['id'], errors_only='', max_depth=-1)],
+            self.client.executions.get_ex_sub_executions.call_args_list
+        )
+
+    def test_sub_executions_errors_only(self):
+        self.client.executions.get_ex_sub_executions.return_value = \
+            EXECS_LIST
+
+        self.call(
+            execution_cmd.SubExecutionsLister,
+            app_args=[EXEC_DICT['id'], '--errors-only']
+        )
+
+        self.assertEqual(
+            1,
+            self.client.executions.get_ex_sub_executions.call_count
+        )
+        self.assertEqual(
+            [mock.call(EXEC_DICT['id'], errors_only=True, max_depth=-1)],
+            self.client.executions.get_ex_sub_executions.call_args_list
+        )
+
+    def test_sub_executions_with_max_depth(self):
+        self.client.executions.get_ex_sub_executions.return_value = \
+            EXECS_LIST
+
+        self.call(
+            execution_cmd.SubExecutionsLister,
+            app_args=[EXEC_DICT['id'], '--max-depth', '3']
+        )
+
+        self.assertEqual(
+            1,
+            self.client.executions.get_ex_sub_executions.call_count
+        )
+        self.assertEqual(
+            [mock.call(EXEC_DICT['id'], errors_only='', max_depth=3)],
+            self.client.executions.get_ex_sub_executions.call_args_list
         )
 
     def test_list_with_pagination(self):

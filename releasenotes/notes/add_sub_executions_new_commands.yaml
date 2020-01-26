@@ -1,0 +1,9 @@
+---
+features:
+  - |
+    Added 2 new CLI commands, "execution-get-sub-executions" returns
+    sub-executions of a given execution id and "task-get-sub-executions"
+    returns the sub-executions of a given task execution id.
+    Both commands have the options "--max-depth" which is the max depth of a
+    sub-execution, and "--errors-only" that allows to find only ERROR paths of
+    the execution tree.

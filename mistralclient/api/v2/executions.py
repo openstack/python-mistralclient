@@ -98,6 +98,15 @@ class ExecutionManager(base.ResourceManager):
 
         return self._get('/executions/%s' % id)
 
+    def get_ex_sub_executions(self, id, errors_only='', max_depth=-1):
+        ex_sub_execs_path = '/executions/%s/executions%s'
+        params = '?max_depth=%s&errors_only=%s' % (max_depth, errors_only)
+
+        return self._list(
+            ex_sub_execs_path % (id, params),
+            response_key='executions'
+        )
+
     def delete(self, id, force=None):
         self._ensure_not_empty(id=id)
 

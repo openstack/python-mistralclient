@@ -19,6 +19,7 @@ from oslo_serialization import jsonutils
 
 import mock
 
+from mistralclient.api.v2.executions import Execution
 from mistralclient.api.v2 import tasks
 from mistralclient.commands.v2 import tasks as task_cmd
 from mistralclient.tests.unit import base
@@ -34,6 +35,37 @@ TASK_DICT = {
     'created_at': '1',
     'updated_at': '1',
 }
+
+TASK_SUB_WF_EXEC = Execution(
+    mock,
+    {
+        'id': '456',
+        'workflow_id': '123e4567-e89b-12d3-a456-426655440000',
+        'workflow_name': 'some_sub_wf',
+        'workflow_namespace': '',
+        'root_execution_id': 'ROOT_EXECUTION_ID',
+        'description': '',
+        'state': 'ERROR',
+        'state_info': None,
+        'created_at': '1',
+        'updated_at': '1',
+        'task_execution_id': '123'
+    }
+)
+
+TASK_SUB_WF_EX_RESULT = (
+    '456',
+    '123e4567-e89b-12d3-a456-426655440000',
+    'some_sub_wf',
+    '',
+    '',
+    '123',
+    'ROOT_EXECUTION_ID',
+    'ERROR',
+    None,
+    '1',
+    '1'
+)
 
 TASK_RESULT = {"test": "is", "passed": "successfully"}
 TASK_PUBLISHED = {"bar1": "val1", "var2": 2}
@@ -131,3 +163,58 @@ class TestCLITasksV2(base.BaseCommandTest):
         )
 
         self.assertEqual(EXPECTED_TASK_RESULT, result[1])
+
+    def test_sub_executions(self):
+        self.client.tasks.get_task_sub_executions.return_value = \
+            TASK_SUB_WF_EXEC
+
+        result = self.call(
+            task_cmd.SubExecutionsLister,
+            app_args=[TASK_DICT['id']]
+        )
+
+        self.assertEqual([TASK_SUB_WF_EX_RESULT], result[1])
+        self.assertEqual(
+            1,
+            self.client.tasks.get_task_sub_executions.call_count
+        )
+        self.assertEqual(
+            [mock.call(TASK_DICT['id'], errors_only='', max_depth=-1)],
+            self.client.tasks.get_task_sub_executions.call_args_list
+        )
+
+    def test_sub_executions_errors_only(self):
+        self.client.tasks.get_task_sub_executions.return_value = \
+            TASK_SUB_WF_EXEC
+
+        self.call(
+            task_cmd.SubExecutionsLister,
+            app_args=[TASK_DICT['id'], '--errors-only']
+        )
+
+        self.assertEqual(
+            1,
+            self.client.tasks.get_task_sub_executions.call_count
+        )
+        self.assertEqual(
+            [mock.call(TASK_DICT['id'], errors_only=True, max_depth=-1)],
+            self.client.tasks.get_task_sub_executions.call_args_list
+        )
+
+    def test_sub_executions_with_max_depth(self):
+        self.client.tasks.get_task_sub_executions.return_value = \
+            TASK_SUB_WF_EXEC
+
+        self.call(
+            task_cmd.SubExecutionsLister,
+            app_args=[TASK_DICT['id'], '--max-depth', '3']
+        )
+
+        self.assertEqual(
+            1,
+            self.client.tasks.get_task_sub_executions.call_count
+        )
+        self.assertEqual(
+            [mock.call(TASK_DICT['id'], errors_only='', max_depth=3)],
+            self.client.tasks.get_task_sub_executions.call_args_list
+        )
