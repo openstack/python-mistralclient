@@ -565,8 +565,7 @@ class MistralShell(app.App):
             ('bash-completion' in argv) or
             ('help' in argv) or
             ('-h' in argv) or
-            ('--help' in argv) or
-            not argv)
+            ('--help' in argv))
 
         # Set default for auth_url if not supplied. The default is not
         # set at the parser to support use cases where auth is not enabled.
