@@ -1,5 +1,5 @@
 # Copyright 2014 - Mirantis, Inc.
-# All Rights Reserved
+# Copyright 2020 - Nokia Software.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -15,6 +15,7 @@
 #
 
 import abc
+import datetime as dt
 import textwrap
 
 from osc_lib.command import command
@@ -30,7 +31,12 @@ class MistralFormatter(object):
 
     @classmethod
     def fields(cls):
-        return [c[0] for c in cls.COLUMNS]
+        # Column should be a tuple:
+        # (<field name>, <field title>, <optional synthetic flag>)
+        # If the 3rd value is specified and it's True then
+        # the field is synthetic (calculated) and should not be requested
+        # from the API client.
+        return [c[0] for c in cls.COLUMNS if len(c) == 2 or not c[2]]
 
     @classmethod
     def headings(cls):
@@ -188,3 +194,34 @@ def get_filters(parsed_args):
             filters[arr[0]] = arr[1]
 
     return filters
+
+
+def get_duration_str(start_dt_str, end_dt_str):
+    """Builds a human friendly duration string.
+
+    :param start_dt_str: Start date time as an ISO string. Must not be empty.
+    :param end_dt_str: End date time as an ISO string. If empty, duration is
+        calculated from the current time.
+    :return: Duration(delta) string.
+    """
+    start_dt = dt.datetime.strptime(start_dt_str, '%Y-%m-%d %H:%M:%S')
+
+    if end_dt_str:
+        end_dt = dt.datetime.strptime(end_dt_str, '%Y-%m-%d %H:%M:%S')
+
+        return str(end_dt - start_dt)
+
+    delta_from_now = dt.datetime.utcnow() - start_dt
+
+    # If delta is too small then we won't show any value. It means that
+    # the corresponding process (e.g. an execution) just started.
+    if delta_from_now < dt.timedelta(seconds=2):
+        return '...'
+
+    # Drop microseconds to decrease verbosity.
+    delta = (
+        delta_from_now
+        - dt.timedelta(microseconds=delta_from_now.microseconds)
+    )
+
+    return "{}...".format(delta)

@@ -22,12 +22,14 @@ class BaseClientTest(base.BaseTestCase):
 
     def setUp(self):
         super(BaseClientTest, self).setUp()
+
         self.requests_mock = self.useFixture(fixture.Fixture())
 
 
 class BaseCommandTest(base.BaseTestCase):
     def setUp(self):
         super(BaseCommandTest, self).setUp()
+
         self.app = mock.Mock()
         self.client = self.app.client_manager.workflow_engine
 

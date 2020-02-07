@@ -1,8 +1,7 @@
 # Copyright 2014 - Mirantis, Inc.
 # Copyright 2015 - StackStorm, Inc.
 # Copyright 2016 - Brocade Communications Systems, Inc.
-#
-# All Rights Reserved
+# Copyright 2020 - Nokia Software.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -19,8 +18,6 @@
 
 import mock
 import pkg_resources as pkg
-import six
-import sys
 
 from oslo_serialization import jsonutils
 
@@ -35,10 +32,10 @@ EXEC_DICT = {
     'workflow_namespace': '',
     'root_execution_id': '',
     'description': '',
-    'state': 'RUNNING',
+    'state': 'SUCCESS',
     'state_info': None,
-    'created_at': '1',
-    'updated_at': '1',
+    'created_at': '2020-02-07 08:10:32',
+    'updated_at': '2020-02-07 08:10:41',
     'task_execution_id': None
 }
 
@@ -55,8 +52,8 @@ SUB_WF_EXEC = executions.Execution(
         'description': '',
         'state': 'ERROR',
         'state_info': None,
-        'created_at': '1',
-        'updated_at': '1',
+        'created_at': '2020-02-07 08:10:32',
+        'updated_at': '2020-02-07 08:10:41',
         'task_execution_id': 'abc'
     }
 )
@@ -69,10 +66,11 @@ EX_RESULT = (
     '',
     '<none>',
     '<none>',
-    'RUNNING',
+    'SUCCESS',
     None,
-    '1',
-    '1'
+    '2020-02-07 08:10:32',
+    '2020-02-07 08:10:41',
+    '0:00:09'
 )
 
 SUB_WF_EX_RESULT = (
@@ -85,8 +83,9 @@ SUB_WF_EX_RESULT = (
     'ROOT_EXECUTION_ID',
     'ERROR',
     None,
-    '1',
-    '1'
+    '2020-02-07 08:10:32',
+    '2020-02-07 08:10:41',
+    '0:00:09'
 )
 
 EXECS_LIST = [EXEC, SUB_WF_EXEC]
@@ -98,23 +97,11 @@ EXEC_WITH_PUBLISHED = executions.Execution(mock, EXEC_WITH_PUBLISHED_DICT)
 
 
 class TestCLIExecutionsV2(base.BaseCommandTest):
-
-    stdout = six.moves.StringIO()
-    stderr = six.moves.StringIO()
-
     def setUp(self):
         super(TestCLIExecutionsV2, self).setUp()
 
-        # Redirect stdout and stderr so it doesn't pollute the test result.
-        sys.stdout = self.stdout
-        sys.stderr = self.stderr
-
     def tearDown(self):
         super(TestCLIExecutionsV2, self).tearDown()
-
-        # Reset to original stdout and stderr.
-        sys.stdout = sys.__stdout__
-        sys.stderr = sys.__stderr__
 
     def test_create_wf_input_string(self):
         self.client.executions.create.return_value = EXEC
@@ -124,10 +111,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
             app_args=['id', '{ "context": true }']
         )
 
-        self.assertEqual(
-            EX_RESULT,
-            result[1]
-        )
+        self.assertEqual(EX_RESULT, result[1])
 
     def test_create_wf_input_file(self):
         self.client.executions.create.return_value = EXEC
@@ -142,10 +126,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
             app_args=['id', path]
         )
 
-        self.assertEqual(
-            EX_RESULT,
-            result[1]
-        )
+        self.assertEqual(EX_RESULT, result[1])
 
     def test_create_with_description(self):
         self.client.executions.create.return_value = EXEC
@@ -155,10 +136,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
             app_args=['id', '{ "context": true }', '-d', '']
         )
 
-        self.assertEqual(
-            EX_RESULT,
-            result[1]
-        )
+        self.assertEqual(EX_RESULT, result[1])
 
     def test_update_state(self):
         states = ['RUNNING', 'SUCCESS', 'PAUSED', 'ERROR', 'CANCELLED']
@@ -175,14 +153,18 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
                     'description': '',
                     'state': state,
                     'state_info': None,
-                    'created_at': '1',
-                    'updated_at': '1',
+                    'created_at': '2020-02-07 08:10:32',
+                    'updated_at': '2020-02-07 08:10:41',
                     'task_execution_id': None
                 }
             )
 
             ex_result = list(EX_RESULT)
             ex_result[7] = state
+
+            # We'll ignore "duration" since for not terminal states
+            # it is unpredictable.
+            del ex_result[11]
             ex_result = tuple(ex_result)
 
             result = self.call(
@@ -190,10 +172,11 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
                 app_args=['id', '-s', state]
             )
 
-            self.assertEqual(
-                ex_result,
-                result[1]
-            )
+            result_ex = list(result[1])
+            del result_ex[11]
+            result_ex = tuple(result_ex)
+
+            self.assertEqual(ex_result, result_ex)
 
     def test_update_invalid_state(self):
         states = ['IDLE', 'WAITING', 'DELAYED']
@@ -214,10 +197,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
             app_args=['id', '-s', 'RUNNING', '--env', '{"k1": "foobar"}']
         )
 
-        self.assertEqual(
-            EX_RESULT,
-            result[1]
-        )
+        self.assertEqual(EX_RESULT, result[1])
 
     def test_update_description(self):
         self.client.executions.update.return_value = EXEC
@@ -227,10 +207,7 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
             app_args=['id', '-d', 'foobar']
         )
 
-        self.assertEqual(
-            EX_RESULT,
-            result[1]
-        )
+        self.assertEqual(EX_RESULT, result[1])
 
     def test_list(self):
         self.client.executions.list.return_value = [SUB_WF_EXEC, EXEC]
@@ -353,20 +330,14 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
 
         result = self.call(execution_cmd.Get, app_args=['id'])
 
-        self.assertEqual(
-            EX_RESULT,
-            result[1]
-        )
+        self.assertEqual(EX_RESULT, result[1])
 
     def test_get_sub_wf_ex(self):
         self.client.executions.get.return_value = SUB_WF_EXEC
 
         result = self.call(execution_cmd.Get, app_args=['id'])
 
-        self.assertEqual(
-            SUB_WF_EX_RESULT,
-            result[1]
-        )
+        self.assertEqual(SUB_WF_EX_RESULT, result[1])
 
     def test_delete(self):
         self.call(execution_cmd.Delete, app_args=['id'])

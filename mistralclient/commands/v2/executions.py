@@ -44,28 +44,35 @@ class ExecutionFormatter(base.MistralFormatter):
         ('state_info', 'State info'),
         ('created_at', 'Created at'),
         ('updated_at', 'Updated at'),
+        ('duration', 'Duration', True),
     ]
 
     @staticmethod
-    def format(execution=None, lister=False):
-        # TODO(nmakhotkin) Add parent task id when it's implemented in API.
+    def format(wf_ex=None, lister=False):
+        if wf_ex:
+            state_info = (
+                wf_ex.state_info if not lister
+                else base.cut(wf_ex.state_info)
+            )
 
-        if execution:
-            state_info = (execution.state_info if not lister
-                          else base.cut(execution.state_info))
+            duration = base.get_duration_str(
+                wf_ex.created_at,
+                wf_ex.updated_at if wf_ex.state in ['ERROR', 'SUCCESS'] else ''
+            )
 
             data = (
-                execution.id,
-                execution.workflow_id,
-                execution.workflow_name,
-                execution.workflow_namespace,
-                execution.description,
-                execution.task_execution_id or '<none>',
-                execution.root_execution_id or '<none>',
-                execution.state,
+                wf_ex.id,
+                wf_ex.workflow_id,
+                wf_ex.workflow_name,
+                wf_ex.workflow_namespace,
+                wf_ex.description,
+                wf_ex.task_execution_id or '<none>',
+                wf_ex.root_execution_id or '<none>',
+                wf_ex.state,
                 state_info,
-                execution.created_at,
-                execution.updated_at or '<none>'
+                wf_ex.created_at,
+                wf_ex.updated_at or '<none>',
+                duration
             )
         else:
             data = (tuple('' for _ in

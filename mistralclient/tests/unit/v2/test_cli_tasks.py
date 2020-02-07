@@ -47,8 +47,8 @@ TASK_SUB_WF_EXEC = Execution(
         'description': '',
         'state': 'ERROR',
         'state_info': None,
-        'created_at': '1',
-        'updated_at': '1',
+        'created_at': '2020-02-07 08:10:32',
+        'updated_at': '2020-02-07 08:10:41',
         'task_execution_id': '123'
     }
 )
@@ -63,8 +63,9 @@ TASK_SUB_WF_EX_RESULT = (
     'ROOT_EXECUTION_ID',
     'ERROR',
     None,
-    '1',
-    '1'
+    '2020-02-07 08:10:32',
+    '2020-02-07 08:10:41',
+    '0:00:09'
 )
 
 TASK_RESULT = {"test": "is", "passed": "successfully"}
