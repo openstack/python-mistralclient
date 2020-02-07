@@ -199,11 +199,14 @@ def get_filters(parsed_args):
 def get_duration_str(start_dt_str, end_dt_str):
     """Builds a human friendly duration string.
 
-    :param start_dt_str: Start date time as an ISO string. Must not be empty.
+    :param start_dt_str: Start date time as an ISO string.
     :param end_dt_str: End date time as an ISO string. If empty, duration is
         calculated from the current time.
     :return: Duration(delta) string.
     """
+    if not start_dt_str:
+        return ''
+
     start_dt = dt.datetime.strptime(start_dt_str, '%Y-%m-%d %H:%M:%S')
 
     if end_dt_str:

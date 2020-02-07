@@ -30,10 +30,11 @@ TASK_DICT = {
     'workflow_name': 'thing',
     'workflow_namespace': '',
     'workflow_execution_id': '321',
-    'state': 'RUNNING',
+    'state': 'SUCCESS',
     'state_info': None,
-    'created_at': '1',
-    'updated_at': '1',
+    'created_at': '2020-02-07 08:10:32',
+    'started_at': '2020-02-07 08:10:32',
+    'finished_at': '2020-02-07 08:10:41'
 }
 
 TASK_SUB_WF_EXEC = Execution(
@@ -81,7 +82,9 @@ TASK_WITH_RESULT = tasks.Task(mock, TASK_WITH_RESULT_DICT)
 TASK_WITH_PUBLISHED = tasks.Task(mock, TASK_WITH_PUBLISHED_DICT)
 
 EXPECTED_TASK_RESULT = (
-    '123', 'some', 'thing', '', '321', 'RUNNING', None, '1', '1'
+    '123', 'some', 'thing', '', '321', 'SUCCESS', None,
+    '2020-02-07 08:10:32', '2020-02-07 08:10:32',
+    '2020-02-07 08:10:41', '0:00:09'
 )
 
 

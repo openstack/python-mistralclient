@@ -31,15 +31,17 @@ LOG = logging.getLogger(__name__)
 
 class TaskFormatter(base.MistralFormatter):
     COLUMNS = [
-        ('id',                      'ID'),
-        ('name',                    'Name'),
-        ('workflow_name',           'Workflow name'),
-        ('workflow_namespace',      'Workflow namespace'),
-        ('workflow_execution_id',   'Workflow Execution ID'),
-        ('state',                   'State'),
-        ('state_info',              'State info'),
-        ('created_at',              'Created at'),
-        ('updated_at',              'Updated at'),
+        ('id', 'ID'),
+        ('name', 'Name'),
+        ('workflow_name', 'Workflow name'),
+        ('workflow_namespace', 'Workflow namespace'),
+        ('workflow_execution_id', 'Workflow Execution ID'),
+        ('state', 'State'),
+        ('state_info', 'State info'),
+        ('created_at', 'Created at'),
+        ('started_at', 'Started at'),
+        ('finished_at', 'Finished at'),
+        ('duration', 'Duration', True),
     ]
 
     @staticmethod
@@ -47,6 +49,8 @@ class TaskFormatter(base.MistralFormatter):
         if task:
             state_info = (task.state_info if not lister
                           else base.cut(task.state_info))
+
+            duration = base.get_duration_str(task.started_at, task.finished_at)
 
             data = (
                 task.id,
@@ -57,7 +61,9 @@ class TaskFormatter(base.MistralFormatter):
                 task.state,
                 state_info,
                 task.created_at,
-                task.updated_at or '<none>'
+                task.started_at or '<none>',
+                task.finished_at or '<none>',
+                duration
             )
         else:
             data = (tuple('' for _ in range(len(TaskFormatter.COLUMNS))),)
