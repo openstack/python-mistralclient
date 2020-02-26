@@ -83,6 +83,9 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
     def setUp(self):
         super(MistralClientTestBase, self).setUp()
 
+    def assertPartIn(self, needle, haystack, message=''):
+        self.assertTrue(any(needle in s for s in haystack), message)
+
     def get_field_value(self, obj, field):
         return [
             o['Value'] for o in obj

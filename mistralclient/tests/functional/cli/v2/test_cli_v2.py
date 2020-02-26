@@ -573,7 +573,7 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
         workflows = self.parser.listing(
             self.mistral(
                 'workflow-list',
-                params='--filter name=std.create_instance'
+                params='--filter name=in:std.create_instance,create_instance'
             )
         )
 
@@ -585,7 +585,7 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
 
         self.assertEqual(1, len(workflows))
 
-        self.assertIn('std.create_instance', workflows[0]['Name'])
+        self.assertIn('create_instance', workflows[0]['Name'])
 
 
 class ExecutionCLITests(base_v2.MistralClientTestBase):

@@ -26,8 +26,8 @@ class StandardItemsAvailabilityCLITests(base_v2.MistralClientTestBase):
             wfs,
             ["Name", "Tags", "Input", "Created at", "Updated at"]
         )
-        self.assertIn("std.create_instance",
-                      [workflow["Name"] for workflow in wfs])
+        self.assertPartIn("create_instance",
+                          [workflow["Name"] for workflow in wfs])
 
         wfs = self.mistral_alt_user("workflow-list")
 
@@ -35,8 +35,8 @@ class StandardItemsAvailabilityCLITests(base_v2.MistralClientTestBase):
             wfs,
             ["Name", "Tags", "Input", "Created at", "Updated at"]
         )
-        self.assertIn("std.create_instance",
-                      [workflow["Name"] for workflow in wfs])
+        self.assertPartIn("create_instance",
+                          [workflow["Name"] for workflow in wfs])
 
     def test_std_actions_availability(self):
         acts = self.mistral_admin("action-list")
