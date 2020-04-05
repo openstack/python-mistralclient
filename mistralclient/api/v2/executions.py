@@ -80,6 +80,10 @@ class ExecutionManager(base.ResourceManager):
         if task:
             filters['task_execution_id'] = task
 
+        # for backwards compatibility
+        if 'nulls' in filters and not filters['nulls']:
+            filters.pop('nulls')
+
         query_string = self._build_query_params(
             marker=marker,
             limit=limit,

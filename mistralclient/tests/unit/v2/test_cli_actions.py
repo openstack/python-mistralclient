@@ -60,7 +60,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
         result = self.call(action_cmd.Create, app_args=['1.txt'])
 
         self.assertEqual(
-            [('1234-4567-7894-7895', 'a', 'test_namespace', True, "param1",
+            [('1234-4567-7894-7895', 'a', True, "param1",
               'My cool action', 'test', '1', '1')],
             result[1]
         )
@@ -75,7 +75,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            [('1234-4567-7894-7895', 'a', 'test_namespace', True, "param1",
+            [('1234-4567-7894-7895', 'a', True, "param1",
               'My cool action', 'test', '1', '1')],
             result[1]
         )
@@ -101,7 +101,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
         result = self.call(action_cmd.Create, app_args=['1.txt'])
 
         self.assertEqual(
-            [('1234-4567-7894-7895', 'a', 'test_namespace',
+            [('1234-4567-7894-7895', 'a',
               True, cmd_base.cut(long_input), 'My cool action',
               'test', '1', '1')],
             result[1]
@@ -114,7 +114,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
         result = self.call(action_cmd.Update, app_args=['my_action.yaml'])
 
         self.assertEqual(
-            [('1234-4567-7894-7895', 'a', 'test_namespace', True, "param1",
+            [('1234-4567-7894-7895', 'a', True, "param1",
               'My cool action', 'test', '1', '1')],
             result[1]
         )
@@ -129,7 +129,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
         )
 
         self.assertEqual(
-            [('1234-4567-7894-7895', 'a', 'test_namespace', True, "param1",
+            [('1234-4567-7894-7895', 'a', True, "param1",
               'My cool action', 'test', '1', '1')],
             result[1]
         )
@@ -145,7 +145,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
         result = self.call(action_cmd.List)
 
         self.assertEqual(
-            [('1234-4567-7894-7895', 'a', 'test_namespace', True, "param1",
+            [('1234-4567-7894-7895', 'a', True, "param1",
               'My cool action', 'test', '1', '1')],
             result[1]
         )
@@ -156,7 +156,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
         result = self.call(action_cmd.Get, app_args=['name'])
 
         self.assertEqual(
-            ('1234-4567-7894-7895', 'a', 'test_namespace', True, "param1",
+            ('1234-4567-7894-7895', 'a', True, "param1",
              'My cool action', 'test', '1', '1'),
             result[1]
         )

@@ -121,7 +121,7 @@ class TestActionsV2(base.BaseClientV2Test):
 
         last_request = self.requests_mock.last_request
 
-        self.assertEqual('scope=private&namespace=', last_request.query)
+        self.assertEqual('scope=private', last_request.query)
         self.assertEqual('text/plain', last_request.headers['content-type'])
         self.assertEqual(ACTION_DEF, last_request.text)
 
@@ -136,7 +136,7 @@ class TestActionsV2(base.BaseClientV2Test):
 
         last_request = self.requests_mock.last_request
 
-        self.assertEqual('scope=private&namespace=', last_request.query)
+        self.assertEqual('scope=private', last_request.query)
         self.assertEqual('text/plain', last_request.headers['content-type'])
         self.assertEqual(ACTION_DEF, last_request.text)
 
@@ -175,7 +175,7 @@ class TestActionsV2(base.BaseClientV2Test):
         self.assertEqual(ACTION_DEF, actions[0].definition)
 
         last_request = self.requests_mock.last_request
-        self.assertEqual('scope=private&namespace=', last_request.query)
+        self.assertEqual('scope=private', last_request.query)
         self.assertEqual('text/plain', last_request.headers['content-type'])
         self.assertEqual(ACTION_DEF, last_request.text)
 

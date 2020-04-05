@@ -27,7 +27,6 @@ class ActionFormatter(base.MistralFormatter):
     COLUMNS = [
         ('id', 'ID'),
         ('name', 'Name'),
-        ('namespace', 'Namespace'),
         ('is_system', 'Is system'),
         ('input', 'Input'),
         ('description', 'Description'),
@@ -47,7 +46,6 @@ class ActionFormatter(base.MistralFormatter):
             data = (
                 action.id,
                 action.name,
-                action.namespace,
                 action.is_system,
                 input_,
                 desc,
@@ -74,6 +72,13 @@ class List(base.MistralLister):
     def get_parser(self, prog_name):
         parser = super(List, self).get_parser(prog_name)
 
+        parser.add_argument(
+            '--namespace',
+            nargs='?',
+            default='',
+            help="Namespace of the actions.",
+        )
+
         return parser
 
     def _get_resources(self, parsed_args):
@@ -85,6 +90,7 @@ class List(base.MistralLister):
             sort_keys=parsed_args.sort_keys,
             sort_dirs=parsed_args.sort_dirs,
             fields=ActionFormatter.fields(),
+            namespace=parsed_args.namespace,
             **base.get_filters(parsed_args)
         )
 
