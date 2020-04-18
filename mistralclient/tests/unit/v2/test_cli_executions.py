@@ -16,8 +16,8 @@
 #    under the License.
 #
 
-import mock
 import pkg_resources as pkg
+from unittest import mock
 
 from oslo_serialization import jsonutils
 

@@ -14,7 +14,7 @@
 #    under the License.
 #
 
-import mock
+from unittest import mock
 
 from mistralclient.api.v2 import event_triggers
 from mistralclient.commands.v2 import event_triggers as event_triggers_cmd

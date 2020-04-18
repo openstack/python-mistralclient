@@ -14,8 +14,8 @@
 
 import base64
 import copy
+from unittest import mock
 
-import mock
 from six.moves.urllib import parse as urlparse
 
 from oslo_utils import uuidutils

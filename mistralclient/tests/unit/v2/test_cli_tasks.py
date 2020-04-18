@@ -15,9 +15,10 @@
 #    under the License.
 #
 
+from unittest import mock
+
 from oslo_serialization import jsonutils
 
-import mock
 
 from mistralclient.api.v2.executions import Execution
 from mistralclient.api.v2 import tasks

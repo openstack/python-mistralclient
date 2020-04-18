@@ -16,10 +16,10 @@
 
 import copy
 import sys
+from unittest import mock
 
 import six
 
-import mock
 
 from oslo_serialization import jsonutils
 

@@ -13,7 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import mock
+from unittest import mock
 
 from mistralclient.api.v2 import workbooks
 from mistralclient.commands.v2 import workbooks as workbook_cmd

@@ -15,7 +15,8 @@
 #    under the License.
 #
 
-import mock
+from unittest import mock
+
 import six
 
 from mistralclient.api.v2 import actions

@@ -16,10 +16,10 @@ import copy
 import datetime
 import os
 import tempfile
+from unittest import mock
 
 from oslo_serialization import jsonutils
 
-import mock
 import yaml
 
 from mistralclient.api.v2 import environments

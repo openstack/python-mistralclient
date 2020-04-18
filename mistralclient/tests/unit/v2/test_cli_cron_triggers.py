@@ -14,7 +14,7 @@
 #    under the License.
 #
 
-import mock
+from unittest import mock
 
 from mistralclient.api.v2 import cron_triggers
 from mistralclient.commands.v2 import cron_triggers as cron_triggers_cmd
