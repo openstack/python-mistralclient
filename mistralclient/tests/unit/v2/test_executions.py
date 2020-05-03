@@ -279,6 +279,20 @@ class TestExecutionsV2(base.BaseClientV2Test):
 
         self.executions.delete(EXEC['id'])
 
+    def test_report_statistics_only(self):
+        url = self.TEST_URL + URL_TEMPLATE_ID % EXEC['id'] \
+              + '/report?statistics_only=True'
+
+        expected_json = {
+            'statistics': {}
+        }
+
+        self.requests_mock.get(url, json=expected_json)
+
+        report = self.executions.get_report(EXEC['id'], statistics_only=True)
+
+        self.assertDictEqual(expected_json, report)
+
     def test_report(self):
         url = self.TEST_URL + URL_TEMPLATE_ID % EXEC['id'] + '/report'
 

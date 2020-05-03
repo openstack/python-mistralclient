@@ -124,13 +124,17 @@ class ExecutionManager(base.ResourceManager):
 
         self._delete('/executions/%s%s' % (id, query_string))
 
-    def get_report(self, id, errors_only=True, max_depth=None):
+    def get_report(self, id, errors_only=True, max_depth=None,
+                   statistics_only=False):
         self._ensure_not_empty(id=id)
 
         query_params = {}
 
         if errors_only:
             query_params['errors_only'] = True
+
+        if statistics_only:
+            query_params['statistics_only'] = True
 
         if max_depth is not None:
             query_params['max_depth'] = max_depth

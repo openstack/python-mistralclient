@@ -362,6 +362,12 @@ class GetReport(command.Command):
             help='Only error paths will be included.'
         )
         parser.add_argument(
+            '--statistics-only',
+            dest='statistics_only',
+            action='store_true',
+            help='Only the statistics will be included.'
+        )
+        parser.add_argument(
             '--no-errors-only',
             dest='errors_only',
             action='store_false',
@@ -459,6 +465,12 @@ class GetReport(command.Command):
             stat['paused_tasks_count']
         )
 
+        if 'estimated_time' in stat:
+            self.print_line(
+                'Estimated time (seconds) for the execution to finish:'' %s\n'
+                % stat['estimated_time']
+            )
+
     def print_report(self, report_json):
         self.print_line(
             "\nTo get more details on a task failure "
@@ -473,14 +485,15 @@ class GetReport(command.Command):
         )
         self.print_statistics(report_json['statistics'])
 
-        self.print_line(
-            '%s Workflow Execution Tree %s\n' %
-            (frame_line, frame_line)
-        )
-        self.print_workflow_execution_entry(
-            report_json['root_workflow_execution'],
-            0
-        )
+        if 'root_workflow_execution' in report_json:
+            self.print_line(
+                '%s Workflow Execution Tree %s\n' %
+                (frame_line, frame_line)
+            )
+            self.print_workflow_execution_entry(
+                report_json['root_workflow_execution'],
+                0
+            )
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
@@ -488,7 +501,8 @@ class GetReport(command.Command):
         report_json = mistral_client.executions.get_report(
             parsed_args.id,
             errors_only=parsed_args.errors_only,
-            max_depth=parsed_args.max_depth
+            max_depth=parsed_args.max_depth,
+            statistics_only=parsed_args.statistics_only,
         )
 
         self.print_report(report_json)

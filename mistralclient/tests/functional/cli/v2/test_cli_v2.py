@@ -272,7 +272,7 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
         for wf_name in wf_names:
             self.mistral_admin(
                 'workflow-delete',
-                params=wf_name+' --namespace abcdef'
+                params=wf_name + ' --namespace abcdef'
             )
 
         wfs = self.mistral_admin('workflow-list')
