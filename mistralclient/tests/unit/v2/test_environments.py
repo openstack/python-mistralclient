@@ -19,8 +19,8 @@ import os.path
 from oslo_serialization import jsonutils
 
 import pkg_resources as pkg
-from six.moves.urllib import parse
-from six.moves.urllib import request
+from urllib import parse
+from urllib import request
 
 from mistralclient.api import base as api_base
 from mistralclient.api.v2 import environments

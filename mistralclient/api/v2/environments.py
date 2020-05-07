@@ -12,7 +12,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import six
 
 from oslo_serialization import jsonutils
 
@@ -26,7 +25,7 @@ class Environment(base.Resource):
     def _set_attributes(self):
         """Override loading of the "variables" attribute from text to dict."""
         for k, v in self._data.items():
-            if k == 'variables' and isinstance(v, six.string_types):
+            if k == 'variables' and isinstance(v, str):
                 v = jsonutils.loads(v)
 
             try:

@@ -14,7 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import six
 
 from oslo_serialization import jsonutils
 from oslo_utils import uuidutils
@@ -51,7 +50,7 @@ class ExecutionManager(base.ResourceManager):
             data.update({'workflow_namespace': namespace})
 
         if workflow_input:
-            if isinstance(workflow_input, six.string_types):
+            if isinstance(workflow_input, str):
                 data.update({'input': workflow_input})
             else:
                 data.update({'input': jsonutils.dumps(workflow_input)})

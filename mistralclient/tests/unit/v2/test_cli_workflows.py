@@ -15,7 +15,6 @@
 
 from unittest import mock
 
-import six
 
 from mistralclient.api.v2 import workflows
 from mistralclient.commands.v2 import base as cmd_base
@@ -90,7 +89,7 @@ class TestCLIWorkflowsV2(base.BaseCommandTest):
     def test_create_long_input(self, mock_open):
         wf_long_input_dict = WORKFLOW_DICT.copy()
         long_input = ', '.join(
-            ['var%s' % i for i in six.moves.xrange(10)]
+            ['var%s' % i for i in range(10)]
         )
         wf_long_input_dict['input'] = long_input
         workflow_long_input = workflows.Workflow(mock, wf_long_input_dict)

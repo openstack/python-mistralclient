@@ -19,14 +19,12 @@ import datetime as dt
 import textwrap
 
 from osc_lib.command import command
-import six
 
 
 DEFAULT_LIMIT = 100
 
 
-@six.add_metaclass(abc.ABCMeta)
-class MistralFormatter(object):
+class MistralFormatter(metaclass=abc.ABCMeta):
     COLUMNS = []
 
     @classmethod
@@ -51,8 +49,7 @@ class MistralFormatter(object):
         pass
 
 
-@six.add_metaclass(abc.ABCMeta)
-class MistralLister(command.Lister):
+class MistralLister(command.Lister, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def _get_format_function(self):
         raise NotImplementedError
@@ -125,8 +122,7 @@ class MistralLister(command.Lister):
             return f()
 
 
-@six.add_metaclass(abc.ABCMeta)
-class MistralExecutionLister(MistralLister):
+class MistralExecutionLister(MistralLister, metaclass=abc.ABCMeta):
     def get_parser(self, parsed_args):
         parser = super(MistralExecutionLister, self).get_parser(parsed_args)
         parser.set_defaults(limit=DEFAULT_LIMIT)

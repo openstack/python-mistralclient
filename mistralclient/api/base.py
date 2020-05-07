@@ -13,13 +13,13 @@
 #    limitations under the License.
 
 import copy
-import six
+import urllib
 
 from oslo_serialization import jsonutils
 
 from keystoneauth1 import exceptions
 
-urlparse = six.moves.urllib.parse
+urlparse = urllib.parse
 
 
 class Resource(object):

@@ -12,11 +12,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import io
 import os
 import sys
 
 from oslotest import base
-import six
 
 from mistralclient import shell
 
@@ -29,8 +29,8 @@ class BaseShellTests(base.BaseTestCase):
         _old_env, os.environ = os.environ, clean_env.copy()
 
         try:
-            sys.stdout = six.moves.cStringIO()
-            sys.stderr = six.moves.cStringIO()
+            sys.stdout = io.StringIO()
+            sys.stderr = io.StringIO()
             _shell = shell.MistralShell()
             _shell.run(argstr.split())
         except SystemExit:

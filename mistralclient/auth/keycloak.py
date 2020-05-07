@@ -15,9 +15,9 @@
 import logging
 import os
 import pprint
+import urllib
 
 import requests
-from six.moves import urllib
 
 from mistralclient import auth
 
