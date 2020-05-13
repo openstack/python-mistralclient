@@ -17,7 +17,6 @@
 
 from unittest import mock
 
-import six
 
 from mistralclient.api.v2 import actions
 from mistralclient.commands.v2 import actions as action_cmd
@@ -90,7 +89,7 @@ class TestCLIActionsV2(base.BaseCommandTest):
     def test_create_long_input(self, mock_open):
         action_long_input_dict = ACTION_DICT.copy()
         long_input = ', '.join(
-            ['var%s' % i for i in six.moves.xrange(10)]
+            ['var%s' % i for i in range(10)]
         )
         action_long_input_dict['input'] = long_input
         workflow_long_input = actions.Action(

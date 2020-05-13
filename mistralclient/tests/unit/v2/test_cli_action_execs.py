@@ -15,11 +15,9 @@
 #
 
 import copy
+import io
 import sys
 from unittest import mock
-
-import six
-
 
 from oslo_serialization import jsonutils
 
@@ -162,7 +160,7 @@ class TestCLIActionExecutions(base.BaseCommandTest):
 
         # Redirect the stderr so it doesn't show during tox
         _stderr = sys.stderr
-        sys.stderr = six.StringIO()
+        sys.stderr = io.StringIO()
 
         for state in states:
             self.assertRaises(

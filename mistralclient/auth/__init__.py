@@ -14,7 +14,6 @@
 
 import abc
 
-import six
 from stevedore import driver
 
 
@@ -28,8 +27,7 @@ def get_auth_handler(auth_type):
     return mgr.driver
 
 
-@six.add_metaclass(abc.ABCMeta)
-class AuthHandler(object):
+class AuthHandler(metaclass=abc.ABCMeta):
     """Abstract base class for an authentication plugin."""
 
     @abc.abstractmethod

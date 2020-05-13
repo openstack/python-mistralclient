@@ -14,7 +14,6 @@
 #    limitations under the License.
 
 import copy
-import six
 
 from oslo_utils import importutils
 
@@ -48,7 +47,7 @@ class Client(object):
         mistral_url = req.get('mistral_url')
         profile = req.get('profile')
 
-        if mistral_url and not isinstance(mistral_url, six.string_types):
+        if mistral_url and not isinstance(mistral_url, str):
             raise RuntimeError('Mistral url should be a string.')
 
         # If auth url was provided then we perform an authentication, otherwise

@@ -18,8 +18,8 @@ import yaml
 
 from oslo_serialization import jsonutils
 
-from six.moves.urllib import parse
-from six.moves.urllib import request
+from urllib import parse
+from urllib import request
 
 from mistralclient import exceptions
 
