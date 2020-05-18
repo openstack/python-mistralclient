@@ -87,7 +87,7 @@ exclude_patterns = []
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'native'
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -127,10 +127,6 @@ html_theme = 'openstackdocs'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ['_static']
-
-# If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
-# using the given strftime format.
-# html_last_updated_fmt = '%b %d, %Y'
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
@@ -255,6 +251,7 @@ texinfo_documents = [
 locale_dirs = ['locale/']
 
 # -- Options for openstackdocstheme -------------------------------------------
-repository_name = 'openstack/python-mistralclient'
-bug_project = 'python-mistralclient'
-bug_tag = ''
+openstackdocs_repo_name = 'openstack/python-mistralclient'
+openstackdocs_bug_project = 'python-mistralclient'
+openstackdocs_bug_tag = ''
+openstackdocs_auto_name = False

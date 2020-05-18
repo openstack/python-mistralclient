@@ -1,7 +1,6 @@
 # Mistral documentation build configuration file
 
 import os
-import pbr.version
 import sys
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -43,13 +42,6 @@ master_doc = 'index'
 project = u'Mistral Client'
 copyright = u'2016, Mistral Contributors'
 
-# The version info for the project you're documenting, acts as replacement for
-# |version| and |release|, also used in various other places throughout the
-# built documents.
-version_info = pbr.version.VersionInfo('python-mistralclient')
-release = version_info.release_string()
-version = version_info.version_string()
-
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns = []
@@ -66,7 +58,7 @@ add_module_names = True
 show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'native'
 
 # A list of ignored prefixes for module index sorting.
 modindex_common_prefix = ['mistralclient.']
@@ -108,6 +100,7 @@ man_pages = [
 ]
 
 # -- Options for openstackdocstheme -------------------------------------------
-repository_name = 'openstack/python-mistralclient'
-bug_project = 'python-mistralclient'
-bug_tag = ''
+openstackdocs_repo_name = 'openstack/python-mistralclient'
+openstackdocs_bug_project = 'python-mistralclient'
+openstackdocs_bug_tag = ''
+openstackdocs_auto_name = False
