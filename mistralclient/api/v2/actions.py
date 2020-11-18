@@ -31,6 +31,7 @@ class ActionManager(base.ResourceManager):
         # definition file
         definition = utils.get_contents_if_file(definition)
         url = '/actions?scope=%s' % scope
+
         if namespace:
             url += '&namespace=%s' % namespace
 
@@ -45,14 +46,18 @@ class ActionManager(base.ResourceManager):
 
     def update(self, definition, scope='private', id=None, namespace=''):
         self._ensure_not_empty(definition=definition)
+
         params = '?scope=%s' % scope
+
         if namespace:
             params += '&namespace=%s' % namespace
 
         url = ('/actions/%s' % id if id else '/actions') + params
+
         # If the specified definition is actually a file, read in the
         # definition file
         definition = utils.get_contents_if_file(definition)
+
         return self._update(
             url,
             definition,

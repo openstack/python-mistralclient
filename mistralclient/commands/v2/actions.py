@@ -113,9 +113,11 @@ class Get(command.ShowOne):
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
+
         action = mistral_client.actions.get(
             parsed_args.action,
-            parsed_args.namespace)
+            parsed_args.namespace
+        )
 
         return ActionFormatter.format(action)
 

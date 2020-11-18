@@ -47,9 +47,11 @@ URL_TEMPLATE_NAME = '/workflows/%s'
 
 class TestWorkflowsV2(base.BaseClientV2Test):
     def test_create(self):
-        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE_SCOPE,
-                                json={'workflows': [WORKFLOW]},
-                                status_code=201)
+        self.requests_mock.post(
+            self.TEST_URL + URL_TEMPLATE_SCOPE,
+            json={'workflows': [WORKFLOW]},
+            status_code=201
+        )
 
         wfs = self.workflows.create(WF_DEF)
 
@@ -62,9 +64,11 @@ class TestWorkflowsV2(base.BaseClientV2Test):
         self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_create_with_file(self):
-        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE_SCOPE,
-                                json={'workflows': [WORKFLOW]},
-                                status_code=201)
+        self.requests_mock.post(
+            self.TEST_URL + URL_TEMPLATE_SCOPE,
+            json={'workflows': [WORKFLOW]},
+            status_code=201
+        )
 
         # The contents of wf_v2.yaml must be identical to WF_DEF
         path = pkg.resource_filename(
@@ -83,8 +87,10 @@ class TestWorkflowsV2(base.BaseClientV2Test):
         self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_update(self):
-        self.requests_mock.put(self.TEST_URL + URL_TEMPLATE_SCOPE,
-                               json={'workflows': [WORKFLOW]})
+        self.requests_mock.put(
+            self.TEST_URL + URL_TEMPLATE_SCOPE,
+            json={'workflows': [WORKFLOW]}
+        )
 
         wfs = self.workflows.update(WF_DEF)
 
@@ -97,8 +103,10 @@ class TestWorkflowsV2(base.BaseClientV2Test):
         self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_update_with_id(self):
-        self.requests_mock.put(self.TEST_URL + URL_TEMPLATE_NAME % '123',
-                               json=WORKFLOW)
+        self.requests_mock.put(
+            self.TEST_URL + URL_TEMPLATE_NAME % '123',
+            json=WORKFLOW
+        )
 
         wf = self.workflows.update(WF_DEF, id='123')
 
@@ -112,8 +120,10 @@ class TestWorkflowsV2(base.BaseClientV2Test):
         self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_update_with_file_uri(self):
-        self.requests_mock.put(self.TEST_URL + URL_TEMPLATE_SCOPE,
-                               json={'workflows': [WORKFLOW]})
+        self.requests_mock.put(
+            self.TEST_URL + URL_TEMPLATE_SCOPE,
+            json={'workflows': [WORKFLOW]}
+        )
 
         # The contents of wf_v2.yaml must be identical to WF_DEF
         path = pkg.resource_filename(
@@ -136,8 +146,10 @@ class TestWorkflowsV2(base.BaseClientV2Test):
         self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_list(self):
-        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE,
-                               json={'workflows': [WORKFLOW]})
+        self.requests_mock.get(
+            self.TEST_URL + URL_TEMPLATE,
+            json={'workflows': [WORKFLOW]}
+        )
 
         workflows_list = self.workflows.list()
 
@@ -151,9 +163,13 @@ class TestWorkflowsV2(base.BaseClientV2Test):
         )
 
     def test_list_with_pagination(self):
-        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE,
-                               json={'workflows': [WORKFLOW],
-                                     'next': '/workflows?fake'})
+        self.requests_mock.get(
+            self.TEST_URL + URL_TEMPLATE,
+            json={
+                'workflows': [WORKFLOW],
+                'next': '/workflows?fake'
+            }
+        )
 
         workflows_list = self.workflows.list(
             limit=1,
@@ -171,8 +187,10 @@ class TestWorkflowsV2(base.BaseClientV2Test):
         self.assertEqual(['asc'], last_request.qs['sort_dirs'])
 
     def test_list_with_no_limit(self):
-        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE,
-                               json={'workflows': [WORKFLOW]})
+        self.requests_mock.get(
+            self.TEST_URL + URL_TEMPLATE,
+            json={'workflows': [WORKFLOW]}
+        )
 
         workflows_list = self.workflows.list(limit=-1)
 
@@ -184,6 +202,7 @@ class TestWorkflowsV2(base.BaseClientV2Test):
 
     def test_get(self):
         url = self.TEST_URL + URL_TEMPLATE_NAME % 'wf'
+
         self.requests_mock.get(url, json=WORKFLOW)
 
         wf = self.workflows.get('wf')
@@ -195,7 +214,9 @@ class TestWorkflowsV2(base.BaseClientV2Test):
         )
 
     def test_delete(self):
-        url = self.TEST_URL + URL_TEMPLATE_NAME % 'wf'
-        self.requests_mock.delete(url, status_code=204)
+        self.requests_mock.delete(
+            self.TEST_URL + URL_TEMPLATE_NAME % 'wf',
+            status_code=204
+        )
 
         self.workflows.delete('wf')

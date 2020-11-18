@@ -29,7 +29,9 @@ from mistralclient.api import client
 from mistralclient.auth import auth_types
 import mistralclient.commands.v2.action_executions
 import mistralclient.commands.v2.actions
+import mistralclient.commands.v2.code_sources
 import mistralclient.commands.v2.cron_triggers
+import mistralclient.commands.v2.dynamic_actions
 import mistralclient.commands.v2.environments
 import mistralclient.commands.v2.event_triggers
 import mistralclient.commands.v2.executions
@@ -581,12 +583,15 @@ class MistralShell(app.App):
             if (not self.options.project_domain_id and
                     not self.options.project_domain_name):
                 self.options.project_domain_id = "default"
+
             if (not self.options.user_domain_id and
                     not self.options.user_domain_name):
                 self.options.user_domain_id = "default"
+
             if (not self.options.target_project_domain_id and
                     not self.options.target_project_domain_name):
                 self.options.target_project_domain_id = "default"
+
             if (not self.options.target_user_domain_id and
                     not self.options.target_user_domain_name):
                 self.options.target_user_domain_id = "default"
@@ -603,6 +608,7 @@ class MistralShell(app.App):
                     ("You must provide a password "
                      "via --os-password env[OS_PASSWORD]")
                 )
+
         self.client = self._create_client() if need_client else None
 
         # Adding client_manager variable to make mistral client work with
@@ -767,6 +773,26 @@ class MistralShell(app.App):
             'member-update': mistralclient.commands.v2.members.Update,
             'member-list': mistralclient.commands.v2.members.List,
             'member-get': mistralclient.commands.v2.members.Get,
+            'code-source-create':
+                mistralclient.commands.v2.code_sources.Create,
+            'code-source-get': mistralclient.commands.v2.code_sources.Get,
+            'code-source-update':
+                mistralclient.commands.v2.code_sources.Update,
+            'code-source-list': mistralclient.commands.v2.code_sources.List,
+            'code-source-delete':
+                mistralclient.commands.v2.code_sources.Delete,
+            'code-source-get-content':
+                mistralclient.commands.v2.code_sources.GetContent,
+            'dynamic-action-create':
+                mistralclient.commands.v2.dynamic_actions.Create,
+            'dynamic-action-get':
+                mistralclient.commands.v2.dynamic_actions.Get,
+            'dynamic-action-update':
+                mistralclient.commands.v2.dynamic_actions.Update,
+            'dynamic-action-list':
+                mistralclient.commands.v2.dynamic_actions.List,
+            'dynamic-action-delete':
+                mistralclient.commands.v2.dynamic_actions.Delete,
         }
 
 

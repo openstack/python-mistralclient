@@ -111,6 +111,7 @@ class MistralLister(command.Lister, metaclass=abc.ABCMeta):
         f = self._get_format_function()
 
         ret = self._get_resources(parsed_args)
+
         if not isinstance(ret, list):
             ret = [ret]
 

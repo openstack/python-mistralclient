@@ -31,6 +31,7 @@ def do_action_on_many(action, resources, success_msg, error_msg):
     for resource in resources:
         try:
             action(resource)
+
             print(success_msg % resource)
         except Exception as e:
             failure_flag = True
@@ -73,10 +74,9 @@ def get_contents_if_file(contents_or_file_name):
             definition_url = contents_or_file_name
         else:
             path = os.path.abspath(contents_or_file_name)
-            definition_url = parse.urljoin(
-                'file:',
-                request.pathname2url(path)
-            )
+
+            definition_url = parse.urljoin('file:', request.pathname2url(path))
+
         return request.urlopen(definition_url).read().decode('utf8')
     except Exception:
         return contents_or_file_name

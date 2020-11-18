@@ -87,10 +87,7 @@ class Get(command.ShowOne):
     def get_parser(self, prog_name):
         parser = super(Get, self).get_parser(prog_name)
 
-        parser.add_argument(
-            'environment',
-            help='Environment name'
-        )
+        parser.add_argument('environment', help='Environment name')
 
         parser.add_argument(
             '--export',

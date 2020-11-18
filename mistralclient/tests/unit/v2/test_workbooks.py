@@ -71,9 +71,11 @@ URL_TEMPLATE_VALIDATE = '/workbooks/validate'
 
 class TestWorkbooksV2(base.BaseClientV2Test):
     def test_create(self):
-        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE,
-                                json=WORKBOOK,
-                                status_code=201)
+        self.requests_mock.post(
+            self.TEST_URL + URL_TEMPLATE,
+            json=WORKBOOK,
+            status_code=201
+        )
 
         wb = self.workbooks.create(WB_DEF)
 
@@ -86,9 +88,11 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_create_with_file_uri(self):
-        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE,
-                                json=WORKBOOK,
-                                status_code=201)
+        self.requests_mock.post(
+            self.TEST_URL + URL_TEMPLATE,
+            json=WORKBOOK,
+            status_code=201
+        )
 
         # The contents of wb_v2.yaml must be identical to WB_DEF
         path = pkg.resource_filename(
@@ -143,8 +147,10 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_list(self):
-        self.requests_mock.get(self.TEST_URL + URL_TEMPLATE,
-                               json={'workbooks': [WORKBOOK]})
+        self.requests_mock.get(
+            self.TEST_URL + URL_TEMPLATE,
+            json={'workbooks': [WORKBOOK]}
+        )
 
         workbook_list = self.workbooks.list()
 
@@ -158,8 +164,10 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         )
 
     def test_get(self):
-        url = self.TEST_URL + URL_TEMPLATE_NAME % 'wb'
-        self.requests_mock.get(url, json=WORKBOOK)
+        self.requests_mock.get(
+            self.TEST_URL + URL_TEMPLATE_NAME % 'wb',
+            json=WORKBOOK
+        )
 
         wb = self.workbooks.get('wb')
 
@@ -176,8 +184,10 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         self.workbooks.delete('wb')
 
     def test_validate(self):
-        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE_VALIDATE,
-                                json={'valid': True})
+        self.requests_mock.post(
+            self.TEST_URL + URL_TEMPLATE_VALIDATE,
+            json={'valid': True}
+        )
 
         result = self.workbooks.validate(WB_DEF)
 
@@ -191,8 +201,10 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_validate_with_file(self):
-        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE_VALIDATE,
-                                json={'valid': True})
+        self.requests_mock.post(
+            self.TEST_URL + URL_TEMPLATE_VALIDATE,
+            json={'valid': True}
+        )
 
         # The contents of wb_v2.yaml must be identical to WB_DEF
         path = pkg.resource_filename(
@@ -218,8 +230,10 @@ class TestWorkbooksV2(base.BaseClientV2Test):
                      "can't be specified both"
         }
 
-        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE_VALIDATE,
-                                json=mock_result)
+        self.requests_mock.post(
+            self.TEST_URL + URL_TEMPLATE_VALIDATE,
+            json=mock_result
+        )
 
         result = self.workbooks.validate(INVALID_WB_DEF)
 
@@ -238,8 +252,10 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         self.assertEqual('text/plain', last_request.headers['content-type'])
 
     def test_validate_api_failed(self):
-        self.requests_mock.post(self.TEST_URL + URL_TEMPLATE_VALIDATE,
-                                status_code=500)
+        self.requests_mock.post(
+            self.TEST_URL + URL_TEMPLATE_VALIDATE,
+            status_code=500
+        )
 
         self.assertRaises(
             api_base.APIException,

@@ -89,6 +89,7 @@ class List(base.MistralExecutionLister):
 
     def get_parser(self, parsed_args):
         parser = super(List, self).get_parser(parsed_args)
+
         parser.add_argument(
             '--task',
             nargs='?',
@@ -146,8 +147,7 @@ class Create(command.ShowOne):
         parser.add_argument(
             'workflow_identifier',
             nargs='?',
-            help='Workflow ID or name. Workflow name will be deprecated since '
-                 'Mitaka.'
+            help='Workflow ID or name'
         )
         parser.add_argument(
             '--namespace',
@@ -249,10 +249,7 @@ class Update(command.ShowOne):
     def get_parser(self, prog_name):
         parser = super(Update, self).get_parser(prog_name)
 
-        parser.add_argument(
-            'id',
-            help='Execution identifier'
-        )
+        parser.add_argument('id', help='Execution identifier')
 
         parser.add_argument(
             '-s',

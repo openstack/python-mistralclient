@@ -51,11 +51,13 @@ class ActionExecutionFormatter(base.MistralFormatter):
             columns = ActionExecutionFormatter.LIST_COLUMN_HEADING_NAMES
         else:
             columns = ActionExecutionFormatter.headings()
+
         if action_ex:
             if hasattr(action_ex, 'task_name'):
                 task_name = action_ex.task_name
             else:
                 task_name = None
+
             data = (
                 action_ex.id,
                 action_ex.name,
@@ -63,16 +65,19 @@ class ActionExecutionFormatter(base.MistralFormatter):
                 action_ex.workflow_namespace,
                 task_name,
                 action_ex.task_execution_id,
-                action_ex.state,)
+                action_ex.state,
+            )
+
             if not lister:
                 data += (action_ex.state_info,)
+
             data += (
                 action_ex.accepted,
                 action_ex.created_at,
                 action_ex.updated_at or '<none>'
             )
         else:
-            data = (tuple('' for _ in range(len(columns))),)
+            data = (('',) * len(columns),)
 
         return columns, data
 
@@ -224,25 +229,30 @@ class Update(command.ShowOne):
 
         parser.add_argument(
             'id',
-            help='Action execution ID.')
+            help='Action execution ID.'
+        )
         parser.add_argument(
             '--state',
             dest='state',
             choices=['PAUSED', 'RUNNING', 'SUCCESS', 'ERROR', 'CANCELLED'],
-            help='Action execution state')
+            help='Action execution state'
+        )
         parser.add_argument(
             '--output',
             dest='output',
-            help='Action execution output')
+            help='Action execution output'
+        )
 
         return parser
 
     def take_action(self, parsed_args):
         output = None
+
         if parsed_args.output:
             output = utils.load_json(parsed_args.output)
 
         mistral_client = self.app.client_manager.workflow_engine
+
         execution = mistral_client.action_executions.update(
             parsed_args.id,
             parsed_args.state,
@@ -257,14 +267,17 @@ class GetOutput(command.Command):
 
     def get_parser(self, prog_name):
         parser = super(GetOutput, self).get_parser(prog_name)
+
         parser.add_argument(
             'id',
-            help='Action execution ID.')
+            help='Action execution ID.'
+        )
 
         return parser
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
+
         output = mistral_client.action_executions.get(parsed_args.id).output
 
         try:
@@ -281,6 +294,7 @@ class GetInput(command.Command):
 
     def get_parser(self, prog_name):
         parser = super(GetInput, self).get_parser(prog_name)
+
         parser.add_argument(
             'id',
             help='Action execution ID.'
@@ -290,6 +304,7 @@ class GetInput(command.Command):
 
     def take_action(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
+
         result = mistral_client.action_executions.get(parsed_args.id).input
 
         try:

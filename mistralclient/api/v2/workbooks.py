@@ -25,19 +25,19 @@ class WorkbookManager(base.ResourceManager):
     resource_class = Workbook
 
     def _get_workbooks_url(self, resource=None, namespace=None, scope=None):
-        path = '/workbooks'
+        url = '/workbooks'
 
         if resource:
-            path += '/%s' % resource
+            url += '/%s' % resource
 
         if scope and namespace:
-            path += '?scope=%s&namespace=%s' % (scope, namespace)
+            url += '?scope=%s&namespace=%s' % (scope, namespace)
         elif scope:
-            path += '?scope=%s' % scope
+            url += '?scope=%s' % scope
         elif namespace:
-            path += '?namespace=%s' % namespace
+            url += '?namespace=%s' % namespace
 
-        return path
+        return url
 
     def create(self, definition, namespace='', scope='private'):
         self._ensure_not_empty(definition=definition)
@@ -78,8 +78,10 @@ class WorkbookManager(base.ResourceManager):
             namespace=namespace
         )
 
-        return self._list('/workbooks{}'.format(query_string),
-                          response_key='workbooks')
+        return self._list(
+            '/workbooks{}'.format(query_string),
+            response_key='workbooks'
+        )
 
     def get(self, name, namespace=''):
         self._ensure_not_empty(name=name)

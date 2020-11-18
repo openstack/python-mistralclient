@@ -20,7 +20,9 @@ from oslo_utils import importutils
 from mistralclient.api import httpclient
 from mistralclient.api.v2 import action_executions
 from mistralclient.api.v2 import actions
+from mistralclient.api.v2 import code_sources
 from mistralclient.api.v2 import cron_triggers
+from mistralclient.api.v2 import dynamic_actions
 from mistralclient.api.v2 import environments
 from mistralclient.api.v2 import event_triggers
 from mistralclient.api.v2 import executions
@@ -86,6 +88,11 @@ class Client(object):
         self.event_triggers = event_triggers.EventTriggerManager(http_client)
         self.environments = environments.EnvironmentManager(http_client)
         self.action_executions = action_executions.ActionExecutionManager(
-            http_client)
+            http_client
+        )
         self.services = services.ServiceManager(http_client)
         self.members = members.MemberManager(http_client)
+        self.code_sources = code_sources.CodeSourceManager(http_client)
+        self.dynamic_actions = dynamic_actions.DynamicActionManager(
+            http_client
+        )

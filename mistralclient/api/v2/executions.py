@@ -28,11 +28,11 @@ class Execution(base.Resource):
 class ExecutionManager(base.ResourceManager):
     resource_class = Execution
 
-    def create(self, workflow_identifier='', namespace='',
+    def create(self, wf_identifier='', namespace='',
                workflow_input=None, description='', source_execution_id=None,
                **params):
         self._ensure_not_empty(
-            workflow_identifier=workflow_identifier or source_execution_id
+            workflow_identifier=wf_identifier or source_execution_id
         )
 
         data = {'description': description}
@@ -40,11 +40,11 @@ class ExecutionManager(base.ResourceManager):
         if uuidutils.is_uuid_like(source_execution_id):
             data.update({'source_execution_id': source_execution_id})
 
-        if workflow_identifier:
-            if uuidutils.is_uuid_like(workflow_identifier):
-                data.update({'workflow_id': workflow_identifier})
+        if wf_identifier:
+            if uuidutils.is_uuid_like(wf_identifier):
+                data.update({'workflow_id': wf_identifier})
             else:
-                data.update({'workflow_name': workflow_identifier})
+                data.update({'workflow_name': wf_identifier})
 
         if namespace:
             data.update({'workflow_namespace': namespace})

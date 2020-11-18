@@ -49,9 +49,11 @@ class Resource(object):
         return copy.deepcopy(self._data)
 
     def __str__(self):
-        vals = ", ".join(["%s='%s'" % (n, v)
-                          for n, v in self._data.items()])
-        return "%s [%s]" % (self.resource_name, vals)
+        values = ", ".join(
+            ["%s='%s'" % (n, v) for n, v in self._data.items()]
+        )
+
+        return "%s [%s]" % (self.resource_name, values)
 
 
 def _check_items(obj, searches):
@@ -130,9 +132,16 @@ class ResourceManager(object):
 
     def _validate(self, url, data, response_key=None, dump_json=True,
                   headers=None, is_iter_resp=False):
-        return self._create(url, data, response_key, dump_json,
-                            headers, is_iter_resp, resp_status_ok=200,
-                            as_class=False)
+        return self._create(
+            url,
+            data,
+            response_key,
+            dump_json,
+            headers,
+            is_iter_resp,
+            resp_status_ok=200,
+            as_class=False
+        )
 
     def _create(self, url, data, response_key=None, dump_json=True,
                 headers=None, is_iter_resp=False, resp_status_ok=201,
@@ -149,9 +158,13 @@ class ResourceManager(object):
             self._raise_api_exception(resp)
 
         resource = extract_json(resp, response_key)
+
         if is_iter_resp:
-            return [self.resource_class(self, resource_data)
-                    for resource_data in resource]
+            return [
+                self.resource_class(self, resource_data)
+                for resource_data in resource
+            ]
+
         return self.resource_class(self, resource) if as_class else resource
 
     def _update(self, url, data, response_key=None, dump_json=True,
@@ -168,9 +181,13 @@ class ResourceManager(object):
             self._raise_api_exception(resp)
 
         resource = extract_json(resp, response_key)
+
         if is_iter_resp:
-            return [self.resource_class(self, resource_data)
-                    for resource_data in resource]
+            return [
+                self.resource_class(self, resource_data)
+                for resource_data in resource
+            ]
+
         return self.resource_class(self, resource)
 
     def _list(self, url, response_key=None, headers=None,
@@ -186,8 +203,10 @@ class ResourceManager(object):
 
         resource_class = returned_res_cls or self.resource_class
 
-        return [resource_class(self, resource_data)
-                for resource_data in extract_json(resp, response_key)]
+        return [
+            resource_class(self, resource_data)
+            for resource_data in extract_json(resp, response_key)
+        ]
 
     def _get(self, url, response_key=None, headers=None):
         try:
@@ -212,12 +231,17 @@ class ResourceManager(object):
     @staticmethod
     def _raise_api_exception(resp):
         try:
-            error_data = (resp.headers.get("Server-Error-Message", None) or
-                          get_json(resp).get("faultstring"))
+            error_data = (
+                resp.headers.get("Server-Error-Message", None)
+                or get_json(resp).get("faultstring")
+            )
         except ValueError:
             error_data = resp.content
-        raise APIException(error_code=resp.status_code,
-                           error_message=error_data)
+
+        raise APIException(
+            error_code=resp.status_code,
+            error_message=error_data
+        )
 
 
 def get_json(response):
