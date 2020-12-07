@@ -1392,13 +1392,13 @@ class ActionCLITests(base_v2.MistralClientTestBase):
 
         self.assertNotIn('404 Not Found', definition)
 
-    def test_action_get_with_id(self):
+    def test_action_get_with_name(self):
         created = self.action_create(self.act_def)
 
         action_name = created[0]['Name']
-        action_id = created[0]['ID']
 
-        fetched = self.mistral_admin('action-get', params=action_id)
+        fetched = self.mistral_admin('action-get', params=action_name)
+
         fetched_action_name = self.get_field_value(fetched, 'Name')
 
         self.assertEqual(action_name, fetched_action_name)
