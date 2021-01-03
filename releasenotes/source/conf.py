@@ -54,8 +54,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Mistral Client Release Notes'
-copyright = u'2016, Mistral developers'
+project = 'Mistral Client Release Notes'
+copyright = '2016, Mistral developers'
 
 # Release notes are version independent.
 # The short X.Y version.
@@ -187,8 +187,8 @@ latex_elements = {
 #  documentclass [howto/manual]).
 latex_documents = [
     ('index', 'MistralClientReleaseNotes.tex',
-     u'Mistral Client Release Notes Documentation',
-     u'Mistral developers', 'manual'),
+     'Mistral Client Release Notes Documentation',
+     'Mistral developers', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -218,8 +218,8 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'mistral_clientreleasenotes',
-     u'Mistral Client Release Notes Documentation',
-     [u'Mistral developers'], 1)
+     'Mistral Client Release Notes Documentation',
+     ['Mistral developers'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -233,8 +233,8 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     ('index', 'MistralClientReleaseNotes',
-     u'Mistral Client Release Notes Documentation',
-     u'Mistral developers', 'MistralClientReleaseNotes',
+     'Mistral Client Release Notes Documentation',
+     'Mistral developers', 'MistralClientReleaseNotes',
      'One line description of project.', 'Miscellaneous'),
 ]
 

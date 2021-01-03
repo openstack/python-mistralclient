@@ -39,8 +39,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Mistral Client'
-copyright = u'2016, Mistral Contributors'
+project = 'Mistral Client'
+copyright = '2016, Mistral Contributors'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -95,8 +95,8 @@ htmlhelp_basename = 'Mistraldoc'
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'mistral_client', u'Mistral Client Documentation',
-    [u'Mistral Contributors'], 1)
+    ('index', 'mistral_client', 'Mistral Client Documentation',
+    ['Mistral Contributors'], 1)
 ]
 
 # -- Options for openstackdocstheme -------------------------------------------
