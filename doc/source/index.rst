@@ -29,13 +29,12 @@ Python API Reference
 
 .. _REST API Specification: https://docs.openstack.org/mistral/latest/api/v2.html
 
-Contributing
-------------
+For Contributors
+----------------
 
-Code is hosted `on GitHub`_. Submit bugs to the python-mistralclient project on
-`Launchpad`_. Submit code to the openstack/python-mistralclient project
-using `Gerrit`_.
+* If you are a new contributor to python-mistralclient please refer: :doc:`contributor/contributing`
 
-.. _on GitHub: https://github.com/openstack/python-mistralclient
-.. _Launchpad: https://launchpad.net/python-mistralclient
-.. _Gerrit: https://docs.openstack.org/infra/manual/developers.html#development-workflow
+  .. toctree::
+     :hidden:
+
+     contributor/contributing
