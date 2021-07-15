@@ -14,7 +14,6 @@
 #    limitations under the License.
 
 from mistralclient.api import base
-from mistralclient import utils
 
 
 class Workflow(base.Resource):
@@ -29,7 +28,7 @@ class WorkflowManager(base.ResourceManager):
 
         # If the specified definition is actually a file, read in the
         # definition file
-        definition = utils.get_contents_if_file(definition)
+        definition = self.get_contents_if_file(definition)
 
         return self._create(
             '/workflows?scope=%s&namespace=%s' % (scope, namespace),
@@ -47,7 +46,7 @@ class WorkflowManager(base.ResourceManager):
 
         # If the specified definition is actually a file, read in the
         # definition file
-        definition = utils.get_contents_if_file(definition)
+        definition = self.get_contents_if_file(definition)
 
         is_iter_resp = True
         response_key = 'workflows'
@@ -106,7 +105,7 @@ class WorkflowManager(base.ResourceManager):
 
         # If the specified definition is actually a file, read in the
         # definition file
-        definition = utils.get_contents_if_file(definition)
+        definition = self.get_contents_if_file(definition)
 
         return self._validate(
             '/workflows/validate',

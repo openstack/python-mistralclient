@@ -41,10 +41,27 @@ _DEFAULT_MISTRAL_URL = "http://localhost:8989/v2"
 
 class Client(object):
 
+    MANAGERS = {
+        'workbooks': workbooks.WorkbookManager,
+        'executions': executions.ExecutionManager,
+        'tasks': tasks.TaskManager,
+        'actions': actions.ActionManager,
+        'workflows': workflows.WorkflowManager,
+        'cron_triggers': cron_triggers.CronTriggerManager,
+        'event_triggers': event_triggers.EventTriggerManager,
+        'environments': environments.EnvironmentManager,
+        'action_executions': action_executions.ActionExecutionManager,
+        'services': services.ServiceManager,
+        'members': members.MemberManager,
+        'code_sources': code_sources.CodeSourceManager,
+        'dynamic_actions': dynamic_actions.DynamicActionManager,
+        }
+
     def __init__(self, auth_type='keystone', **kwargs):
         # We get the session at this point, as some instances of session
         # objects might have mutexes that can't be deep-copied.
         session = kwargs.pop('session', None)
+        enforce_raw_definitions = kwargs.pop('enforce_raw_definitions', False)
         req = copy.deepcopy(kwargs)
         mistral_url = req.get('mistral_url')
         profile = req.get('profile')
@@ -77,22 +94,6 @@ class Client(object):
 
         http_client = httpclient.HTTPClient(mistral_url, session=session,
                                             **req)
-
         # Create all resource managers.
-        self.workbooks = workbooks.WorkbookManager(http_client)
-        self.executions = executions.ExecutionManager(http_client)
-        self.tasks = tasks.TaskManager(http_client)
-        self.actions = actions.ActionManager(http_client)
-        self.workflows = workflows.WorkflowManager(http_client)
-        self.cron_triggers = cron_triggers.CronTriggerManager(http_client)
-        self.event_triggers = event_triggers.EventTriggerManager(http_client)
-        self.environments = environments.EnvironmentManager(http_client)
-        self.action_executions = action_executions.ActionExecutionManager(
-            http_client
-        )
-        self.services = services.ServiceManager(http_client)
-        self.members = members.MemberManager(http_client)
-        self.code_sources = code_sources.CodeSourceManager(http_client)
-        self.dynamic_actions = dynamic_actions.DynamicActionManager(
-            http_client
-        )
+        for name, cls in self.MANAGERS.items():
+            setattr(self, name, cls(http_client, enforce_raw_definitions))

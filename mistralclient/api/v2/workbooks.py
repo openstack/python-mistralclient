@@ -14,7 +14,6 @@
 #    limitations under the License.
 
 from mistralclient.api import base
-from mistralclient import utils
 
 
 class Workbook(base.Resource):
@@ -44,7 +43,7 @@ class WorkbookManager(base.ResourceManager):
 
         # If the specified definition is actually a file, read in the
         # definition file
-        definition = utils.get_contents_if_file(definition)
+        definition = self.get_contents_if_file(definition)
 
         return self._create(
             self._get_workbooks_url(None, namespace, scope),
@@ -58,7 +57,7 @@ class WorkbookManager(base.ResourceManager):
 
         # If the specified definition is actually a file, read in the
         # definition file
-        definition = utils.get_contents_if_file(definition)
+        definition = self.get_contents_if_file(definition)
 
         return self._update(
             self._get_workbooks_url(None, namespace, scope),
@@ -100,7 +99,7 @@ class WorkbookManager(base.ResourceManager):
 
         # If the specified definition is actually a file, read in the
         # definition file
-        definition = utils.get_contents_if_file(definition)
+        definition = self.get_contents_if_file(definition)
 
         return self._validate(
             '/workbooks/validate',

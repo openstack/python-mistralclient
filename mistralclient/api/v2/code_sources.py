@@ -13,7 +13,6 @@
 #    limitations under the License.
 
 from mistralclient.api import base
-from mistralclient import utils
 
 
 class CodeSource(base.Resource):
@@ -27,7 +26,7 @@ class CodeSourceManager(base.ResourceManager):
         self._ensure_not_empty(name=name, content=content)
 
         # If the specified content is actually a file, read from it.
-        content = utils.get_contents_if_file(content)
+        content = self.get_contents_if_file(content)
 
         return self._create(
             '/code_sources?name=%s&scope=%s&namespace=%s' %
@@ -41,7 +40,7 @@ class CodeSourceManager(base.ResourceManager):
         self._ensure_not_empty(identifier=identifier, content=content)
 
         # If the specified content is actually a file, read from it.
-        content = utils.get_contents_if_file(content)
+        content = self.get_contents_if_file(content)
 
         return self._update(
             '/code_sources?identifier=%s&scope=%s&namespace=%s' %

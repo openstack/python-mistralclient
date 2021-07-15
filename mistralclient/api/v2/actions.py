@@ -14,7 +14,6 @@
 #    limitations under the License.
 
 from mistralclient.api import base
-from mistralclient import utils
 
 
 class Action(base.Resource):
@@ -29,7 +28,7 @@ class ActionManager(base.ResourceManager):
 
         # If the specified definition is actually a file, read in the
         # definition file
-        definition = utils.get_contents_if_file(definition)
+        definition = self.get_contents_if_file(definition)
         url = '/actions?scope=%s' % scope
 
         if namespace:
@@ -56,7 +55,7 @@ class ActionManager(base.ResourceManager):
 
         # If the specified definition is actually a file, read in the
         # definition file
-        definition = utils.get_contents_if_file(definition)
+        definition = self.get_contents_if_file(definition)
 
         return self._update(
             url,
@@ -101,7 +100,7 @@ class ActionManager(base.ResourceManager):
 
         # If the specified definition is actually a file, read in the
         # definition file
-        definition = utils.get_contents_if_file(definition)
+        definition = self.get_contents_if_file(definition)
 
         return self._validate(
             '/actions/validate',
