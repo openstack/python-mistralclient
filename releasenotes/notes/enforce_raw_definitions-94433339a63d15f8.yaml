@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    The new ``enforce_raw_definitions`` variable has been added to
+    the ``Client`` class and each ``ResourceManager`` class. This variable is
+    set to False by default. Setting this parameter to True enforces the client
+    to use ``definition`` passed in as raw content.
