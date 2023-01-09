@@ -13,6 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import time
+
 from tempest.lib import exceptions
 
 from mistralclient.tests.functional.cli import base
@@ -558,6 +560,7 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
         self.assertNotEqual('None', wf_error)
 
     def test_workflow_list_with_filter(self):
+        self.workflow_create(self.wf_def)
         workflows = self.parser.listing(self.mistral('workflow-list'))
 
         self.assertTableStruct(
@@ -566,14 +569,14 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
              'Updated at']
         )
 
-        # We know that we have more than one workflow by default.
-        self.assertGreater(len(workflows), 1)
+        # We created 2 workflows, so we should have at least 2
+        self.assertGreaterEqual(len(workflows), 2)
 
         # Now let's provide a filter to the list command.
         workflows = self.parser.listing(
             self.mistral(
                 'workflow-list',
-                params='--filter name=in:std.create_instance,create_instance'
+                params='--filter name=eq:wf1'
             )
         )
 
@@ -585,7 +588,7 @@ class WorkflowCLITests(base_v2.MistralClientTestBase):
 
         self.assertEqual(1, len(workflows))
 
-        self.assertIn('create_instance', workflows[0]['Name'])
+        self.assertEqual('wf1', workflows[0]['Name'])
 
 
 class ExecutionCLITests(base_v2.MistralClientTestBase):
@@ -794,76 +797,114 @@ class ExecutionCLITests(base_v2.MistralClientTestBase):
         self.assertEqual(wrapping_task_id, wf_exec['Task Execution ID'])
 
     def test_executions_list_with_pagination(self):
-        self.execution_create(
+        # Create 2 executions
+        ex1 = self.execution_create(
             params='{0} -d "a"'.format(self.direct_wf['Name'])
         )
-
-        self.execution_create(
+        # We need to sleep at least one sec between the creation of the two
+        # executions because the default sort is by created_at descending
+        # (newest first)
+        # And the tests may fail if the created_at are identical (some sort
+        # of race condition)
+        time.sleep(1)
+        ex2 = self.execution_create(
             params='{0} -d "b"'.format(self.direct_wf['Name'])
         )
 
-        all_wf_execs = self.mistral_cli(True, 'execution-list')
+        all_wf_ids = [
+            self.get_field_value(ex1, 'ID'),
+            self.get_field_value(ex2, 'ID'),
+        ]
 
-        self.assertEqual(2, len(all_wf_execs))
+        # List all executions
+        wf_execs = self.mistral_cli(True, 'execution-list')
 
+        # We are supposed to have 2
+        self.assertEqual(2, len(wf_execs))
+
+        # We are supposed to have the correct IDs
+        self.assertEqual(
+            set(all_wf_ids),
+            set([ex['ID'] for ex in wf_execs])
+        )
+
+        # List executions with limit 1
+        # NOTE(arnaud) mistral client is returning newest first by default
+        # even if it say differently in help message
+        # See change: I002edd1b10ab281072cfa7501cfa763073a7781c
+        # So here, for the test with marker to work, we need to
+        # specificaly ask for ascending execution list using --oldest
         wf_execs = self.mistral_cli(
             True,
             'execution-list',
-            params="--limit 1"
+            params="--oldest --limit 1"
         )
 
+        # We are supposed to have one
         self.assertEqual(1, len(wf_execs))
 
-        wf_ex1_id = all_wf_execs[0]['ID']
-        wf_ex2_id = all_wf_execs[1]['ID']
-
+        # List executions starting after the one we received before
+        not_expected = wf_execs[0]['ID']
+        expected = [ex for ex in all_wf_ids if ex != wf_execs[0]['ID']][0]
         wf_execs = self.mistral_cli(
             True,
             'execution-list',
-            params="--marker %s" % wf_ex1_id
+            params="--marker %s" % not_expected
         )
 
-        self.assertNotIn(wf_ex1_id, [ex['ID'] for ex in wf_execs])
-        self.assertIn(wf_ex2_id, [ex['ID'] for ex in wf_execs])
+        # Check if we have correct ex ID
+        self.assertNotIn(
+            not_expected,
+            [ex['ID'] for ex in wf_execs]
+        )
+        self.assertIn(
+            expected,
+            [ex['ID'] for ex in wf_execs]
+        )
 
+        # List sorted by Description
         wf_execs = self.mistral_cli(
             True,
             'execution-list',
             params="--sort_keys Description"
         )
 
-        self.assertIn(wf_ex1_id, [ex['ID'] for ex in wf_execs])
-        self.assertIn(wf_ex2_id, [ex['ID'] for ex in wf_execs])
+        # We are supposed to have both
+        self.assertEqual(
+            set(all_wf_ids),
+            set([ex['ID'] for ex in wf_execs])
+        )
 
+        # Now check if they are correctly ordered
+        # Ascending by default
         wf_ex1_index = -1
         wf_ex2_index = -1
-
         for idx, ex in enumerate(wf_execs):
-            if ex['ID'] == wf_ex1_id:
+            if ex['ID'] == all_wf_ids[0]:
                 wf_ex1_index = idx
-            elif ex['ID'] == wf_ex2_id:
+            elif ex['ID'] == all_wf_ids[1]:
                 wf_ex2_index = idx
-
         self.assertLess(wf_ex1_index, wf_ex2_index)
 
+        # Check if descending is working also
         wf_execs = self.mistral_cli(
             True,
             'execution-list',
             params="--sort_keys Description --sort_dirs=desc"
         )
 
-        self.assertIn(wf_ex1_id, [ex['ID'] for ex in wf_execs])
-        self.assertIn(wf_ex2_id, [ex['ID'] for ex in wf_execs])
+        self.assertEqual(
+            set(all_wf_ids),
+            set([ex['ID'] for ex in wf_execs])
+        )
 
         wf_ex1_index = -1
         wf_ex2_index = -1
-
         for idx, ex in enumerate(wf_execs):
-            if ex['ID'] == wf_ex1_id:
+            if ex['ID'] == all_wf_ids[0]:
                 wf_ex1_index = idx
-            elif ex['ID'] == wf_ex2_id:
+            elif ex['ID'] == all_wf_ids[1]:
                 wf_ex2_index = idx
-
         self.assertGreater(wf_ex1_index, wf_ex2_index)
 
     def test_execution_list_with_filter(self):
@@ -2360,7 +2401,7 @@ class NegativeCLITests(base_v2.MistralClientTestBase):
             '--os-target-password="{password}" '
             '--os-target-auth-url="{auth_url}" '
             '--target_insecure '
-            'run-action heat.stacks_list'
+            'run-action std.noop'
         ).format(
             tenantname=self.clients.tenant_name,
             username=self.clients.username,

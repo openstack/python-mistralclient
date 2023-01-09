@@ -108,7 +108,7 @@ class MistralCLIAltAuth(base.ClientTestBase):
     _mistral_url = None
 
     def _get_alt_clients(self):
-        creds = credentials('devstack-alt')
+        creds = credentials('devstack-alt-member')
 
         clients = base.CLIClient(
             username=creds['username'],

@@ -17,49 +17,6 @@ from tempest.lib import exceptions
 from mistralclient.tests.functional.cli.v2 import base_v2
 
 
-class StandardItemsAvailabilityCLITests(base_v2.MistralClientTestBase):
-
-    def test_std_workflows_availability(self):
-        wfs = self.mistral_admin("workflow-list")
-
-        self.assertTableStruct(
-            wfs,
-            ["Name", "Tags", "Input", "Created at", "Updated at"]
-        )
-        self.assertPartIn("create_instance",
-                          [workflow["Name"] for workflow in wfs])
-
-        wfs = self.mistral_alt_user("workflow-list")
-
-        self.assertTableStruct(
-            wfs,
-            ["Name", "Tags", "Input", "Created at", "Updated at"]
-        )
-        self.assertPartIn("create_instance",
-                          [workflow["Name"] for workflow in wfs])
-
-    def test_std_actions_availability(self):
-        acts = self.mistral_admin("action-list")
-
-        self.assertTableStruct(
-            acts,
-            ["Name", "Is system", "Input", "Description",
-             "Tags", "Created at", "Updated at"]
-        )
-        self.assertIn("glance.images_list",
-                      [action["Name"] for action in acts])
-
-        acts = self.mistral_alt_user("action-list")
-
-        self.assertTableStruct(
-            acts,
-            ["Name", "Is system", "Input", "Description",
-             "Tags", "Created at", "Updated at"]
-        )
-        self.assertIn("glance.images_list",
-                      [action["Name"] for action in acts])
-
-
 class WorkbookIsolationCLITests(base_v2.MistralClientTestBase):
 
     def test_workbook_name_uniqueness(self):
