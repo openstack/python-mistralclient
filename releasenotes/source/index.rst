@@ -8,6 +8,7 @@ Contents
    :maxdepth: 2
 
    unreleased
+   2024.2
    2024.1
    zed
    yoga
