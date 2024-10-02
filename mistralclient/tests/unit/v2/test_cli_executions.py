@@ -16,7 +16,7 @@
 #    under the License.
 #
 
-import pkg_resources as pkg
+import os.path
 from unittest import mock
 
 from oslo_serialization import jsonutils
@@ -116,10 +116,8 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
     def test_create_wf_input_file(self):
         self.client.executions.create.return_value = EXEC
 
-        path = pkg.resource_filename(
-            'mistralclient',
-            'tests/unit/resources/ctx.json'
-        )
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            '..', 'resources', 'ctx.json')
 
         result = self.call(
             execution_cmd.Create,

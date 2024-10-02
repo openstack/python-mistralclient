@@ -13,7 +13,6 @@
 #    limitations under the License.
 
 import os.path
-import pkg_resources as pkg
 from urllib import parse
 from urllib import request
 
@@ -71,10 +70,8 @@ class TestWorkflowsV2(base.BaseClientV2Test):
         )
 
         # The contents of wf_v2.yaml must be identical to WF_DEF
-        path = pkg.resource_filename(
-            'mistralclient',
-            'tests/unit/resources/wf_v2.yaml'
-        )
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            '..', 'resources', 'wf_v2.yaml')
 
         wfs = self.workflows.create(path)
 
@@ -126,10 +123,9 @@ class TestWorkflowsV2(base.BaseClientV2Test):
         )
 
         # The contents of wf_v2.yaml must be identical to WF_DEF
-        path = pkg.resource_filename(
-            'mistralclient',
-            'tests/unit/resources/wf_v2.yaml'
-        )
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            '..', 'resources', 'wf_v2.yaml')
+
         path = os.path.abspath(path)
 
         # Convert the file path to file URI

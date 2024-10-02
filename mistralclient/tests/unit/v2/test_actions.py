@@ -14,7 +14,6 @@
 #    limitations under the License.
 
 import os.path
-import pkg_resources as pkg
 from urllib import parse
 from urllib import request
 
@@ -96,10 +95,8 @@ class TestActionsV2(base.BaseClientV2Test):
                                 status_code=201)
 
         # The contents of action_v2.yaml must be identical to ACTION_DEF
-        path = pkg.resource_filename(
-            'mistralclient',
-            'tests/unit/resources/action_v2.yaml'
-        )
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            '..', 'resources', 'action_v2.yaml')
 
         actions = self.actions.create(path)
 
@@ -160,10 +157,8 @@ class TestActionsV2(base.BaseClientV2Test):
                                json={'actions': [ACTION]})
 
         # The contents of action_v2.yaml must be identical to ACTION_DEF
-        path = pkg.resource_filename(
-            'mistralclient',
-            'tests/unit/resources/action_v2.yaml'
-        )
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            '..', 'resources', 'action_v2.yaml')
         path = os.path.abspath(path)
 
         # Convert the file path to file URI
@@ -286,10 +281,8 @@ class TestActionsV2(base.BaseClientV2Test):
                                 json={'valid': True})
 
         # The contents of action_v2.yaml must be identical to ACTION_DEF
-        path = pkg.resource_filename(
-            'mistralclient',
-            'tests/unit/resources/action_v2.yaml'
-        )
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            '..', 'resources', 'action_v2.yaml')
 
         result = self.actions.validate(path)
 
