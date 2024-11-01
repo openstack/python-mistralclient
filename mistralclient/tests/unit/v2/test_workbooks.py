@@ -14,7 +14,6 @@
 #    limitations under the License.
 
 import os.path
-import pkg_resources as pkg
 from urllib import parse
 from urllib import request
 
@@ -95,11 +94,8 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         )
 
         # The contents of wb_v2.yaml must be identical to WB_DEF
-        path = pkg.resource_filename(
-            'mistralclient',
-            'tests/unit/resources/wb_v2.yaml'
-        )
-        path = os.path.abspath(path)
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            '..', 'resources', 'wb_v2.yaml')
 
         # Convert the file path to file URI
         uri = parse.urljoin('file:', request.pathname2url(path))
@@ -131,10 +127,8 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         self.requests_mock.put(self.TEST_URL + URL_TEMPLATE, json=WORKBOOK)
 
         # The contents of wb_v2.yaml must be identical to WB_DEF
-        path = pkg.resource_filename(
-            'mistralclient',
-            'tests/unit/resources/wb_v2.yaml'
-        )
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            '..', 'resources', 'wb_v2.yaml')
 
         wb = self.workbooks.update(path)
 
@@ -207,10 +201,8 @@ class TestWorkbooksV2(base.BaseClientV2Test):
         )
 
         # The contents of wb_v2.yaml must be identical to WB_DEF
-        path = pkg.resource_filename(
-            'mistralclient',
-            'tests/unit/resources/wb_v2.yaml'
-        )
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            '..', 'resources', 'wb_v2.yaml')
 
         result = self.workbooks.validate(path)
 
