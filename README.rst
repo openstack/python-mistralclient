@@ -2,6 +2,10 @@
 Mistral
 =======
 
+.. image:: https://governance.openstack.org/tc/badges/python-mistralclient.svg
+
+.. Change things from this point on
+
 .. image:: https://img.shields.io/pypi/v/python-mistralclient.svg
     :target: https://pypi.org/project/python-mistralclient/
     :alt: Latest Version
