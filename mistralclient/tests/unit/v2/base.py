@@ -38,5 +38,4 @@ class BaseClientV2Test(base.BaseClientTest):
             self.environments = self._client.environments
             self.action_executions = self._client.action_executions
             self.actions = self._client.actions
-            self.services = self._client.services
             self.members = self._client.members

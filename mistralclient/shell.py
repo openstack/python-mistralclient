@@ -36,7 +36,6 @@ import mistralclient.commands.v2.environments
 import mistralclient.commands.v2.event_triggers
 import mistralclient.commands.v2.executions
 import mistralclient.commands.v2.members
-import mistralclient.commands.v2.services
 import mistralclient.commands.v2.tasks
 import mistralclient.commands.v2.workbooks
 import mistralclient.commands.v2.workflows
@@ -767,7 +766,6 @@ class MistralShell(app.App):
             mistralclient.commands.v2.event_triggers.Create,
             'event-trigger-delete':
             mistralclient.commands.v2.event_triggers.Delete,
-            'service-list': mistralclient.commands.v2.services.List,
             'member-create': mistralclient.commands.v2.members.Create,
             'member-delete': mistralclient.commands.v2.members.Delete,
             'member-update': mistralclient.commands.v2.members.Update,

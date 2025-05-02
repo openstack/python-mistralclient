@@ -27,7 +27,6 @@ from mistralclient.api.v2 import environments
 from mistralclient.api.v2 import event_triggers
 from mistralclient.api.v2 import executions
 from mistralclient.api.v2 import members
-from mistralclient.api.v2 import services
 from mistralclient.api.v2 import tasks
 from mistralclient.api.v2 import workbooks
 from mistralclient.api.v2 import workflows
@@ -51,7 +50,6 @@ class Client(object):
         'event_triggers': event_triggers.EventTriggerManager,
         'environments': environments.EnvironmentManager,
         'action_executions': action_executions.ActionExecutionManager,
-        'services': services.ServiceManager,
         'members': members.MemberManager,
         'code_sources': code_sources.CodeSourceManager,
         'dynamic_actions': dynamic_actions.DynamicActionManager,
