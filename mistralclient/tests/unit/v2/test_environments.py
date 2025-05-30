@@ -14,11 +14,10 @@
 
 import collections
 import copy
-import os.path
+import importlib.resources
 
 from oslo_serialization import jsonutils
 
-import pkg_resources as pkg
 from urllib import parse
 from urllib import request
 
@@ -61,11 +60,9 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
 
     def test_create_with_json_file_uri(self):
         # The contents of env_v2.json must be equivalent to ENVIRONMENT
-        path = pkg.resource_filename(
-            'mistralclient',
+        path = str(importlib.resources.files('mistralclient').joinpath(
             'tests/unit/resources/env_v2.json'
-        )
-        path = os.path.abspath(path)
+        ))
 
         # Convert the file path to file URI
         uri = parse.urljoin('file:', request.pathname2url(path))
@@ -115,10 +112,9 @@ class TestEnvironmentsV2(base.BaseClientV2Test):
 
     def test_update_with_yaml_file(self):
         # The contents of env_v2.json must be equivalent to ENVIRONMENT
-        path = pkg.resource_filename(
-            'mistralclient',
+        path = str(importlib.resources.files('mistralclient').joinpath(
             'tests/unit/resources/env_v2.json'
-        )
+        ))
         data = collections.OrderedDict(
             utils.load_content(
                 utils.get_contents_if_file(path)
