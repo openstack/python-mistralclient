@@ -13,13 +13,12 @@
 #    limitations under the License.
 
 import copy
-import datetime
 import os
 import tempfile
 from unittest import mock
 
 from oslo_serialization import jsonutils
-
+from oslo_utils import timeutils
 import yaml
 
 from mistralclient.api.v2 import environments
@@ -37,8 +36,8 @@ ENVIRONMENT_DICT = {
         'timeout': 600,
         'verbose': True
     },
-    'created_at': str(datetime.datetime.utcnow()),
-    'updated_at': str(datetime.datetime.utcnow())
+    'created_at': str(timeutils.utcnow()),
+    'updated_at': str(timeutils.utcnow())
 }
 
 ENVIRONMENT = environments.Environment(mock, ENVIRONMENT_DICT)
