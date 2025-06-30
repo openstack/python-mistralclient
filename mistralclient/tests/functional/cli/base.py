@@ -14,7 +14,7 @@
 
 import os
 
-import os_client_config
+from openstack import config as occ
 from tempest.lib.cli import base
 
 
@@ -39,7 +39,7 @@ def credentials(cloud='devstack-admin'):
 
 
 def get_cloud_config(cloud='devstack-admin'):
-    return os_client_config.OpenStackConfig().get_one_cloud(cloud=cloud)
+    return occ.OpenStackConfig().get_one(cloud=cloud)
 
 
 class MistralCLIAuth(base.ClientTestBase):
