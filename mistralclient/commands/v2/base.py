@@ -15,10 +15,11 @@
 #
 
 import abc
-import datetime as dt
+import datetime
 import textwrap
 
 from osc_lib.command import command
+from oslo_utils import timeutils
 
 
 DEFAULT_LIMIT = 100
@@ -204,24 +205,24 @@ def get_duration_str(start_dt_str, end_dt_str):
     if not start_dt_str:
         return ''
 
-    start_dt = dt.datetime.strptime(start_dt_str, '%Y-%m-%d %H:%M:%S')
+    start_dt = datetime.datetime.strptime(start_dt_str, '%Y-%m-%d %H:%M:%S')
 
     if end_dt_str:
-        end_dt = dt.datetime.strptime(end_dt_str, '%Y-%m-%d %H:%M:%S')
+        end_dt = datetime.datetime.strptime(end_dt_str, '%Y-%m-%d %H:%M:%S')
 
         return str(end_dt - start_dt)
 
-    delta_from_now = dt.datetime.utcnow() - start_dt
+    delta_from_now = timeutils.utcnow() - start_dt
 
     # If delta is too small then we won't show any value. It means that
     # the corresponding process (e.g. an execution) just started.
-    if delta_from_now < dt.timedelta(seconds=2):
+    if delta_from_now < datetime.timedelta(seconds=2):
         return '...'
 
     # Drop microseconds to decrease verbosity.
     delta = (
         delta_from_now
-        - dt.timedelta(microseconds=delta_from_now.microseconds)
+        - datetime.timedelta(microseconds=delta_from_now.microseconds)
     )
 
     return "{}...".format(delta)
