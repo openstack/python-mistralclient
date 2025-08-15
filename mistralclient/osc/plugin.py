@@ -43,7 +43,9 @@ def make_client(instance):
         interface='publicURL'
     )
 
-    client = workflow_client(mistral_url=mistral_url, session=instance.session)
+    client = workflow_client(
+        mistral_url=mistral_url, session=instance.session,
+        cacert=instance._cacert if instance._cacert else None)
 
     return client
 
