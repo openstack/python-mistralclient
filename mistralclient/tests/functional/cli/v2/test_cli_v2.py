@@ -21,7 +21,9 @@ from mistralclient.tests.functional.cli import base
 from mistralclient.tests.functional.cli.v2 import base_v2
 
 
-MISTRAL_URL = "http://localhost:8989/v2"
+# NOTE(amorin) this is the hardcoded mistral URL in devstack
+# Since we moved to uwsgi, this is behind apache ProxyPass /workflow
+MISTRAL_URL = "http://localhost/workflow/v2"
 
 
 class SimpleMistralCLITests(base.MistralCLIAuth):

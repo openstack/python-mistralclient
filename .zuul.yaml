@@ -14,10 +14,8 @@
         h-eng: true
       tox_envlist: functional
       tox_environment:
+        # NOTE(amorin) is it still needed?
         IDENTITY_API_VERSION: 3
-        PYTHONUNBUFFERED: 'true'
-        MISTRAL_USE_MOD_WSGI: true
-        MISTRAL_RPC_IMPLEMENTATION: oslo
         MYSQL_ROOT_PW: secretdatabase
     required-projects:
       - openstack/heat
