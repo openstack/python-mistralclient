@@ -109,8 +109,6 @@ class BaseClientTest(base.BaseTestCase):
         mistral_url_for_http = http_client_mock.call_args[0][0]
         self.assertEqual(MISTRAL_HTTP_URL, mistral_url_for_http)
 
-    @mock.patch('mistralclient.auth.keystone.KeystoneAuthHandler'
-                '._is_service_catalog_v2', return_value=True)
     @mock.patch('keystoneauth1.identity.generic.Password')
     @mock.patch('keystoneauth1.session.Session')
     @mock.patch('mistralclient.api.httpclient.HTTPClient')
@@ -118,8 +116,7 @@ class BaseClientTest(base.BaseTestCase):
         self,
         http_client_mock,
         session_mock,
-        password_mock,
-        catalog_type_mock
+        password_mock
     ):
 
         session = mock.MagicMock()
@@ -139,12 +136,6 @@ class BaseClientTest(base.BaseTestCase):
         target_session.get_auth_headers = mock.Mock(return_value={
             'X-Auth-Token': 'authtoken'
         })
-
-        mock_access = mock.MagicMock()
-        mock_catalog = mock.MagicMock()
-        mock_catalog.catalog = {}
-        mock_access.service_catalog = mock_catalog
-        auth.get_access = mock.Mock(return_value=mock_access)
 
         client.client(
             auth_url=AUTH_HTTP_URL_v3,
@@ -174,7 +165,6 @@ class BaseClientTest(base.BaseTestCase):
             'target_project_name': 'tmistralp',
             'target_username': 'tmistral',
             'target_region_name': 'tregion',
-            'target_service_catalog': "{}"
         }
 
         for key in expected_values:

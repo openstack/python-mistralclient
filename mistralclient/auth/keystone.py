@@ -19,7 +19,6 @@ import keystoneauth1.identity.generic as auth_plugin
 from keystoneauth1 import session as ks_session
 import mistralclient.api.httpclient as api
 from mistralclient import auth as mistral_auth
-from oslo_serialization import jsonutils
 
 
 LOG = logging.getLogger(__name__)
@@ -34,21 +33,7 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
             for Keystone authentication.
         """
         reqs = self._separate_target_reqs(req)
-        try:
-            result = self._authenticate(reqs, session)
-        except Exception as e:
-            if "Cannot use v2 authentication with domain scope" in str(e):
-                LOG.warning("Client tried to use v2 authentication with "
-                            "domain scope. Domain parameters are assumed "
-                            "to be erroneously set. Retrying "
-                            "authentication without them. "
-                            "Request parameters: %s" % str(reqs))
-                domainless_reqs = [reqs[0],
-                                   self._remove_domain(reqs[1])]
-                result = self._authenticate(domainless_reqs, session)
-            else:
-                raise
-        return result
+        return self._authenticate(reqs, session)
 
     @staticmethod
     def _separate_target_reqs(req):
@@ -70,24 +55,6 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
                 r[key] = req[key]
 
         return [r, target_r]
-
-    @staticmethod
-    def _remove_domain(req):
-        """Remove all domain parameters from req.
-
-        Keystoneauth with V2 does not accept domain parameters. This
-        is an incompatible change from Keystoneclient but it would
-        unnecessarily break clients of Mistral. It is safe to remove
-        domain parameters if V2 auth is targeted.
-
-        :param req: Request dict containing list of parameters required
-        :return: Request dict without domains
-        """
-        r = {}
-        for key in req:
-            if "domain" not in key:
-                r[key] = req[key]
-        return r
 
     @staticmethod
     def _get_auth(api_key=None, auth_token=None, auth_url=None,
@@ -208,19 +175,6 @@ class KeystoneAuthHandler(mistral_auth.AuthHandler):
                     api.TARGET_USER_ID: target_session.get_user_id(),
                     api.TARGET_AUTH_URI: target_auth._plugin.auth_url,
                 })
-
-                access = target_auth.get_access(target_session)
-                service_catalog = access.service_catalog
-
-                if self._is_service_catalog_v2(service_catalog):
-                    access_data = access._data["access"]
-                    if not len(access_data['serviceCatalog']):
-                        LOG.warning(
-                            "Service Catalog empty, some authentication"
-                            "credentials may be missing. This can cause"
-                            "malfunction in the Mistral action executions.")
-                    sc_json = jsonutils.dumps(access_data)
-                    auth_response[api.TARGET_SERVICE_CATALOG] = sc_json
 
         if not auth_response:
             LOG.debug("No valid token or password + user provided. "
