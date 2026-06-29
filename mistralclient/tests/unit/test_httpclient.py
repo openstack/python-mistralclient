@@ -112,16 +112,11 @@ class HTTPClientTest(base.BaseClientTest):
         data = {'base_id': PROFILER_TRACE_ID, 'parent_id': PROFILER_TRACE_ID}
         signed_data = osprofiler_utils.signed_pack(data, PROFILER_HMAC_KEY)
 
-        headers = {
-            'X-Trace-Info': signed_data[0],
-            'X-Trace-HMAC': signed_data[1]
-        }
-
         self.client.get(API_URL)
 
         self.assertTrue(m.called_once)
         headers = self.assertExpectedAuthHeaders()
-        self.assertEqual(signed_data[0], headers['X-Trace-Info'])
+        self.assertEqual(signed_data[0].decode(), headers['X-Trace-Info'])
         self.assertEqual(signed_data[1], headers['X-Trace-HMAC'])
 
     def test_get_request_options_with_headers_for_get(self):
