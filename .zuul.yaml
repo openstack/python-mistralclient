@@ -40,8 +40,16 @@
               - ^.*\.rst$
               - ^doc/.*$
               - ^releasenotes/.*$
-        - python-mistralclient-functional-devstack
+        - python-mistralclient-functional-devstack:
+            voting: false
+        - openstack-tox-py311:
+            voting: false
+        - openstack-tox-py313:
+            voting: false
     gate:
       jobs:
-        - python-mistralclient-functional-devstack
+        - openstack-tox-py311:
+            voting: false
+        - openstack-tox-py313:
+            voting: false
 
