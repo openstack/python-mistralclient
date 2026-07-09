@@ -133,6 +133,12 @@ class WorkbookCLITests(base_v2.MistralClientTestBase):
     def test_workbook_create_delete(self):
         wb = self.mistral_admin('workbook-create', params=self.wb_def)
 
+        # Deleting the workbook (at the end of this test) doesn't delete
+        # the workflows and ad-hoc actions created from it, so they must
+        # be cleaned up explicitly.
+        self.addCleanup(self.mistral_admin, 'workflow-delete', params='wb.wf1')
+        self.addCleanup(self.mistral_admin, 'action-delete', params='wb.ac1')
+
         wb_name = self.get_field_value(wb, "Name")
 
         self.assertTableStruct(wb, ['Field', 'Value'])

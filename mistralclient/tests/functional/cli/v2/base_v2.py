@@ -156,6 +156,22 @@ class MistralClientTestBase(base.MistralCLIAuth, base.MistralCLIAltAuth):
             params='wb.wf1'
         )
 
+        # Deleting a workbook doesn't delete the ad-hoc actions created
+        # from it. If they are left behind, the same action may end up
+        # existing in several projects at the same time (admin sees all
+        # of them) and subsequent workbook creations fail with a
+        # duplicate entry error.
+        with open(wb_def) as f:
+            wb_def_content = f.read()
+
+        if 'actions:' in wb_def_content:
+            self.addCleanup(
+                self.mistral_cli,
+                admin,
+                'action-delete',
+                params='wb.ac1'
+            )
+
         return wb
 
     def workflow_create(self, wf_def, namespace='', admin=True,
