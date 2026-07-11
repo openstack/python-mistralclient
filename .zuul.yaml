@@ -7,10 +7,8 @@
         mistral: https://opendev.org/openstack/mistral
         heat: https://opendev.org/openstack/heat
       devstack_services:
-        heat: true
         h-api: true
         h-api-cfn: true
-        h-api-cw: true
         h-eng: true
       tox_envlist: functional
       tox_environment:
