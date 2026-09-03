@@ -12,8 +12,6 @@
         h-eng: true
       tox_envlist: functional
       tox_environment:
-        # NOTE(amorin) is it still needed?
-        IDENTITY_API_VERSION: 3
         MYSQL_ROOT_PW: secretdatabase
     required-projects:
       - openstack/heat
