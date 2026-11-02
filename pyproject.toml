@@ -1,3 +1,136 @@
 [build-system]
 requires = ["pbr>=6.1.1"]
 build-backend = "pbr.build"
+
+[project]
+name = "python-mistralclient"
+description = "Mistral Client Library"
+authors = [
+    {name = "OpenStack", email = "openstack-discuss@lists.openstack.org"},
+]
+readme = {file = "README.rst", content-type = "text/x-rst"}
+license = "Apache-2.0"
+dynamic = ["version", "dependencies"]
+requires-python = ">=3.11"
+classifiers = [
+    "Environment :: OpenStack",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+]
+
+[project.urls]
+Homepage = "https://docs.openstack.org/python-mistralclient/latest/"
+"Bug Tracker" = "https://bugs.launchpad.net/python-mistralclient/"
+"Source Code" = "https://opendev.org/openstack/python-mistralclient"
+
+[tool.setuptools.packages.find]
+include = ["mistralclient*"]
+
+[project.scripts]
+mistral = "mistralclient.shell:main"
+
+[project.entry-points."openstack.cli.extension"]
+workflow_engine = "mistralclient.osc.plugin"
+
+[project.entry-points."openstack.workflow_engine.v2"]
+workbook_list = "mistralclient.commands.v2.workbooks:List"
+workbook_show = "mistralclient.commands.v2.workbooks:Get"
+workbook_create = "mistralclient.commands.v2.workbooks:Create"
+workbook_delete = "mistralclient.commands.v2.workbooks:Delete"
+workbook_update = "mistralclient.commands.v2.workbooks:Update"
+workbook_definition_show = "mistralclient.commands.v2.workbooks:GetDefinition"
+workbook_validate = "mistralclient.commands.v2.workbooks:Validate"
+
+workflow_list = "mistralclient.commands.v2.workflows:List"
+workflow_show = "mistralclient.commands.v2.workflows:Get"
+workflow_create = "mistralclient.commands.v2.workflows:Create"
+workflow_delete = "mistralclient.commands.v2.workflows:Delete"
+workflow_update = "mistralclient.commands.v2.workflows:Update"
+workflow_definition_show = "mistralclient.commands.v2.workflows:GetDefinition"
+workflow_validate = "mistralclient.commands.v2.workflows:Validate"
+
+workflow_env_create = "mistralclient.commands.v2.environments:Create"
+workflow_env_delete = "mistralclient.commands.v2.environments:Delete"
+workflow_env_update = "mistralclient.commands.v2.environments:Update"
+workflow_env_list = "mistralclient.commands.v2.environments:List"
+workflow_env_show = "mistralclient.commands.v2.environments:Get"
+
+action_execution_run = "mistralclient.commands.v2.action_executions:Create"
+action_execution_list = "mistralclient.commands.v2.action_executions:List"
+action_execution_show = "mistralclient.commands.v2.action_executions:Get"
+action_execution_input_show = "mistralclient.commands.v2.action_executions:GetInput"
+action_execution_output_show = "mistralclient.commands.v2.action_executions:GetOutput"
+action_execution_update = "mistralclient.commands.v2.action_executions:Update"
+action_execution_delete = "mistralclient.commands.v2.action_executions:Delete"
+
+workflow_execution_create = "mistralclient.commands.v2.executions:Create"
+workflow_execution_delete = "mistralclient.commands.v2.executions:Delete"
+workflow_execution_update = "mistralclient.commands.v2.executions:Update"
+workflow_execution_list = "mistralclient.commands.v2.executions:List"
+workflow_execution_show = "mistralclient.commands.v2.executions:Get"
+workflow_execution_input_show = "mistralclient.commands.v2.executions:GetInput"
+workflow_execution_output_show = "mistralclient.commands.v2.executions:GetOutput"
+workflow_execution_params_show = "mistralclient.commands.v2.executions:GetParams"
+workflow_execution_report_show = "mistralclient.commands.v2.executions:GetReport"
+workflow_execution_published_show = "mistralclient.commands.v2.executions:GetPublished"
+
+task_execution_list = "mistralclient.commands.v2.tasks:List"
+task_execution_show = "mistralclient.commands.v2.tasks:Get"
+task_execution_published_show = "mistralclient.commands.v2.tasks:GetPublished"
+task_execution_result_show = "mistralclient.commands.v2.tasks:GetResult"
+task_execution_rerun = "mistralclient.commands.v2.tasks:Rerun"
+
+action_definition_list = "mistralclient.commands.v2.actions:List"
+action_definition_show = "mistralclient.commands.v2.actions:Get"
+action_definition_create = "mistralclient.commands.v2.actions:Create"
+action_definition_delete = "mistralclient.commands.v2.actions:Delete"
+action_definition_update = "mistralclient.commands.v2.actions:Update"
+action_definition_definition_show = "mistralclient.commands.v2.actions:GetDefinition"
+
+cron_trigger_list = "mistralclient.commands.v2.cron_triggers:List"
+cron_trigger_show = "mistralclient.commands.v2.cron_triggers:Get"
+cron_trigger_create = "mistralclient.commands.v2.cron_triggers:Create"
+cron_trigger_delete = "mistralclient.commands.v2.cron_triggers:Delete"
+
+event_trigger_list = "mistralclient.commands.v2.event_triggers:List"
+event_trigger_show = "mistralclient.commands.v2.event_triggers:Get"
+event_trigger_create = "mistralclient.commands.v2.event_triggers:Create"
+event_trigger_delete = "mistralclient.commands.v2.event_triggers:Delete"
+
+resource_member_list = "mistralclient.commands.v2.members:List"
+resource_member_show = "mistralclient.commands.v2.members:Get"
+resource_member_create = "mistralclient.commands.v2.members:Create"
+resource_member_delete = "mistralclient.commands.v2.members:Delete"
+resource_member_update = "mistralclient.commands.v2.members:Update"
+
+code_source_list = "mistralclient.commands.v2.code_sources:List"
+code_source_show = "mistralclient.commands.v2.code_sources:Get"
+code_source_create = "mistralclient.commands.v2.code_sources:Create"
+code_source_delete = "mistralclient.commands.v2.code_sources:Delete"
+code_source_update = "mistralclient.commands.v2.code_sources:Update"
+code_source_content_show = "mistralclient.commands.v2.code_sources:GetContent"
+
+dynamic_action_list = "mistralclient.commands.v2.dynamic_actions:List"
+dynamic_action_show = "mistralclient.commands.v2.dynamic_actions:Get"
+dynamic_action_create = "mistralclient.commands.v2.dynamic_actions:Create"
+dynamic_action_delete = "mistralclient.commands.v2.dynamic_actions:Delete"
+dynamic_action_update = "mistralclient.commands.v2.dynamic_actions:Update"
+
+[project.entry-points."mistralclient.auth"]
+# Standard Keystone authentication.
+keystone = "mistralclient.auth.keystone:KeystoneAuthHandler"
+
+# Authentication using OpenID Connect protocol but specific to KeyCloak
+# server regarding multi-tenancy support. KeyCloak has a notion of realm
+# used as an analog of Keystone project/tenant.
+keycloak-oidc = "mistralclient.auth.keycloak:KeycloakAuthHandler"
