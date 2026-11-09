@@ -102,10 +102,11 @@ class HTTPClient(object):
                 # A keystoneauth session already carries its own verify
                 self.ssl_options['verify'] = True
 
-            self.ssl_options['cert'] = (
-                kwargs.get(CERT_FILE),
-                kwargs.get(CERT_KEY)
-            )
+            if kwargs.get(CERT_FILE):
+                self.ssl_options['cert'] = (
+                    kwargs.get(CERT_FILE),
+                    kwargs.get(CERT_KEY)
+                )
 
     @log_request
     def get(self, url, headers=None):

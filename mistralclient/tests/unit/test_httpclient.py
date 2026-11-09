@@ -295,3 +295,21 @@ class HTTPClientTest(base.BaseClientTest):
                                        insecure=True)
 
         self.assertIs(False, client.ssl_options['verify'])
+
+    def test_https_cert_from_keystone_session(self):
+        session = ks_session.Session(cert=('/c.pem', '/k.pem'))
+        client = httpclient.HTTPClient(HTTPS_BASE_URL, session=session)
+
+        self.assertNotIn('cert', client.ssl_options)
+
+        with mock.patch.object(requests.Session, 'request') as request:
+            request.return_value = mock.Mock(status_code=200, headers={})
+            client.get(API_URL)
+
+        self.assertEqual(('/c.pem', '/k.pem'), request.call_args[1]['cert'])
+
+    def test_https_cert(self):
+        client = httpclient.HTTPClient(HTTPS_BASE_URL, cert='/c.pem',
+                                       key='/k.pem')
+
+        self.assertEqual(('/c.pem', '/k.pem'), client.ssl_options['cert'])

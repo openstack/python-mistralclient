@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    The client certificate of a keystoneauth session passed to the client,
+    such as ``openstack --os-cert``, is no longer replaced by an empty one.
