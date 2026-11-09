@@ -732,6 +732,8 @@ class MistralShell(app.App):
             mistralclient.commands.v2.executions.GetInput,
             'execution-get-output':
             mistralclient.commands.v2.executions.GetOutput,
+            'execution-get-params':
+            mistralclient.commands.v2.executions.GetParams,
             'execution-get-report':
             mistralclient.commands.v2.executions.GetReport,
             'execution-get-published':
