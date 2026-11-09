@@ -60,6 +60,8 @@ class EventTriggerFormatter(base.MistralFormatter):
 class List(base.MistralLister):
     """List all event triggers."""
 
+    supports_all_projects = True
+
     def _get_format_function(self):
         return EventTriggerFormatter.format_list
 

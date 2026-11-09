@@ -51,6 +51,8 @@ class MistralFormatter(metaclass=abc.ABCMeta):
 
 
 class MistralLister(command.Lister, metaclass=abc.ABCMeta):
+    supports_all_projects = False
+
     @abc.abstractmethod
     def _get_format_function(self):
         raise NotImplementedError
@@ -94,6 +96,13 @@ class MistralLister(command.Lister, metaclass=abc.ABCMeta):
             action='append',
             help='Filters. Can be repeated.'
         )
+
+        if self.supports_all_projects:
+            parser.add_argument(
+                '--all-projects',
+                action='store_true',
+                help='List resources of all projects (admin only).'
+            )
 
         return parser
 
@@ -190,6 +199,9 @@ def get_filters(parsed_args):
                 raise ValueError('Invalid filter: %s' % f)
 
             filters[arr[0]] = arr[1]
+
+    if getattr(parsed_args, 'all_projects', False):
+        filters['all_projects'] = True
 
     return filters
 
