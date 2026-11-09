@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    The SSL verification settings of a keystoneauth session passed to the
+    client, such as ``openstack --insecure``, are now honoured instead of
+    always verifying certificates.

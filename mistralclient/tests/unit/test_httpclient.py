@@ -18,14 +18,17 @@ from unittest import mock
 
 from urllib import parse as urlparse
 
+from keystoneauth1 import session as ks_session
 from oslo_utils import uuidutils
 from osprofiler import _utils as osprofiler_utils
 import osprofiler.profiler
+import requests
 
 from mistralclient.api import httpclient
 from mistralclient.tests.unit import base
 
 API_BASE_URL = 'http://localhost:8989/v2'
+HTTPS_BASE_URL = 'https://localhost:8989/v2'
 API_URL = '/executions'
 
 EXPECTED_URL = API_BASE_URL + API_URL
@@ -268,3 +271,27 @@ class HTTPClientTest(base.BaseClientTest):
 
         self.assertTrue(m.called_once)
         self.assertExpectedAuthHeaders()
+
+    def test_https_verify_default(self):
+        client = httpclient.HTTPClient(HTTPS_BASE_URL)
+
+        self.assertIs(True, client.ssl_options['verify'])
+
+    def test_https_verify_from_keystone_session(self):
+        session = ks_session.Session(verify=False)
+        client = httpclient.HTTPClient(HTTPS_BASE_URL, session=session)
+
+        self.assertNotIn('verify', client.ssl_options)
+
+        with mock.patch.object(requests.Session, 'request') as request:
+            request.return_value = mock.Mock(status_code=200, headers={})
+            client.get(API_URL)
+
+        self.assertIs(False, request.call_args[1]['verify'])
+
+    def test_https_insecure_with_keystone_session(self):
+        session = ks_session.Session()
+        client = httpclient.HTTPClient(HTTPS_BASE_URL, session=session,
+                                       insecure=True)
+
+        self.assertIs(False, client.ssl_options['verify'])
