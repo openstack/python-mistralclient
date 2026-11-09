@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    ``openstack workflow execution list`` and ``openstack action execution
+    list`` have a new ``--include-output`` option that adds an Output
+    column.

@@ -19,6 +19,7 @@ import datetime
 import textwrap
 
 from osc_lib.command import command
+from oslo_serialization import jsonutils
 from oslo_utils import timeutils
 
 
@@ -172,6 +173,26 @@ class MistralExecutionLister(MistralLister, metaclass=abc.ABCMeta):
             return f()[0], data
         else:
             return f()
+
+
+def with_output(format_function):
+    def _format(instance=None):
+        columns, data = format_function(instance)
+
+        if instance is None:
+            return (
+                list(columns) + ['Output'],
+                tuple(tuple(row) + ('',) for row in data)
+            )
+
+        output = getattr(instance, 'output', None)
+
+        if output is not None and not isinstance(output, str):
+            output = jsonutils.dumps(output)
+
+        return columns, tuple(data) + (output or '<none>',)
+
+    return _format
 
 
 def cut(string, length=25):

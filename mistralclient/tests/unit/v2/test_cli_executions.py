@@ -221,6 +221,30 @@ class TestCLIExecutionsV2(base.BaseCommandTest):
             result[1]
         )
 
+    def test_list_include_output(self):
+        exec_dict = dict(EXEC_DICT, output='{"result": "ok"}')
+        self.client.executions.list.return_value = [
+            executions.Execution(mock, exec_dict)
+        ]
+
+        result = self.call(execution_cmd.List, app_args=['--include-output'])
+
+        self.assertEqual('Output', result[0][-1])
+        self.assertEqual([EX_RESULT + ('{"result": "ok"}',)], result[1])
+
+        kwargs = self.client.executions.list.call_args[1]
+
+        self.assertTrue(kwargs['include_output'])
+        self.assertIn('output', kwargs['fields'])
+
+    def test_list_include_output_empty(self):
+        self.client.executions.list.return_value = []
+
+        result = self.call(execution_cmd.List, app_args=['--include-output'])
+
+        self.assertEqual('Output', result[0][-1])
+        self.assertEqual(len(result[0]), len(result[1][0]))
+
     def test_sub_executions(self):
         self.client.executions.get_ex_sub_executions.return_value = \
             EXECS_LIST

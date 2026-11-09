@@ -172,7 +172,12 @@ class Create(command.ShowOne):
 class List(base.MistralExecutionLister):
     """List all Action executions."""
 
+    include_output = False
+
     def _get_format_function(self):
+        if self.include_output:
+            return base.with_output(ActionExecutionFormatter.format_list)
+
         return ActionExecutionFormatter.format_list
 
     def get_parser(self, prog_name):
@@ -183,11 +188,23 @@ class List(base.MistralExecutionLister):
             nargs='?',
             help='Task execution ID.'
         )
+        parser.add_argument(
+            '--include-output',
+            help="Include the output of each action execution.",
+            action='store_true',
+        )
 
         return parser
 
+    def _validate_parsed_args(self, parsed_args):
+        self.include_output = parsed_args.include_output
+
     def _get_resources(self, parsed_args):
         mistral_client = self.app.client_manager.workflow_engine
+        filters = base.get_filters(parsed_args)
+
+        if parsed_args.include_output:
+            filters['include_output'] = True
 
         return mistral_client.action_executions.list(
             parsed_args.task_execution_id,
@@ -197,7 +214,7 @@ class List(base.MistralExecutionLister):
             sort_dirs=parsed_args.sort_dirs,
             # TODO(bobh) - Uncomment when the fix for bug 1800322 merges
             # fields=ActionExecutionFormatter.LIST_COLUMN_FIELD_NAMES,
-            **base.get_filters(parsed_args)
+            **filters
         )
 
 

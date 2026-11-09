@@ -185,6 +185,23 @@ class TestCLIActionExecutions(base.BaseCommandTest):
             result[1]
         )
 
+    def test_list_include_output(self):
+        self.client.action_executions.list.return_value = [
+            ACTION_EX_WITH_OUTPUT
+        ]
+
+        result = self.call(action_ex_cmd.List, app_args=['--include-output'])
+
+        self.assertEqual('Output', result[0][-1])
+        self.assertEqual(
+            [('123', 'some', 'thing', '', 'task1', '1-2-3-4', 'RUNNING', True,
+              '1', '1', jsonutils.dumps(ACTION_EX_RESULT))],
+            result[1]
+        )
+        self.assertTrue(
+            self.client.action_executions.list.call_args[1]['include_output']
+        )
+
     def test_get(self):
         self.client.action_executions.get.return_value = ACTION_EX
 
