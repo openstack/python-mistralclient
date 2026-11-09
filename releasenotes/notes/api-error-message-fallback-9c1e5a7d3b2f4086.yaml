@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    API errors without a ``faultstring`` now report the response body or the
+    HTTP status instead of an empty message.
