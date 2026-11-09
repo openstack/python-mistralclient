@@ -344,6 +344,32 @@ class GetOutput(command.Command):
         self.app.stdout.write(output or "\n")
 
 
+class GetParams(command.Command):
+    """Show execution params."""
+
+    def get_parser(self, prog_name):
+        parser = super(GetParams, self).get_parser(prog_name)
+
+        parser.add_argument('id', help='Execution ID')
+
+        return parser
+
+    def take_action(self, parsed_args):
+        mistral_client = self.app.client_manager.workflow_engine
+
+        params = getattr(
+            mistral_client.executions.get(parsed_args.id), 'params', None
+        )
+
+        try:
+            params = jsonutils.loads(params)
+            params = jsonutils.dumps(params, indent=4) + "\n"
+        except Exception:
+            LOG.debug("Execution params are not JSON.")
+
+        self.app.stdout.write(params or "\n")
+
+
 REPORT_ENTRY_INDENT = 4
 
 

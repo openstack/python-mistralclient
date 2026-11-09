@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    New ``openstack workflow execution params show`` command (and
+    ``mistral execution-get-params``) to show the params of a workflow
+    execution, such as its ``env``.
