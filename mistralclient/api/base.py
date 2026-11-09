@@ -239,13 +239,18 @@ class ResourceManager(object):
 
     @staticmethod
     def _raise_api_exception(resp):
-        try:
+        error_data = resp.headers.get("Server-Error-Message")
+
+        if not error_data:
+            try:
+                error_data = get_json(resp).get("faultstring")
+            except (ValueError, AttributeError):
+                pass
+
+        if not error_data:
             error_data = (
-                resp.headers.get("Server-Error-Message", None)
-                or get_json(resp).get("faultstring")
+                resp.text.strip() or '%s %s' % (resp.status_code, resp.reason)
             )
-        except ValueError:
-            error_data = resp.content
 
         raise APIException(
             error_code=resp.status_code,

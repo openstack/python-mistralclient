@@ -256,6 +256,48 @@ class TestExecutionsV2(base.BaseClientV2Test):
             ex.to_dict()
         )
 
+    def test_get_error_faultstring(self):
+        url = self.TEST_URL + URL_TEMPLATE_ID % EXEC['id']
+        self.requests_mock.get(url, status_code=400,
+                               json={'faultstring': 'Invalid input'})
+
+        e = self.assertRaises(api_base.APIException,
+                              self.executions.get, EXEC['id'])
+
+        self.assertEqual(400, e.error_code)
+        self.assertEqual('Invalid input', e.error_message)
+
+    def test_get_error_json_without_faultstring(self):
+        url = self.TEST_URL + URL_TEMPLATE_ID % EXEC['id']
+        self.requests_mock.get(url, status_code=500, json={'error': 'boom'})
+
+        e = self.assertRaises(api_base.APIException,
+                              self.executions.get, EXEC['id'])
+
+        self.assertEqual(500, e.error_code)
+        self.assertEqual('{"error": "boom"}', e.error_message)
+
+    def test_get_error_text(self):
+        url = self.TEST_URL + URL_TEMPLATE_ID % EXEC['id']
+        self.requests_mock.get(url, status_code=502, text='Bad Gateway\n')
+
+        e = self.assertRaises(api_base.APIException,
+                              self.executions.get, EXEC['id'])
+
+        self.assertEqual(502, e.error_code)
+        self.assertEqual('Bad Gateway', e.error_message)
+
+    def test_get_error_empty_body(self):
+        url = self.TEST_URL + URL_TEMPLATE_ID % EXEC['id']
+        self.requests_mock.get(url, status_code=503,
+                               reason='Service Unavailable')
+
+        e = self.assertRaises(api_base.APIException,
+                              self.executions.get, EXEC['id'])
+
+        self.assertEqual(503, e.error_code)
+        self.assertEqual('503 Service Unavailable', e.error_message)
+
     def test_get_sub_wf_ex(self):
         url = self.TEST_URL + URL_TEMPLATE_ID % SUB_WF_EXEC['id']
         self.requests_mock.get(url, json=SUB_WF_EXEC)
