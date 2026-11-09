@@ -60,6 +60,8 @@ class DynamicActionFormatter(base.MistralFormatter):
 class List(base.MistralLister):
     """List all dynamic actions."""
 
+    supports_all_projects = True
+
     def _get_format_function(self):
         return DynamicActionFormatter.format_list
 

@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    The list commands for workflow executions, workflows, cron triggers,
+    event triggers, code sources and dynamic actions have a new
+    ``--all-projects`` option to list the resources of all projects. It
+    requires admin rights.

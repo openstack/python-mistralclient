@@ -57,6 +57,8 @@ class CodeSourceFormatter(base.MistralFormatter):
 class List(base.MistralLister):
     """List all workflows."""
 
+    supports_all_projects = True
+
     def _get_format_function(self):
         return CodeSourceFormatter.format_list
 

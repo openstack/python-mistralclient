@@ -84,6 +84,8 @@ class ExecutionFormatter(base.MistralFormatter):
 class List(base.MistralExecutionLister):
     """List all executions."""
 
+    supports_all_projects = True
+
     def _get_format_function(self):
         return ExecutionFormatter.format_list
 
